@@ -1,8 +1,12 @@
 {
-  "name": "backend-authorization-service",
+  "name": "ms-enigma-backend",
   "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "description": "Enigma Portal backend service.",
+  "author": "Enigma Portal Developer Team",
+  "repository": {
+    "type": "git",
+    "url": "https://git.sqrtechno.com/enigma-portal/ms-enigma-backend.git"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
@@ -38,6 +42,7 @@
     "passport": "^0.4.0",
     "passport-cookie": "^1.0.6",
     "path": "^0.12.7",
+    "redis": "^2.8.0",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
