@@ -5,11 +5,13 @@ import { DatabaseConnectionConfig } from '../config/database.config';
 import { ApiController } from './main/api.controller';
 import { ApiService } from './main/api.service';
 import { LibraryModule } from '../libraries/library.module';
+import { JobModule } from './master/jobs/job.module';
 
 @Module({
   imports: [
     ConfigModule,
     LibraryModule,
+    JobModule,
     TypeOrmModule.forRootAsync({
       imports: [ ConfigModule ],
       useClass: DatabaseConnectionConfig,

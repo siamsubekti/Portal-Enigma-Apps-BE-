@@ -1,13 +1,14 @@
 import 'reflect-metadata';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
-import * as csurf from 'csurf';
+// import * as csurf from 'csurf';
 import * as limiter from 'express-rate-limit';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppConfig } from './config/app.config';
 import { ApiModule } from './api/api.module';
+import { JobModule } from './api/master/jobs/job.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
@@ -17,7 +18,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(compression());
   app.use(helmet());
-  app.use(csurf());
+  // app.use(csurf());
   app.use(limiter({ windowMS: 10 * 60 * 1000, max: 100 }));
 
   app.useGlobalPipes(new ValidationPipe());
@@ -35,7 +36,9 @@ function generateSwagger(app) {
     .setSchemes('http')
     .addBearerAuth()
     .build();
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, options, {
+    include: [JobModule]
+  });
   SwaggerModule.setup('swagger-ui', app, document);
 }
 
