@@ -9,6 +9,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppConfig } from './config/app.config';
 import { ApiModule } from './api/api.module';
 import { JobModule } from './api/master/jobs/job.module';
+import { RegionsModule } from './api/master/regions/regions.module';
+import { SkillsModule } from './api/master/skills/skills.module';
+import { TemplateModule } from './api/master/templates/template.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
@@ -37,7 +40,7 @@ function generateSwagger(app) {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options, {
-    include: [JobModule]
+    include: [JobModule, RegionsModule, SkillsModule, TemplateModule]
   });
   SwaggerModule.setup('swagger-ui', app, document);
 }

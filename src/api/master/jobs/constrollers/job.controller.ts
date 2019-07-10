@@ -1,23 +1,22 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
-import { JobServices } from '../services/job.service';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Body, Logger, HttpException, HttpStatus, Param, Put } from '@nestjs/common';
+import { JobService } from '../services/job.service';
 import ResponseUtil from 'src/libraries/response/response.util';
-import { async } from 'rxjs/internal/scheduler/async';
+import { ApiUseTags, ApiOperation, ApiOkResponse, ApiImplicitParam } from '@nestjs/swagger';
 import { JobDTO } from '../models/job.dto';
-import Job from '../models/job.entity';
+let logger = new Logger;
 
 @Controller('jobs')
-export class JobsController {
+export class JobController {
 
     constructor(
-        private readonly jobService: JobServices, 
-        private readonly responseUtil: ResponseUtil 
-        ) { }
+        private readonly jobService: JobService,
+        private readonly responseUtil: ResponseUtil
+    ) { }
 
     @Get()
     @ApiUseTags('Jobs')
     @ApiOperation({ title: 'Jobs', description: 'API get list Jobs' })
-    @ApiOkResponse({description: 'Success'})
+    @ApiOkResponse({ description: 'Success' })
     async get() {
         const jobs = await this.jobService.findAll();
 
@@ -27,9 +26,34 @@ export class JobsController {
     @Post()
     @ApiUseTags('Jobs')
     @ApiOperation({ title: 'Jobs', description: 'API insert into Jobs' })
-    async insert(@Body() jobDto: JobDTO){
-        const job = await this.jobService.create(jobDto);
+    async insert(@Body() jobDto: JobDTO) {
+        try {
+            const job = await this.jobService.create(jobDto);
 
-        return this.responseUtil.rebuildResponse(job);
+            return this.responseUtil.rebuildResponse(job);
+        } catch (error) {
+            logger.error(error);
+            throw new HttpException('Internal Server Error', HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Put(':id')
+    @ApiUseTags('Jobs')
+    async update(@Param('id') id, @Body() jobDto: JobDTO): Promise<any> {
+        // updateJobDto.id = Number(id);
+        // console.log('Update #' + updateJobDto.id)
+        const updatedJob = await this.jobService.update(id, jobDto);
+        return this.responseUtil.rebuildResponse(updatedJob);
+    }
+
+    @Delete(':id')
+    @ApiUseTags('Jobs')
+    async delete(@Param() id) {
+        // try {
+            const job = await this.jobService.remove(id);
+            return this.responseUtil.rebuildResponse(job);
+        // } catch (error) {
+        //     throw new HttpException('Failed to delete job', HttpStatus.NOT_FOUND);
+        // }
     }
 }
