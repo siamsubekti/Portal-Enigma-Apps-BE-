@@ -12,6 +12,7 @@ import { JobModule } from './api/master/jobs/job.module';
 import { RegionsModule } from './api/master/regions/regions.module';
 import { SkillsModule } from './api/master/skills/skills.module';
 import { TemplateModule } from './api/master/templates/template.module';
+import { CustomException } from './shared/custom-exception';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
@@ -25,6 +26,7 @@ async function bootstrap() {
   app.use(limiter({ windowMS: 10 * 60 * 1000, max: 100 }));
 
   app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalFilters(new CustomException());
 
   await app.listen(3000, '0.0.0.0');
 }

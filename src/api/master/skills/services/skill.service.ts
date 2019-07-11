@@ -1,9 +1,8 @@
-import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Skill from '../models/skill.entity';
 import { Repository, DeleteResult } from 'typeorm';
 import { SkillDTO } from '../models/skill.dto';
-let logger = new Logger;
 
 @Injectable()
 export class SkillService {
@@ -11,21 +10,68 @@ export class SkillService {
     constructor(@InjectRepository(Skill) private skillRepository: Repository<Skill>) { }
 
     async findAll(): Promise<Skill[]> {
-        const skills = await this.skillRepository.find();
-        return skills;
+        try {
+            const skills: Skill[] = await this.skillRepository.find();
+            return skills;
+        } catch (error) {
+            Logger.error(error);
+            throw new InternalServerErrorException();
+        }
     }
 
     async create(skillDto: SkillDTO): Promise<Skill> {
-        const skill = await this.skillRepository.save(skillDto);
-        logger.log(`Insert into skill with id : ${skill.id}`);
-        return skill;
+        const isExist: Skill = await this.skillRepository.findOne({
+            where: {
+                name: skillDto.name
+            }
+        });
+        if (isExist) {
+            throw new HttpException('Data ini telah ada', HttpStatus.BAD_REQUEST);
+        } else {
+            try {
+                const skill: Skill = await this.skillRepository.save(skillDto);
+                Logger.log(`Insert into skill with id : ${skill.id}`);
+                return skill;
+            } catch (error) {
+                Logger.error(error);
+                throw new InternalServerErrorException();
+            }
+        }
     }
 
     async remove(id): Promise<DeleteResult> {
-        const skill = await this.skillRepository.delete(id);
-        if (skill.affected < 1) {
-            throw new HttpException('Failed to delete skill', HttpStatus.NOT_FOUND);
+        const isExist: boolean = await this.skillRepository.count(id) > 0;
+        if (!isExist) {
+            throw new NotFoundException('Skill not found');
+        } else {
+            try {
+                const skill: DeleteResult = await this.skillRepository.delete(id);
+                return skill;
+            } catch (error) {
+                Logger.error(error);
+                throw new InternalServerErrorException();
+            }
         }
-        return skill;
+    }
+
+    async update(id, skillDto: SkillDTO): Promise<Skill> {
+        let data: Skill = await this.skillRepository.findOne({
+            where: {
+                id
+            }
+        });
+        if (!data) {
+            throw new NotFoundException('Skill not found');
+        } else {
+            try {
+                data = this.skillRepository.merge(data, skillDto);
+                Logger.log(data);
+                const skill: Skill = await this.skillRepository.save(data);
+                return skill;
+            } catch (error) {
+                Logger.error(error);
+                throw new InternalServerErrorException();
+            }
+        }
     }
 }
