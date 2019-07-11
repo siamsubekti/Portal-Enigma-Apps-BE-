@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '../config/config.module';
 import { DatabaseConnectionConfig } from '../config/database.config';
 import { ApiController } from './main/api.controller';
 import { ApiService } from './main/api.service';
-import { LibraryModule } from '../libraries/library.module';
+import ConfigModule from '../config/config.module';
+import LibraryModule from '../libraries/library.module';
+import AccountModule from './accounts/account.module';
+import AuthModule from './auth/auth.module';
 
 @Module({
   imports: [
@@ -14,8 +16,10 @@ import { LibraryModule } from '../libraries/library.module';
       imports: [ ConfigModule ],
       useClass: DatabaseConnectionConfig,
     }),
+    AccountModule,
+    AuthModule,
   ],
-  controllers: [ApiController],
-  providers: [ApiService],
+  controllers: [ ApiController ],
+  providers: [ ApiService ],
 })
 export class ApiModule {}

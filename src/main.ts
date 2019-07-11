@@ -17,7 +17,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(compression());
   app.use(helmet());
-  app.use(csurf());
+  // app.use(csurf());
   app.use(limiter({ windowMS: 10 * 60 * 1000, max: 100 }));
 
   app.useGlobalPipes(new ValidationPipe());

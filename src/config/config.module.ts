@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { AppConfig } from './app.config';
 import { DatabaseConnectionConfig } from './database.config';
 
+@Global()
 @Module({
   providers: [
     {
@@ -13,4 +14,4 @@ import { DatabaseConnectionConfig } from './database.config';
   exports: [ AppConfig, DatabaseConnectionConfig ],
 })
 
-export class ConfigModule {}
+export default class ConfigModule {}
