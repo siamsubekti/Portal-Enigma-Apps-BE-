@@ -1,7 +1,7 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
-import { IApiResponse } from '../../../libraries/response/response.interface';
-import { ResponseStatus } from '../../../libraries/response/response.class';
+import { IApiResponse } from '../../../libraries/responses/response.interface';
+import { ResponseStatus } from '../../../libraries/responses/response.class';
 
 export class LoginCredentialDTO {
   @IsDefined()

@@ -4,7 +4,9 @@ import * as path from 'path';
 import * as root from 'app-root-dir';
 import * as md5 from 'md5';
 import * as moment from 'moment';
+import * as bcrypt from 'bcrypt';
 import { RedisModuleOptions } from 'nestjs-redis';
+import { Logger } from '@nestjs/common';
 
 export class AppConfig {
   private readonly configurations: dotenv.DotenvParseOutput;
@@ -17,13 +19,15 @@ export class AppConfig {
 
   private configure(): dotenv.DotenvParseOutput {
     const { parsed: config, error} = dotenv.config();
+    const saltbae: string = bcrypt.genSaltSync(Number(config['HASH_SALTROUNDS']));
 
     if (error) throw new Error(`Unable to load environment variables from the root of app directory.`);
 
+    config['HASH_SECRET'] = bcrypt.hashSync(md5(`${config['HASH_KEY']}x${moment().valueOf()}`), saltbae);
     config['BASE_PATH'] = root.get();
     config['SRC_PATH'] = path.join(root.get(), 'src');
-    config['HASH_SECRET'] = md5(`${config['HASH_KEY']}x${moment().valueOf()}`);
 
+    Logger.log(`${Object.keys(config).length} configuration items loaded.`, 'AppConfig', true);
     return config;
   }
 

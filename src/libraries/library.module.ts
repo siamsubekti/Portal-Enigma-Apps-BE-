@@ -2,7 +2,7 @@ import { Module, Global } from '@nestjs/common';
 import { RedisModule } from 'nestjs-redis';
 import { AppConfig } from '../config/app.config';
 import ConfigModule from '../config/config.module';
-import ResponseUtil from './response/response.util';
+import ResponseUtil from './responses/response.util';
 import HashUtil from './utilities/hash.util';
 
 @Global()

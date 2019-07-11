@@ -11,7 +11,7 @@ export class CookieAuthGuard extends AuthGuard('cookie') {
   canActivate(context: ExecutionContext) {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.
-    Logger.log(context.switchToHttp().getRequest());
+    // Logger.log(context.switchToHttp().getRequest());
     return super.canActivate(context);
   }
 

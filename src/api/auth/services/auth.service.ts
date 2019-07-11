@@ -22,16 +22,12 @@ export default class AuthService {
     private readonly config: AppConfig,
   ) {}
 
-  private async getJwtSecret(): Promise<string> {
-    return await this.hashUtil.create(this.config.get('HASH_SECRET'));
-  }
-
   private async createSession(account: Account): Promise<string> {
     const sessionId: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}`);
-    const token: string = jwtSign({ aid: account.id }, await this.getJwtSecret());
+    const token: string = jwtSign({ aid: account.id }, this.config.get('HASH_SECRET'));
     const client: IORedis.Redis = await this.redisService.getClient();
 
-    client.set(sessionId, token);
+    await client.set(sessionId, token);
     return sessionId;
   }
 
@@ -50,6 +46,22 @@ export default class AuthService {
     } catch (error) {
       Logger.error(error);
       return null;
+    }
+  }
+
+  async logout(sessionId: string): Promise<boolean> {
+    try {
+      const client: IORedis.Redis = await this.redisService.getClient();
+
+      if (!(await client.exists(sessionId))) return false;
+      else {
+        await client.unlink(sessionId);
+
+        return !( await client.exists(sessionId) );
+      }
+    } catch (error) {
+      Logger.error(error, undefined, 'AuthService');
+      return false;
     }
   }
 
@@ -77,13 +89,13 @@ export default class AuthService {
   async validateSession(cookie: string): Promise<Account> {
     try {
       const client: IORedis.Redis = await this.redisService.getClient();
-      const token: string = client.get(cookie);
-      const payload: JwtPayload = jwtVerify(token, await this.getJwtSecret()) as JwtPayload;
+      const token: string = await client.get(cookie);
+      const payload: JwtPayload = jwtVerify(token, this.config.get('HASH_SECRET')) as JwtPayload;
 
       return await this.accountService.get(payload.accountId);
 
     } catch (error) {
-      Logger.error(error);
+      Logger.error(error, undefined, 'AuthService');
       return null;
     }
   }

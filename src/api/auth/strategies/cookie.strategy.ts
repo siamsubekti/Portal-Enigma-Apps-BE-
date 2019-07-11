@@ -7,7 +7,9 @@ import Account from '../../accounts/models/account.entity';
 @Injectable()
 export default class CookieStrategy extends PassportStrategy(Strategy, 'cookie') {
   constructor(private readonly authService: AuthService) {
-    super();
+    super({
+      cookieName: 'EPSESSION',
+    });
   }
 
   async validate(cookie: string, done: any) {
