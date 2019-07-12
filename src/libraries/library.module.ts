@@ -1,12 +1,21 @@
 import { Module, Global } from '@nestjs/common';
-import { HashUtil } from './utilities/hash.util';
-import ResponseUtil from './response/response.util';
-import { ConfigModule } from '../config/config.module';
+import { RedisModule } from 'nestjs-redis';
+import { AppConfig } from '../config/app.config';
+import ConfigModule from '../config/config.module';
+import ResponseUtil from './responses/response.util';
+import HashUtil from './utilities/hash.util';
 
 @Global()
 @Module({
-  imports: [ConfigModule],
+  imports: [
+    ConfigModule,
+    RedisModule.forRootAsync({
+      useFactory: (config: AppConfig) => config.redis(),
+      inject: [AppConfig],
+      imports: [ConfigModule],
+    }),
+  ],
   exports: [HashUtil, ResponseUtil],
   providers: [HashUtil, ResponseUtil],
 })
-export class LibraryModule {}
+export default class LibraryModule {}

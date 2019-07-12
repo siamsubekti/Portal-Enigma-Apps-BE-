@@ -9,6 +9,7 @@ export class DatabaseConnectionConfig implements TypeOrmOptionsFactory {
   createTypeOrmOptions(): TypeOrmModuleOptions {
     const driver: any = this.config.get('DB_DRIVER');
     const options: TypeOrmModuleOptions = {
+      name: driver,
       type: driver,
       host: this.config.get('DB_HOST'),
       port: Number(this.config.get('DB_PORT')),
@@ -16,8 +17,8 @@ export class DatabaseConnectionConfig implements TypeOrmOptionsFactory {
       password: this.config.get('DB_PASSWORD'),
       database: this.config.get('DB_NAME'),
       entities: [
-        this.config.get('SRC_PATH') + '/**/*.entity{.ts,.js}',
-        this.config.get('SRC_PATH') + '/**/*.model{.ts,.js}',
+        `${__dirname}/../**/*.entity{.ts,.js}`,
+        `${__dirname}/../**/*.model{.ts,.js}`,
       ],
       synchronize: (this.config.get('DB_SYNC') === 'true'),
     };
