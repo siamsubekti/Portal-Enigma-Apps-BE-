@@ -7,9 +7,6 @@ export class ApiController {
   constructor(private readonly service: ApiService) {}
 
   @Get()
-  @ApiUseTags('Default')
-  @ApiOperation({title: 'Greeting', description: 'API Greeting Response'})
-  @ApiOkResponse({description: 'Halo', type: 'string'})
   getHello(): string {
     return this.service.getHello();
   }
