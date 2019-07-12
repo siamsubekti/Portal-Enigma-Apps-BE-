@@ -8,7 +8,7 @@ export default class Region {
     id: string;    
 
     @Column({type: 'varchar', length: 32, nullable: false})
-    type: string;
+    type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
 
     @Column({type: 'varchar', length: 255, nullable: false})
     name: string;

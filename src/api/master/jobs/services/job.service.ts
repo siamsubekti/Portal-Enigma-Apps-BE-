@@ -43,10 +43,10 @@ export class JobService {
 
     }
 
-    async remove(id): Promise<DeleteResult> {
-        const isExist: boolean = (await this.jobRepository.count(id)) > 0;
+    async remove(id: number): Promise<DeleteResult> {
+        const isExist: boolean = (await this.jobRepository.count({ id })) > 0;
         if (!isExist) {
-            throw new NotFoundException();
+            throw new NotFoundException(`Job with id: ${id} not found`);
         } else {
             try {
                 const job: DeleteResult = await this.jobRepository.delete(id);
@@ -59,7 +59,7 @@ export class JobService {
 
     }
 
-    async update(id, jobDto: JobDTO): Promise<Job> {
+    async update(id: number, jobDto: JobDTO): Promise<Job> {
         let data: Job = await this.jobRepository.findOne({
             where: {
                 id
@@ -67,7 +67,7 @@ export class JobService {
         });
 
         if (!data) {
-            throw new NotFoundException('Job not found');
+            throw new NotFoundException(`Job with id: ${id} not found`);
         } else {
             try {
                 data = this.jobRepository.merge(data, jobDto);

@@ -28,7 +28,7 @@ export class TemplateService {
         });
 
         if (template) {
-            throw new NotFoundException('Data ini telah ada')
+            throw new HttpException('Data ini telah ada', HttpStatus.BAD_REQUEST)
         } else {
             try {
                 const template: Template = await this.templateRepository.save(templateDto);
@@ -40,10 +40,10 @@ export class TemplateService {
         }
     }
 
-    async remove(id): Promise<DeleteResult> {
-        const isExist = await this.templateRepository.count(id) > 0;
+    async remove(id: number): Promise<DeleteResult> {
+        const isExist = await this.templateRepository.count({ id }) > 0;
         if (!isExist) {
-            throw new NotFoundException('Template not found');
+            throw new NotFoundException(`Template with id: ${id} not found`);
         } else {
             try {
                 const template: DeleteResult = await this.templateRepository.delete(id);
@@ -55,7 +55,7 @@ export class TemplateService {
         }
     }
 
-    async update(id, templateDto: TemplateDTO): Promise<Template> {
+    async update(id: number, templateDto: TemplateDTO): Promise<Template> {
         let data: Template = await this.templateRepository.findOne({
             where: {
                 id
@@ -63,7 +63,7 @@ export class TemplateService {
         });
 
         if (!data) {
-            throw new NotFoundException('Template Not Found');
+            throw new NotFoundException(`Template with id: ${id} not found`);
         } else {
             try {
                 data = this.templateRepository.merge(data, templateDto);

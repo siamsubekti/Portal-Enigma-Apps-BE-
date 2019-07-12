@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import * as cookieParser from 'cookie-parser';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
 // import * as csurf from 'csurf';
@@ -12,7 +13,9 @@ import { JobModule } from './api/master/jobs/job.module';
 import { RegionsModule } from './api/master/regions/regions.module';
 import { SkillsModule } from './api/master/skills/skills.module';
 import { TemplateModule } from './api/master/templates/template.module';
-import { CustomException } from './shared/custom-exception';
+import { HttpExceptionFilter } from './libraries/filters/http-exception.filter';
+import AuthModule from './api/auth/auth.module';
+import { ParameterModule } from './api/master/parameters/parameter.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(ApiModule);
@@ -22,9 +25,11 @@ async function bootstrap() {
   app.enableCors();
   app.use(compression());
   app.use(helmet());
+  app.use(cookieParser());
   // app.use(csurf());
   app.use(limiter({ windowMS: 10 * 60 * 1000, max: 100 }));
 
+  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   // app.useGlobalFilters(new CustomException());
 
@@ -42,7 +47,7 @@ function generateSwagger(app) {
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, options, {
-    include: [JobModule, RegionsModule, SkillsModule, TemplateModule]
+    include: [JobModule, RegionsModule, SkillsModule, TemplateModule, AuthModule, ParameterModule]
   });
   SwaggerModule.setup('swagger-ui', app, document);
 }

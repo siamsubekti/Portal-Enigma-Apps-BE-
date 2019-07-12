@@ -29,10 +29,10 @@ export class RegionService {
         }
     }
 
-    async remove(id): Promise<DeleteResult> {
-        const isExist: boolean = (await this.regionRepository.count(id)) > 0;
+    async remove(id: string): Promise<DeleteResult> {
+        const isExist: boolean = (await this.regionRepository.count({ id })) > 0;
         if (!isExist) {
-            throw new NotFoundException();
+            throw new NotFoundException(`Region with id: ${id} not found`);
         } else {
             try {
                 const region: DeleteResult = await this.regionRepository.delete(id);
@@ -43,7 +43,7 @@ export class RegionService {
         }
     }
 
-    async update(id, regionDto: RegionDTO): Promise<Region> {
+    async update(id: string, regionDto: RegionDTO): Promise<Region> {
         let data: Region = await this.regionRepository.findOne({
             where: {
                 id
@@ -51,7 +51,7 @@ export class RegionService {
         });
 
         if (!data) {
-            throw new NotFoundException();
+            throw new NotFoundException(`Region with id: ${id} not found`);
         } else {
             try {
                 data = this.regionRepository.merge(data, regionDto);

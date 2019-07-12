@@ -1,6 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IApiResponse, IApiPagedResponse } from 'src/libraries/response/response.interface';
-import { ResponseStatus, PagingData } from 'src/libraries/response/response.class';
+import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
+import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
 
 export class TemplateDTO {
 
@@ -22,12 +22,20 @@ export class TemplateDTO {
 }
 
 export class TemplateResponse implements IApiResponse {
+    @ApiModelProperty({ type: ResponseStatus })
     status: ResponseStatus;
+
+    @ApiModelProperty({ type: TemplateDTO })
     data: TemplateDTO;
 }
 
 export class TemplatePageResponse implements IApiPagedResponse {
+    @ApiModelProperty({ type: PagingData })
     paging: PagingData;
+
+    @ApiModelProperty({ type: ResponseStatus })
     status: ResponseStatus;
+
+    @ApiModelProperty({ type: TemplateDTO })
     data: TemplateDTO[];
 } 

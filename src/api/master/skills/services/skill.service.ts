@@ -39,10 +39,10 @@ export class SkillService {
         }
     }
 
-    async remove(id): Promise<DeleteResult> {
-        const isExist: boolean = await this.skillRepository.count(id) > 0;
+    async remove(id: number): Promise<DeleteResult> {
+        const isExist: boolean = await this.skillRepository.count({ id }) > 0;
         if (!isExist) {
-            throw new NotFoundException('Skill not found');
+            throw new NotFoundException(`Skill with id: ${id} not found`);
         } else {
             try {
                 const skill: DeleteResult = await this.skillRepository.delete(id);
@@ -54,14 +54,14 @@ export class SkillService {
         }
     }
 
-    async update(id, skillDto: SkillDTO): Promise<Skill> {
+    async update(id: number, skillDto: SkillDTO): Promise<Skill> {
         let data: Skill = await this.skillRepository.findOne({
             where: {
                 id
             }
         });
         if (!data) {
-            throw new NotFoundException('Skill not found');
+            throw new NotFoundException(`Skill with id: ${id} not found`);
         } else {
             try {
                 data = this.skillRepository.merge(data, skillDto);

@@ -4,17 +4,17 @@ import { Injectable } from '@nestjs/common';
 import { AppConfig } from '../../config/app.config';
 
 @Injectable()
-export class HashUtil {
+export default class HashUtil {
   constructor(private readonly config: AppConfig) {}
 
-  async createPassword(input: string): Promise<string> {
+  async create(input: string): Promise<string> {
     const saltrounds: number = Number(this.config.get('HASH_SALTROUNDS'));
-    const saltbae = bcrypt.genSaltSync(saltrounds);
+    const saltbae = await bcrypt.genSalt(saltrounds);
 
     return bcrypt.hash(input, saltbae);
   }
 
-  async comparePasswordHash(input: string, hash: string): Promise<boolean> {
+  async compare(input: string, hash: string): Promise<boolean> {
     return bcrypt.compare(input, hash);
   }
 

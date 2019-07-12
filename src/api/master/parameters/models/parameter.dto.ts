@@ -1,37 +1,35 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsNotEmpty } from 'class-validator';
-import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
+import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
 
-export class JobDTO {
-
+export default class ParameterDTO {
     id?: number;
 
     @ApiModelProperty()
-    @IsNotEmpty()
-    name: string;
+    key: string;
 
     @ApiModelProperty()
-    description: string;
+    value: string;
 
     createdAt: Date;
 }
 
-export class JobResponse implements IApiResponse {
+export class ParameterResponse implements IApiResponse {
     @ApiModelProperty({ type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: JobDTO })
-    data: JobDTO;
+    @ApiModelProperty({ type: ParameterDTO })
+    data: ParameterDTO;
 }
 
-export class JobPageResponse implements IApiPagedResponse {
+export class ParameterPageResponse implements IApiPagedResponse {
+
     @ApiModelProperty({ type: PagingData })
     paging: PagingData;
 
     @ApiModelProperty({ type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: JobDTO })
-    data: JobDTO[];
+    @ApiModelProperty({ type: ParameterDTO })
+    data: ParameterDTO[];
 }
