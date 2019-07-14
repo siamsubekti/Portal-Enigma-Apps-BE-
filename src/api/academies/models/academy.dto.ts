@@ -1,7 +1,7 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, MaxLength, MinLength } from 'class-validator';
-import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
-import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
+import { IsNotEmpty, MaxLength, MinLength, IsDefined, IsEnum } from 'class-validator';
+import { IApiResponse, IApiPagedResponse } from '../../../libraries/responses/response.interface';
+import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
 
 export class AcademyDTO {
     @ApiModelProperty()
@@ -16,16 +16,17 @@ export class AcademyDTO {
     name: string;
 
     @ApiModelPropertyOptional()
-    @MaxLength(15, {message: 'Length maximal 15 number'})
-    @MinLength(10, {message: 'Length minimal 10 number'})
+    @MaxLength(11, {message: 'Length maximal 15 number'})
     phone?: string;
 
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({enum: [ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI']})
+    @IsEnum([ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI'])
+    @IsDefined()
     @IsNotEmpty()
-    type: string;
+    type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
 
     @ApiModelProperty()
     createdAt: Date;
@@ -49,9 +50,11 @@ export class AcademyResponseDTO {
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({enum: [ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI']})
+    @IsEnum([ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI'])
+    @IsDefined()
     @IsNotEmpty()
-    type: string;
+    type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
 }
 
 export class AcademyResponse implements IApiResponse {
