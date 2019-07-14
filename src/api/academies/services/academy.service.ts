@@ -21,12 +21,12 @@ export class AcademyService {
     }
 
     async insertAcademy(academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
-        const codeIsExist: Academy = await this.academy.findOne({
+        const checkCode: Academy = await this.academy.findOne({
             where: {code: academyDTO.code}});
-        const phoneIsExist: Academy = await this.academy.findOne({
+        const checkPhone: Academy = await this.academy.findOne({
             where: {phone: academyDTO.phone}});
-        if (codeIsExist) throw new BadRequestException('Code has been use');
-        if (phoneIsExist) throw new BadRequestException('Phone has been use');
+        if (checkCode) throw new BadRequestException('Code has been use');
+        if (checkPhone) throw new BadRequestException('Phone has been use');
         try {
             const data = await this.academy.save(academyDTO);
             return data;

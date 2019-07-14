@@ -9,6 +9,8 @@ import AccountModule from './accounts/account.module';
 import AuthModule from './auth/auth.module';
 import { AcademyModule } from './academies/academy.module';
 import { MajorModule } from './majors/major.module';
+import { DegreeModule } from './degrees/degree.module';
+import { RoleModule } from './roles/role.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { MajorModule } from './majors/major.module';
     LibraryModule,
     AcademyModule,
     MajorModule,
+    DegreeModule,
+    RoleModule,
     TypeOrmModule.forRootAsync({
       imports: [ ConfigModule ],
       useClass: DatabaseConnectionConfig,
