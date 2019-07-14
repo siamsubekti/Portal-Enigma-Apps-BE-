@@ -1,4 +1,4 @@
-import { PrimaryColumn, Generated, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { PrimaryColumn, Generated, Column, Entity } from 'typeorm';
 
 @Entity('mst_roles')
 export default class Role {
