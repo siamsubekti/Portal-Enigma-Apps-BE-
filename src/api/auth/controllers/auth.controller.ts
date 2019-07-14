@@ -1,6 +1,16 @@
-import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException } from '@nestjs/common';
+import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, UseInterceptors } from '@nestjs/common';
 import { Response, Request } from 'express';
-import { ApiUseTags, ApiOperation, ApiCreatedResponse, ApiImplicitBody, ApiBadRequestResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiUnauthorizedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import {
+  ApiUseTags,
+  ApiOperation,
+  ApiCreatedResponse,
+  ApiImplicitBody,
+  ApiBadRequestResponse,
+  ApiForbiddenResponse,
+  ApiNoContentResponse,
+  ApiUnauthorizedResponse,
+  ApiNotFoundResponse,
+} from '@nestjs/swagger';
 import { LoginCredentialDTO, LoginResponse, LoginResponseDTO } from '../models/auth.dto';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import ResponseUtil from '../../../libraries/responses/response.util';
@@ -21,13 +31,13 @@ export default class AuthController {
   @ApiForbiddenResponse({description: 'Invalid user account credential.', type: ApiExceptionResponse})
   @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
   @ApiImplicitBody({name: 'LoginCredentialDTO', description: 'User account form data.', type: LoginCredentialDTO})
-  async login(@Body() form: LoginCredentialDTO, @Res() response: Response) {
+  async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
     const credential: LoginResponseDTO = await this.authService.login(form);
 
     if (credential) {
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential);
       response.cookie('EPSESSION', credential.sessionId);
-      response.send(body);
+      response.json(body);
     } else
       throw new ForbiddenException('Invalid account credential.');
   }
@@ -38,7 +48,7 @@ export default class AuthController {
   @ApiNoContentResponse({description: 'User successfuly logged-out.'})
   @ApiUnauthorizedResponse({description: 'Unauthorized logout', type: ApiExceptionResponse})
   @ApiNotFoundResponse({description: 'Session invalid', type: ApiExceptionResponse})
-  async logout(@Req() request: Request, @Res() response: Response) {
+  async logout(@Req() request: Request, @Res() response: Response): Promise<void> {
     const { EPSESSION: sessionId } = request.cookies;
     const loggedOut: boolean = await this.authService.logout(sessionId);
 

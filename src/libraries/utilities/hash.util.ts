@@ -9,7 +9,7 @@ export default class HashUtil {
 
   async create(input: string): Promise<string> {
     const saltrounds: number = Number(this.config.get('HASH_SALTROUNDS'));
-    const saltbae = await bcrypt.genSalt(saltrounds);
+    const saltbae: string = await bcrypt.genSalt(saltrounds);
 
     return bcrypt.hash(input, saltbae);
   }

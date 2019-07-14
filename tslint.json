@@ -16,7 +16,18 @@
     "no-string-literal": false,
     "max-classes-per-file": false,
     "curly": [true, "as-needed"],
-    "semicolon": [true, "always"]
+    "semicolon": [true, "always"],
+    "typedef": [
+      true,
+      "call-signature",
+      "arrow-call-signature",
+      "parameter",
+      "arrow-parameter",
+      "property-declaration",
+      "variable-declaration",
+      "member-variable-declaration"
+    ],
+    "typedef-whitespace": true
   },
   "rulesDirectory": []
 }
