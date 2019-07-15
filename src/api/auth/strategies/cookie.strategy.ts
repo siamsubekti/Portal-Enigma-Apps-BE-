@@ -12,7 +12,7 @@ export default class CookieStrategy extends PassportStrategy(Strategy, 'cookie')
     });
   }
 
-  async validate(cookie: string, done: any) {
+  async validate(cookie: string, done: any): Promise<any> {
     // console.log(payload);
     const account: Account = await this.authService.validateSession(cookie);
 

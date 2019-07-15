@@ -35,12 +35,11 @@ export default class AuthService {
     let loginResponse: LoginResponseDTO = null;
     const account: Account = await this.accountService.findByUsername(credential.username);
     try {
-      if ( account && await this.hashUtil.compare(credential.password, account.password) ) {
+      if ( account && await this.hashUtil.compare(credential.password, account.password) )
         loginResponse = {
           accountId: account.id,
           sessionId: await this.createSession(account),
         };
-      }
 
       return loginResponse;
     } catch (error) {
