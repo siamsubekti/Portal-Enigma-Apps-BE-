@@ -1,4 +1,4 @@
-import { PrimaryColumn, Generated, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { PrimaryColumn, Generated, Column, Entity } from 'typeorm';
 
 @Entity('mst_degrees')
 export default class Degree {
@@ -9,6 +9,6 @@ export default class Degree {
     @Column({ type: 'varchar', length: 10, nullable: false})
     name: string;
 
-    @Column({ type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+    @Column({ type: 'timestamp', nullable: false, default: 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 }

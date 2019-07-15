@@ -12,7 +12,7 @@ export class RoleService {
     ) {}
 
     async getRoles(): Promise<RoleResponseDTO[]> {
-        const role = await this.roleRepository.find();
+        const role: Role[] = await this.roleRepository.find();
         try {
             return role;
         } catch (error) {
@@ -57,7 +57,7 @@ export class RoleService {
     }
 
     async deleteRole(id: number): Promise<DeleteResult> {
-        const countId = await this.roleRepository.count({id}) > 0;
+        const countId: boolean = await this.roleRepository.count({id}) > 0;
         if (!countId) throw new NotFoundException('Id Not Found');
         try {
             const result: DeleteResult = await this.roleRepository.delete(id);

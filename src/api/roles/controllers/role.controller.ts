@@ -2,7 +2,9 @@ import { RoleService } from '../services/role.service';
 import ResponseUtil from '../../../libraries/responses/response.util';
 import { RoleResponse, RolePagedResponse, RoleDTO, RoleResponseDTO } from '../models/role.dto';
 import { Get, Controller, Body, Post, Logger, Param, Put, Delete } from '@nestjs/common';
-import { ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiImplicitParam, ApiResponse, ApiAcceptedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
+     ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse,
+     ApiImplicitParam, ApiResponse, ApiAcceptedResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 

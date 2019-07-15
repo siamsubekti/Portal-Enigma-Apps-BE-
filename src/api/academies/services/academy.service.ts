@@ -13,7 +13,7 @@ export class AcademyService {
 
     async getAcademies(): Promise<AcademyResponseDTO[]>  {
         try {
-            const Result = await this.academy.find();
+            const Result: Academy[] = await this.academy.find();
             return Result;
         } catch (error) {
             throw new InternalServerErrorException('Internal server error');
@@ -28,8 +28,8 @@ export class AcademyService {
         if (checkCode) throw new BadRequestException('Code has been use');
         if (checkPhone) throw new BadRequestException('Phone has been use');
         try {
-            const data = await this.academy.save(academyDTO);
-            return data;
+            const academy: Academy = await this.academy.save(academyDTO);
+            return academy;
         } catch (error) {
             Logger.error(error);
             throw new InternalServerErrorException('Internal server error');
@@ -37,21 +37,21 @@ export class AcademyService {
     }
 
     async getAcademy(id: number): Promise<AcademyResponseDTO> {
-        const data: Academy = await this.academy.findOne(id);
-        if (!data) throw new NotFoundException('Academy not Found');
+        const academy: Academy = await this.academy.findOne(id);
+        if (!academy) throw new NotFoundException('Academy not Found');
         try {
-            return data;
+            return academy;
         } catch (error) {
             throw new InternalServerErrorException('Internal server error');
         }
     }
 
     async update(id: number, academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
-        let data: Academy = await this.academy.findOne({where: {id}});
-        if (!data) throw new NotFoundException('Academy not found');
+        let academy: Academy = await this.academy.findOne({where: {id}});
+        if (!academy) throw new NotFoundException('Academy not found');
         try {
-            data = this.academy.merge(data, academyDTO);
-            const updateAcademy = await this.academy.save(data);
+            academy = this.academy.merge(academy, academyDTO);
+            const updateAcademy: Academy = await this.academy.save(academy);
             return updateAcademy;
         } catch (error) {
             throw new InternalServerErrorException('Internal server error');

@@ -5,6 +5,7 @@ import { ApiUseTags, ApiResponse, ApiOperation, ApiImplicitParam, ApiCreatedResp
 import { AcademyResponse, AcademyResponseDTO, AcademyDTO, AcademiesPagedResponse } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
+import Academy from '../models/academy.entity';
 
 @ApiUseTags('Academies')
 @Controller('academies')
@@ -18,9 +19,8 @@ export class AcademyController {
     @ApiResponse({status: 200, description: 'Ok', type: AcademiesPagedResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
     async listAcademies(): Promise<AcademiesPagedResponse> {
-        const data = await this.academieService.getAcademies();
-        Logger.log(data);
-        return this.responseUtil.rebuildPagedResponse(data);
+        const academy: AcademyDTO[] = await this.academieService.getAcademies();
+        return this.responseUtil.rebuildPagedResponse(academy);
     }
 
     @Post('create')

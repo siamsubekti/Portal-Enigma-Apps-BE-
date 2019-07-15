@@ -2,7 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException, Logger } f
 import { InjectRepository } from '@nestjs/typeorm';
 import Degree from '../models/degree.entity';
 import { Repository, DeleteResult } from 'typeorm';
-import { DegreeResponseDTO, DegreeDTO, DegreeResponse } from '../models/degree.dto';
+import { DegreeResponseDTO, DegreeDTO } from '../models/degree.dto';
 
 @Injectable()
 export class DegreeService {
@@ -12,28 +12,28 @@ export class DegreeService {
     ) {}
 
     async getDegrees(): Promise<DegreeResponseDTO[]> {
+        const degrees: Degree[] = await this.degreeRepository.find();
         try {
-        const Degrees = await this.degreeRepository.find();
-        return Degrees;
+        return degrees;
         } catch (error) {
             throw new InternalServerErrorException('Internal server Error');
         }
     }
 
     async getDegree(id: number): Promise<DegreeResponseDTO> {
-        const Data: Degree = await this.degreeRepository.findOne(id);
-        Logger.log(Data);
-        if (!Data) throw new NotFoundException('Degree Not Found');
+        const degree: Degree = await this.degreeRepository.findOne(id);
+        Logger.log(degree);
+        if (!degree) throw new NotFoundException('Degree Not Found');
         try {
-            return Data;
+            return degree;
         } catch (error) {
             throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
-    async insertDegree(data: DegreeDTO): Promise<DegreeResponseDTO> {
+    async insertDegree(degreeDTO: DegreeDTO): Promise<DegreeResponseDTO> {
         try {
-            const degree = this.degreeRepository.save(data);
+            const degree: Degree = await this.degreeRepository.create(degreeDTO);
             return degree;
         } catch (error) {
             throw new InternalServerErrorException('Internal Server Error');
@@ -45,7 +45,7 @@ export class DegreeService {
         if (!degree) throw new NotFoundException('Degree Not Found');
         try {
             degree = this.degreeRepository.merge(degree, degreeDTO);
-            const updateDegree = await this.degreeRepository.save(degree);
+            const updateDegree: Degree = await this.degreeRepository.save(degree);
             return updateDegree;
         } catch (error) {
             throw new InternalServerErrorException('Internal server error');
@@ -53,7 +53,7 @@ export class DegreeService {
     }
 
     async deleteDegree(id: number): Promise<DeleteResult> {
-        const countId = await this.degreeRepository.count({id}) > 0;
+        const countId: boolean = await this.degreeRepository.count({id}) > 0;
         if (!countId) throw new NotFoundException('Id Not Found');
         try {
             const result: DeleteResult = await this.degreeRepository.delete(id);

@@ -5,14 +5,26 @@ import { IsNotEmpty, MaxLength } from 'class-validator';
 
 export class DegreeDTO {
     @ApiModelProperty()
+    id: number;
+
+    @ApiModelProperty()
     @IsNotEmpty()
-    @MaxLength(5, {message: 'Max name 5 length'})
+    @MaxLength(25, {message: 'Name Max 25 length'})
     name: string;
+
+    @ApiModelProperty()
+    createdAt: Date;
 }
 
 export class DegreeResponseDTO {
     @ApiModelProperty()
+    id: number;
+
+    @ApiModelProperty()
     name: string;
+
+    @ApiModelProperty()
+    createdAt: Date;
 }
 
 export class DegreeResponse implements IApiResponse {

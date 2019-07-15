@@ -1,5 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
-import { IsNotEmpty, MaxLength, MinLength, IsDefined, IsEnum } from 'class-validator';
+import { IsNotEmpty, MaxLength, IsDefined, IsEnum } from 'class-validator';
 import { IApiResponse, IApiPagedResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
 
@@ -16,7 +16,7 @@ export class AcademyDTO {
     name: string;
 
     @ApiModelPropertyOptional()
-    @MaxLength(11, {message: 'Length maximal 15 number'})
+    @MaxLength(13, {message: 'Phone max 13 length'})
     phone?: string;
 
     @ApiModelPropertyOptional()
@@ -55,6 +55,9 @@ export class AcademyResponseDTO {
     @IsDefined()
     @IsNotEmpty()
     type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
+
+    @ApiModelProperty()
+    createdAt: Date;
 }
 
 export class AcademyResponse implements IApiResponse {

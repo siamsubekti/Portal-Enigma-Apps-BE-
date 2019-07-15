@@ -17,18 +17,18 @@ export default class Academy {
     name: string;
 
     @ApiModelPropertyOptional()
-    @Column({ type: 'varchar', length: 15, nullable: true, default: () => 'NULL' })
+    @Column({ type: 'varchar', length: 15, nullable: true, default: null })
     phone: string;
 
     @ApiModelPropertyOptional()
-    @Column({ type: 'text', nullable: true, default: () => 'NULL'})
+    @Column({ type: 'text', nullable: true, default: null})
     address: string;
 
     @ApiModelProperty()
-    @Column({ type: 'varchar', length: 10, nullable: false})
+    @Column({ type: 'varchar', length: 20, nullable: false})
     type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
 
     @ApiModelProperty()
-    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 }

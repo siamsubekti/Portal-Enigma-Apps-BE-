@@ -12,6 +12,6 @@ export default class Role {
     @Column({ type: 'varchar', length: 25, nullable: false})
     name: string;
 
-    @Column({name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+    @Column({name: 'created_at', type: 'timestamp', nullable: false, default: 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 }

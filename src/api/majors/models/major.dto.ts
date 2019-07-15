@@ -5,13 +5,25 @@ import { IApiPagedResponse, IApiResponse } from 'src/libraries/responses/respons
 
 export class MajorDTO {
     @ApiModelProperty()
+    id: number;
+
+    @ApiModelProperty()
     @IsNotEmpty()
     name: string;
+
+    @ApiModelProperty()
+    createdAt: Date;
 }
 
 export class MajorResponseDTO {
     @ApiModelProperty()
+    id: number;
+
+    @ApiModelProperty()
     name: string;
+
+    @ApiModelProperty()
+    createdAt: Date;
 }
 
 export class MajorResponse implements IApiResponse {

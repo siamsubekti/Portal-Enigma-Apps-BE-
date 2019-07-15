@@ -9,6 +9,6 @@ export default class Major {
     @Column({ type: 'varchar', length: 255, nullable: false})
     name: string;
 
-    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 }

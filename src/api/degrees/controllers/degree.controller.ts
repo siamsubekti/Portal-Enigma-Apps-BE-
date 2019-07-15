@@ -39,16 +39,16 @@ export class DegreeController {
     async DetailDegree(@Param('id') params: number): Promise<DegreeResponse> {
         const Degree: DegreeResponseDTO = await this.degreeService.getDegree(params);
         Logger.log(Degree);
-        return this.responseUtil.rebuildResponse(Degree);
+        return this.responseUtil.rebuildResponse(Degree, {code: '202', description: 'Get major by id'});
     }
 
     @Put(':id')
     @ApiOperation({title: 'Update Degree', description: 'Update Degree'})
     @ApiOkResponse({description: 'Detail Degree', type: DegreeResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
-    async updateAcademy(@Param('id') params: number, @Body() form: DegreeDTO): Promise<DegreeResponse> {
-        const academy: DegreeResponseDTO = await this.degreeService.updateDegree(params, form);
-        return this.responseUtil.rebuildResponse(academy, {code: '200', description: 'Update Success'});
+    async updateDegree(@Param('id') params: number, @Body() form: DegreeDTO): Promise<DegreeResponse> {
+        const degree: DegreeResponseDTO = await this.degreeService.updateDegree(params, form);
+        return this.responseUtil.rebuildResponse(degree, {code: '200', description: 'Update Success'});
     }
 
     @Delete(':id')
