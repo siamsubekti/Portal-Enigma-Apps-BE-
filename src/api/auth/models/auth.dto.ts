@@ -79,6 +79,18 @@ export class AccountRegisterResponse implements IApiResponse {
   data: AccountRegisterResponseDTO;
 }
 
+export class AccountRegistrationCredential {
+  owner: string;
+  key: string;
+  token: string;
+  activationLink: string;
+}
+
 export interface JwtPayload {
   accountId: string;
+}
+
+export interface JwtActivationPayload {
+  account: AccountRegisterDTO;
+  token: string;
 }

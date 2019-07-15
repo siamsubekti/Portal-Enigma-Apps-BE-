@@ -4,6 +4,7 @@ import { AppConfig } from '../config/app.config';
 import ConfigModule from '../config/config.module';
 import ResponseUtil from './responses/response.util';
 import HashUtil from './utilities/hash.util';
+import MailerUtil from './mailer/mailer.util';
 
 @Global()
 @Module({
@@ -15,7 +16,7 @@ import HashUtil from './utilities/hash.util';
       imports: [ConfigModule],
     }),
   ],
-  exports: [HashUtil, ResponseUtil],
-  providers: [HashUtil, ResponseUtil],
+  exports: [HashUtil, MailerUtil, ResponseUtil],
+  providers: [HashUtil, MailerUtil, ResponseUtil],
 })
 export default class LibraryModule {}
