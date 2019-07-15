@@ -1,14 +1,15 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
-import { IsDefined } from 'class-validator';
+import { IsDefined, IsEnum } from 'class-validator';
 
 export class RegionDTO {
 
     id?: string;
 
     @IsDefined()
-    @ApiModelProperty()
+    @IsEnum([ 'KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI' ])
+    @ApiModelProperty({enum: [ 'KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI' ]})
     type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
 
     @ApiModelProperty()
