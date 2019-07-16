@@ -26,7 +26,7 @@ export default class Academy {
 
     @ApiModelProperty()
     @Column({ type: 'varchar', length: 20, nullable: false})
-    type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
+    type: string;
 
     @ApiModelProperty()
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: 'CURRENT_TIMESTAMP'})

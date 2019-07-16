@@ -8,11 +8,6 @@ import { ResponseRebuildInterceptor } from '../../libraries/responses/response.i
 export class ApiController {
   constructor(private readonly service: ApiService) {}
 
-  @Get()
-  getHello(): string {
-    return this.service.getHello();
-  }
-
   @Get('response/single')
   @ApiUseTags('Default')
   @UseInterceptors(ResponseRebuildInterceptor)

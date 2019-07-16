@@ -1,63 +1,73 @@
 import { AcademyService } from '../services/academy.service';
 import ResponseUtil from '../../../libraries/responses/response.util';
-import { Controller, Get, Body, Post, Logger, Param, Put, Delete } from '@nestjs/common';
-import { ApiUseTags, ApiResponse, ApiOperation, ApiImplicitParam, ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse, ApiOkResponse } from '@nestjs/swagger';
-import { AcademyResponse, AcademyResponseDTO, AcademyDTO, AcademiesPagedResponse } from '../models/academy.dto';
+import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors } from '@nestjs/common';
+import { ApiUseTags, ApiOperation, ApiImplicitParam,
+        ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse,
+        ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { AcademyResponse, AcademyDTO, AcademiesPagedResponse } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
-import Academy from '../models/academy.entity';
+import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 
 @ApiUseTags('Academies')
 @Controller('academies')
 export class AcademyController {
     constructor(
-    private academieService: AcademyService,
-    private responseUtil: ResponseUtil ) {}
+    private academieService: AcademyService ) {}
 
     @Get('list')
     @ApiOperation({title: 'List Academies', description: 'All Academies'})
-    @ApiResponse({status: 200, description: 'Ok', type: AcademiesPagedResponse})
+    @ApiOkResponse({description: 'List Academies', type: AcademiesPagedResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
-    async listAcademies(): Promise<AcademiesPagedResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async listAcademies(): Promise<AcademyDTO[]> {
         const academy: AcademyDTO[] = await this.academieService.getAcademies();
-        return this.responseUtil.rebuildPagedResponse(academy);
+        Logger.log(academy);
+        return academy;
     }
 
     @Post('create')
     @ApiOperation({title: 'Create Academy', description: 'Create Academy'})
     @ApiCreatedResponse({description: 'Academy successfuly created.', type: AcademyResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
-    @ApiBadRequestResponse({description: 'Code has been use'})
-    @ApiBadRequestResponse({description: 'Phone has been use'})
-    async addAcademy(@Body() form: AcademyDTO): Promise<AcademyResponse> {
-        const academy: AcademyResponseDTO = await this.academieService.insertAcademy(form);
-        return this.responseUtil.rebuildResponse(academy, {code: '201', description: 'Created.'});
+    @ApiBadRequestResponse({description: 'Code has been use', type: ApiExceptionResponse})
+    @ApiBadRequestResponse({description: 'Phone has been use', type: ApiExceptionResponse})
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async addAcademy(@Body() form: AcademyDTO): Promise<AcademyDTO> {
+        const academy: AcademyDTO = await this.academieService.insertAcademy(form);
+        Logger.log(academy);
+        return academy;
     }
 
     @Get(':id')
     @ApiOperation({title: 'Detail Academy', description: 'Detail Academy'})
     @ApiImplicitParam({name: 'id'})
-    @ApiResponse({status: 202, description: 'Ok', type: AcademyResponse })
+    @ApiOkResponse({description: 'Detail Academy', type: AcademyResponse })
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
-    async getAcademyById(@Param('id') id: number): Promise<AcademyResponse> {
-        const academy: AcademyResponseDTO = await this.academieService.getAcademy(id);
+    @ApiNotFoundResponse({description: 'Academy Not Found', type: ApiExceptionResponse})
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getAcademyById(@Param('id') id: number): Promise<AcademyDTO> {
+        const academy: AcademyDTO = await this.academieService.getAcademy(id);
         Logger.log(academy);
-        return this.responseUtil.rebuildResponse(academy, {code: '200', description: 'Get academy by id'});
+        return academy;
     }
 
     @Put(':id')
     @ApiOperation({title: 'Update Academy', description: 'Update Academy'})
-    @ApiResponse({status: 200, description: 'Updated Success', type: AcademyResponse})
+    @ApiOkResponse({description: 'Updated Success', type: AcademyResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
-    async updateAcademy(@Param('id') id: number, @Body() form: AcademyDTO): Promise<AcademyResponse> {
-        const academy: AcademyResponseDTO = await this.academieService.update(id, form);
-        return this.responseUtil.rebuildResponse(academy, {code: '200', description: 'Update Success'});
+    @ApiNotFoundResponse({description: 'Academy Not Found', type: ApiExceptionResponse})
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async updateAcademy(@Param('id') id: number, @Body() form: AcademyDTO): Promise<AcademyDTO> {
+        const academy: AcademyDTO = await this.academieService.update(id, form);
+        Logger.log(academy);
+        return academy;
     }
 
     @Delete(':id')
-    @ApiOkResponse({description: 'Ok'})
     @ApiOperation({title: 'Delete Academy', description: 'Delete Academy'})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
+    @ApiNotFoundResponse({description: 'Academy Not Found', type: ApiExceptionResponse})
     async DeleteAcademy(@Param('id') id: number): Promise<DeleteResult> {
         const {affected}: DeleteResult = await this.academieService.delete(id);
         Logger.log(affected);

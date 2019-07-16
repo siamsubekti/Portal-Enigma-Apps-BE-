@@ -12,54 +12,54 @@ export class MajorService {
     ) {}
 
     async getMajors(): Promise<MajorResponseDTO[]>  {
+        const result: Major[] = await this.majorRepository.find();
         try {
-            const Result = await this.majorRepository.find();
-            return Result;
+            return result;
         } catch (error) {
-            throw new InternalServerErrorException('Internal server error');
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
     async insertMajor(majorDTO: MajorDTO): Promise<MajorResponseDTO> {
         try {
-            const data = await this.majorRepository.save(majorDTO);
-            return data;
+            const major: Major = await this.majorRepository.save(majorDTO);
+            return major;
         } catch (error) {
             Logger.error(error);
-            throw new InternalServerErrorException('Internal server error');
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
     async getDetailMajor(id: number): Promise<MajorResponseDTO> {
-        const data: Major = await this.majorRepository.findOne(id);
-        if (!data) throw new NotFoundException('Major not Found');
+        const major: Major = await this.majorRepository.findOne(id);
+        if (!major) throw new NotFoundException(`Major with id: ${id} Not Found`);
         try {
-            return data;
+            return major;
         } catch (error) {
-            throw new InternalServerErrorException('Internal server error');
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
     async update(id: number, majorDTO: MajorDTO): Promise<MajorResponseDTO> {
-        let data: Major = await this.majorRepository.findOne({where: {id}});
-        if (!data) throw new NotFoundException('Academy not found');
+        let major: Major = await this.majorRepository.findOne({where: {id}});
+        if (!major) throw new NotFoundException(`Major with id: ${id} Not Found`);
         try {
-            data = this.majorRepository.merge(data, majorDTO);
-            const updateAcademy = await this.majorRepository.save(data);
-            return updateAcademy;
+            major = this.majorRepository.merge(major, majorDTO);
+            const updateMajor: Major  = await this.majorRepository.save(major);
+            return updateMajor;
         } catch (error) {
-            throw new InternalServerErrorException('Internal server error');
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        const academy: boolean = await this.majorRepository.count({id}) >  0;
-        if (!academy) throw new NotFoundException('Academy not found');
+        const major: boolean = await this.majorRepository.count({id}) >  0;
+        if (!major) throw new NotFoundException(`Major with id: ${id} Not Found`);
         try {
-            const removeAcademy: DeleteResult = await this.majorRepository.delete(id);
-            return removeAcademy;
+            const removeMajor: DeleteResult = await this.majorRepository.delete(id);
+            return removeMajor;
         } catch (error) {
-            throw new InternalServerErrorException('Internal server error');
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 }

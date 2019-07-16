@@ -24,7 +24,7 @@ export class RoleService {
         const checkCode: Role = await this.roleRepository.findOne({
             where: {code: roleDTO.code}});
         Logger.log(checkCode);
-        if (checkCode) throw new BadRequestException('Code has been use');
+        if (checkCode) throw new BadRequestException('Code Has Been Use');
         try {
             const role: Role = await this.roleRepository.save(roleDTO);
             Logger.log(role);
@@ -36,7 +36,7 @@ export class RoleService {
 
     async getRole(id: number): Promise<RoleResponseDTO> {
         const role: Role = await this.roleRepository.findOne(id);
-        if (!role) throw new NotFoundException('Academy not Found');
+        if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             return role;
         } catch (error) {
@@ -46,7 +46,7 @@ export class RoleService {
 
     async updateRole(id: number, roleDTO: RoleDTO): Promise<RoleResponseDTO> {
         let role: Role = await this.roleRepository.findOne({where: {id}});
-        if (!role) throw new NotFoundException('Role not found');
+        if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             role = this.roleRepository.merge(role, roleDTO);
             const result: Role = await this.roleRepository.save(role);
@@ -58,7 +58,7 @@ export class RoleService {
 
     async deleteRole(id: number): Promise<DeleteResult> {
         const countId: boolean = await this.roleRepository.count({id}) > 0;
-        if (!countId) throw new NotFoundException('Id Not Found');
+        if (!countId) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             const result: DeleteResult = await this.roleRepository.delete(id);
             return result;

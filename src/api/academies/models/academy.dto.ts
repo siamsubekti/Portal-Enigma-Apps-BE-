@@ -22,11 +22,11 @@ export class AcademyDTO {
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty({enum: [ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI']})
-    @IsEnum([ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI'])
+    @ApiModelProperty({enum: [ 'SMA', 'SMK', 'D3', 'S1', 'S2']})
+    @IsEnum([ 'SMA', 'SMK', 'D3', 'S1', 'S2'])
     @IsDefined()
     @IsNotEmpty()
-    type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
+    type: string;
 
     @ApiModelProperty()
     createdAt: Date;
@@ -37,7 +37,6 @@ export class AcademyResponseDTO {
     id?: number;
 
     @ApiModelProperty()
-    @IsNotEmpty({message: 'Harus diisi'})
     code: string;
 
     @ApiModelProperty()
@@ -50,11 +49,9 @@ export class AcademyResponseDTO {
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty({enum: [ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI']})
-    @IsEnum([ 'SD', 'SMP', 'SMA/SMK', 'PERGURUAN TINGGI'])
-    @IsDefined()
-    @IsNotEmpty()
-    type: 'SD' | 'SMP' | 'SMA/SMK' | 'PERGURUAN TINGGI';
+    @ApiModelProperty({enum: [ 'SMA', 'SMK', 'D3', 'S1', 'S2']})
+    @IsEnum([ 'SMA', 'SMK', 'D3', 'S1', 'S2'])
+    type: string;
 
     @ApiModelProperty()
     createdAt: Date;
