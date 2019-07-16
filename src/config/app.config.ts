@@ -28,6 +28,7 @@ export class AppConfig {
     config['SRC_PATH'] = path.join(root.get(), 'src');
 
     Logger.log(`${Object.keys(config).length} configuration items loaded.`, 'AppConfig', true);
+    Logger.debug(`SECRET: ${config['HASH_SECRET']}`, 'AppConfig', true);
     return config;
   }
 
