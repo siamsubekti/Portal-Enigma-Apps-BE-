@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { TypeOrmOptionsFactory, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { AppConfig } from './app.config';
+import AppConfig from './app.config';
 
 @Injectable()
-export class DatabaseConnectionConfig implements TypeOrmOptionsFactory {
+export default class DatabaseConnectionConfig implements TypeOrmOptionsFactory {
   constructor(private readonly config: AppConfig) {}
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
