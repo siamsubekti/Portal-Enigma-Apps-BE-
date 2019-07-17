@@ -30,7 +30,7 @@ export default class Profile {
   @Column({type: 'varchar', length: 20, nullable: true})
   maritalStatus: 'KAWIN' | 'BELUM KAWIN' | 'DUDA' | 'JANDA';
 
-  @Column({name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+  @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})

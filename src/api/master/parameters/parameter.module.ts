@@ -6,13 +6,15 @@ import { ParameterService } from './services/parameter.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Parameter])
+        TypeOrmModule.forFeature([Parameter]),
     ],
     controllers: [
-        ParameterController
+        ParameterController,
     ],
     providers: [
-        ParameterService
-    ]
+        ParameterService,
+    ],
 })
-export class ParameterModule { }
+export class ParameterModule {
+
+}

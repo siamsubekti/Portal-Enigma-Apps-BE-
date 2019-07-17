@@ -16,13 +16,13 @@ export default class Account {
   @Column({type: 'varchar', length: 15, nullable: false, default: 'INACTIVE'})
   status: 'INACTIVE' | 'ACTIVE' | 'SUSPENDED' | 'BLACKLISTED';
 
-  @Column({name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP'})
+  @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
-  @OneToOne(type => Profile)
+  @OneToOne((type: Profile) => Profile)
   @JoinColumn({name: 'profile_id'})
   profile: Profile;
 }

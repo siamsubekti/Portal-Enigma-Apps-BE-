@@ -1,54 +1,52 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, HttpStatus, InternalServerErrorException, HttpCode } from '@nestjs/common';
-import ResponseUtil from 'src/libraries/responses/response.util';
+import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors } from '@nestjs/common';
 import { TemplateService } from '../services/template.service';
-import { ApiUseTags, ApiOperation, ApiResponse, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
 import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
 
 @Controller('templates')
 @ApiUseTags('Templates')
 export class TemplateController {
 
-    constructor(private responseUtils: ResponseUtil, private templateService: TemplateService) { }
+    constructor(private templateService: TemplateService) { }
 
     @Get()
     @ApiOperation({ title: 'GET Templates', description: 'API get list og templates' })
     @ApiOkResponse({ description: 'Success to get list fo templates.', type: TemplatePageResponse })
     @ApiInternalServerErrorResponse({ description: 'If internal server error', type: ApiExceptionResponse })
-    async get(): Promise<TemplatePageResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async get(): Promise<Template[]> {
         const templates: Template[] = await this.templateService.findAll();
-        return this.responseUtils.rebuildPagedResponse(templates);
+        return templates;
     }
 
     @Post()
     @ApiOperation({ title: 'CREATE Template', description: 'API insert into templates' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to create template.', type: TemplateResponse })
-    async insert(@Body() templateDto: TemplateDTO): Promise<TemplateResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async insert(@Body() templateDto: TemplateDTO): Promise<Template> {
         const template: Template = await this.templateService.create(templateDto);
-        return this.responseUtils.rebuildResponse(template);
+        return template;
     }
 
     @Put(':id')
     @ApiOperation({ title: 'UPDATE Template', description: 'API Update template' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update template.', type: TemplateResponse })
-    async update(@Param('id') id: number, @Body() templateDto: TemplateDTO): Promise<TemplateResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async update(@Param('id') id: number, @Body() templateDto: TemplateDTO): Promise<Template> {
         const template: Template = await this.templateService.update(id, templateDto);
-        return this.responseUtils.rebuildResponse(template);
+        return template;
     }
 
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ title: 'DELETE Template', description: 'API delete template' })
-    async delete(@Param('id') id: number) {
-        const { affected } = await this.templateService.remove(id);
-        // return this.responseUtils.rebuildResponse(template);
-        if (affected === 1) {
-            return null;
-        } else {
-            throw new InternalServerErrorException();
-        }
+    async delete(@Param('id') id: number): Promise<any> {
+        const { affected }: any = await this.templateService.remove(id);
+        return (affected !== 1) ? new InternalServerErrorException() : null;
     }
 }

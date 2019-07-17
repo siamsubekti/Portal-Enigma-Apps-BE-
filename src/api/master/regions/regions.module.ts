@@ -6,13 +6,13 @@ import { RegionService } from './services/region.service';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Region])
+        TypeOrmModule.forFeature([Region]),
     ],
     controllers: [
-        RegionController
+        RegionController,
     ],
     providers: [
-        RegionService
-    ]
+        RegionService,
+    ],
 })
-export class RegionsModule {}
+export class RegionsModule { }

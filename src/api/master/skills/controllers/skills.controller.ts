@@ -1,54 +1,52 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors } from '@nestjs/common';
 import { SkillService } from '../services/skill.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse } from '@nestjs/swagger';
-import ResponseUtil from 'src/libraries/responses/response.util';
 import { SkillDTO, SkillPageResponse, SkillResponse } from '../models/skill.dto';
 import Skill from '../models/skill.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
 
 @Controller('skills')
 @ApiUseTags('Skills')
 export class SkillsController {
 
-    constructor(private responseUtils: ResponseUtil, private skillService: SkillService) { }
+    constructor(private skillService: SkillService) { }
 
     @Get()
     @ApiOperation({ title: 'GET Skills', description: 'API Get list of skills' })
     @ApiOkResponse({ description: 'Success to get list skills.', type: SkillPageResponse })
-    async get(): Promise<SkillPageResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async get(): Promise<Skill[]> {
         const skills: Skill[] = await this.skillService.findAll();
-        return this.responseUtils.rebuildPagedResponse(skills);
+        return skills;
     }
 
     @Post()
     @ApiOperation({ title: 'CREATE Skill', description: 'API Insert skill' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to create skill.', type: SkillResponse })
-    async insert(@Body() skillDto: SkillDTO): Promise<SkillResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async insert(@Body() skillDto: SkillDTO): Promise<Skill> {
         const skill: Skill = await this.skillService.create(skillDto);
-        return this.responseUtils.rebuildResponse(skill);
+        return skill;
     }
 
     @Put(':id')
     @ApiOperation({ title: 'UPDATE Skill', description: 'API UPDATE skill' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update skill.', type: SkillResponse })
-    async update(@Param('id') id: number, @Body() skillDto: SkillDTO): Promise<SkillResponse> {
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async update(@Param('id') id: number, @Body() skillDto: SkillDTO): Promise<Skill> {
         const skill: Skill = await this.skillService.update(id, skillDto);
-        return this.responseUtils.rebuildResponse(skill);
+        return skill;
     }
 
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ title: 'DELETE Skill', description: 'API Delete skill' })
-    async delete(@Param('id') id: number) {
+    async delete(@Param('id') id: number): Promise<any> {
         const { affected }: DeleteResult = await this.skillService.remove(id);
-        // return this.responseUtils.rebuildResponse(skill);
-        if (affected === 1) {
-            return null;
-        } else {
-            throw new InternalServerErrorException();
-        }
+        return (affected !== 1) ? new InternalServerErrorException() : null;
     }
 }

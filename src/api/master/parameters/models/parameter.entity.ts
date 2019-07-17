@@ -12,6 +12,7 @@ export default class Parameter {
     @Column({ type: 'varchar', length: 255, nullable: false })
     value: string;
 
-    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: () => 'CURRENT_TIMESTAMP' })
+    @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
+
 }

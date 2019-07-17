@@ -8,8 +8,8 @@ export class RegionDTO {
     id?: string;
 
     @IsDefined()
-    @IsEnum([ 'KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI' ])
-    @ApiModelProperty({enum: [ 'KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI' ]})
+    @IsEnum(['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'])
+    @ApiModelProperty({ enum: ['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'] })
     type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
 
     @ApiModelProperty()
@@ -35,4 +35,5 @@ export class RegionPageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: RegionDTO })
     data: RegionDTO[];
+
 }

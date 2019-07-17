@@ -5,7 +5,7 @@ import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/respons
 export default class ParameterDTO {
     id?: number;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ uniqueItems: true })
     key: string;
 
     @ApiModelProperty()

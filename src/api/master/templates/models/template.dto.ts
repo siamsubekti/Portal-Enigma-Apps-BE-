@@ -6,7 +6,7 @@ export class TemplateDTO {
 
     id?: number;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ uniqueItems: true })
     name: string;
 
     @ApiModelProperty()
@@ -38,4 +38,4 @@ export class TemplatePageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: TemplateDTO })
     data: TemplateDTO[];
-} 
+}

@@ -1,12 +1,12 @@
-import { ApiModelProperty } from "@nestjs/swagger";
-import { ResponseStatus, PagingData } from "src/libraries/responses/response.class";
-import { IApiResponse, IApiPagedResponse } from "src/libraries/responses/response.interface";
+import { ApiModelProperty } from '@nestjs/swagger';
+import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
+import { IApiResponse, IApiPagedResponse } from 'src/libraries/responses/response.interface';
 
 export class SkillDTO {
 
     id?: number;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ uniqueItems: true })
     name: string;
 
     @ApiModelProperty()
@@ -32,4 +32,5 @@ export class SkillPageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: SkillDTO })
     data: SkillDTO[];
-} 
+
+}

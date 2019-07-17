@@ -1,5 +1,5 @@
 import { Module, Global } from '@nestjs/common';
-import { RedisModule } from 'nestjs-redis';
+import { RedisModule, RedisModuleOptions } from 'nestjs-redis';
 import { AppConfig } from '../config/app.config';
 import ConfigModule from 'src/config/config.module';
 import HashUtil from './utilities/hash.util';
@@ -10,7 +10,7 @@ import ResponseUtil from './responses/response.util';
   imports: [
     ConfigModule,
     RedisModule.forRootAsync({
-      useFactory: (config: AppConfig) => config.redis(),
+      useFactory: (config: AppConfig): RedisModuleOptions => config.redis(),
       inject: [AppConfig],
       imports: [ConfigModule],
     }),
