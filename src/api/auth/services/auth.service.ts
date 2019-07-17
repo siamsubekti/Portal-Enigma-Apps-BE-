@@ -286,7 +286,7 @@ export default class AuthService {
       const { account: { profile: { fullname: name }, username: to }, key, token } = credential;
       const resetPasswordLink: string = `${this.config.get('API_BASE_URL')}/password-reset/${encodeURI(key)}/${encodeURI(token)}`;
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
-        name, resetPasswordLink, baseUrl: this.config.get('API_BASE_URL')
+        name, resetPasswordLink, baseUrl: this.config.get('API_BASE_URL'),
       });
       const response: any = await this.mailUtil.send({
         from: this.config.get('MAIL_SENDER'),
