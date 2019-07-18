@@ -59,14 +59,14 @@ export default class AppConfig {
   }
 
   serverOptions(): NestApplicationOptions {
-    if (process.env.NODE_ENV !== 'local' && existsSync(this.get('SSL_KEY')) && existsSync(this.get('SSL_CERT'))) {
+    if (process.env.NODE_ENV === 'local' && existsSync(this.get('SSL_KEY')) && existsSync(this.get('SSL_CERT')))
       return {
         httpsOptions: {
           key: readFileSync(this.get('SSL_KEY')),
           cert: readFileSync(this.get('SSL_CERT')),
         },
       };
-    } else return undefined;
+    else return undefined;
   }
 
   viewEngine(): {viewPath: string, partialsDir: string, layoutsDir: string, extname: string} {
