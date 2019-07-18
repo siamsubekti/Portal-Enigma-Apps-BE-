@@ -1,9 +1,11 @@
 import { Module, Global } from '@nestjs/common';
 import { RedisModule, RedisModuleOptions } from 'nestjs-redis';
-import { AppConfig } from '../config/app.config';
-import ConfigModule from 'src/config/config.module';
-import HashUtil from './utilities/hash.util';
+import AppConfig from '../config/app.config';
+import ConfigModule from '../config/config.module';
 import ResponseUtil from './responses/response.util';
+import HashUtil from './utilities/hash.util';
+import MailerUtil from './mailer/mailer.util';
+import TemplateUtil from './utilities/template.util';
 
 @Global()
 @Module({
@@ -15,7 +17,7 @@ import ResponseUtil from './responses/response.util';
       imports: [ConfigModule],
     }),
   ],
-  exports: [HashUtil, ResponseUtil],
-  providers: [HashUtil, ResponseUtil],
+  exports: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
+  providers: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
 })
 export default class LibraryModule { }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DatabaseConnectionConfig } from '../config/database.config';
+import DatabaseConnectionConfig from '../config/database.config';
 import { ApiController } from './main/api.controller';
 import { ApiService } from './main/api.service';
 import { JobModule } from './master/jobs/job.module';

@@ -22,7 +22,7 @@ export default class Account {
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
-  @OneToOne((type: Profile) => Profile)
+  @OneToOne((type: Profile) => Profile, (profile: Profile) => profile.account)
   @JoinColumn({name: 'profile_id'})
   profile: Profile;
 }

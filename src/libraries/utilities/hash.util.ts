@@ -1,7 +1,7 @@
 import * as md5 from 'md5';
 import * as bcrypt from 'bcrypt';
 import { Injectable } from '@nestjs/common';
-import { AppConfig } from '../../config/app.config';
+import AppConfig from '../../config/app.config';
 
 @Injectable()
 export default class HashUtil {

@@ -1,6 +1,6 @@
 import { Module, Global } from '@nestjs/common';
-import { AppConfig } from './app.config';
-import { DatabaseConnectionConfig } from './database.config';
+import AppConfig from './app.config';
+import DatabaseConnectionConfig from './database.config';
 
 @Global()
 @Module({

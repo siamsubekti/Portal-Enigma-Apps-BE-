@@ -1,4 +1,5 @@
-import { Entity, PrimaryColumn, Generated, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn } from 'typeorm';
+import Account from './account.entity';
 
 @Entity('profiles')
 export default class Profile {
@@ -22,17 +23,20 @@ export default class Profile {
   birthdate: Date;
 
   @Column({type: 'varchar', length: 10, nullable: true})
-  gender: 'LAKI-LAKI' | 'PEREMPUAN';
+  gender: 'MALE' | 'FEMALE';
 
   @Column({type: 'varchar', length: 50, nullable: true})
-  religion: 'BUDHA' | 'HINDU' | 'ISLAM' | 'KONG HU CHU' | 'KRISTEN PROTESTAN' | 'KRISTEN KATOLIK';
+  religion: 'BUDDHA' | 'HINDU' | 'ISLAM' | 'KONG HU CHU' | 'CHRISTIAN' | 'CATHOLIC';
 
-  @Column({type: 'varchar', length: 20, nullable: true})
-  maritalStatus: 'KAWIN' | 'BELUM KAWIN' | 'DUDA' | 'JANDA';
+  @Column({type: 'varchar', length: 20, nullable: true, name: 'marital_status'})
+  maritalStatus: 'SINGLE' | 'IN RELATIONSHIP' | 'MARRIED' | 'DIVORCED';
 
   @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
 
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
+
+  @OneToOne((type: Account) => Account, (account: Account) => account.profile)
+  account: Account;
 }
