@@ -59,7 +59,7 @@ export default class AppConfig {
   }
 
   serverOptions(): NestApplicationOptions {
-    if (existsSync(this.get('SSL_KEY')) && existsSync(this.get('SSL_CERT'))) {
+    if (process.env.NODE_ENV !== 'local' && existsSync(this.get('SSL_KEY')) && existsSync(this.get('SSL_CERT'))) {
       return {
         httpsOptions: {
           key: readFileSync(this.get('SSL_KEY')),
