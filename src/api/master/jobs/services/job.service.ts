@@ -14,6 +14,8 @@ export class JobService {
     }
 
     async create(jobDto: JobDTO): Promise<Job> {
+        const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
+        if (exist) throw new BadRequestException('Data ini telah ada.');
         return await this.jobRepository.save(jobDto);
     }
 

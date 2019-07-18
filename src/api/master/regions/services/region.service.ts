@@ -1,4 +1,4 @@
-import { Injectable, Logger, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, InternalServerErrorException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Region from '../models/region.entity';
 import { Repository, DeleteResult } from 'typeorm';
@@ -14,6 +14,8 @@ export class RegionService {
     }
 
     async create(regionDto: RegionDTO): Promise<Region> {
+        const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
+        if (exist) throw new BadRequestException('Data ini telah ada.');
         return await this.regionRepository.save(regionDto);
     }
 
@@ -30,6 +32,8 @@ export class RegionService {
 
         if (!data) throw new NotFoundException(`Region with id: ${id} not found`);
         else {
+            const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
+            if (exist && regionDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
             data = this.regionRepository.merge(data, regionDto);
             return await this.regionRepository.save(data);
         }

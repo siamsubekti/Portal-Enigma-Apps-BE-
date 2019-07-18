@@ -12,7 +12,7 @@ export class RegionDTO {
     @ApiModelProperty({ enum: ['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'] })
     type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
 
-    @ApiModelProperty()
+    @ApiModelProperty({ uniqueItems: true })
     name: string;
 
     createdAt: Date;

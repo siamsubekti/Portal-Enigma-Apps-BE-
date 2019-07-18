@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors } from '@nestjs/common';
 import { RegionService } from '../services/region.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
@@ -27,7 +27,7 @@ export class RegionController {
     @Post()
     @ApiOperation({ title: 'CREATE Region', description: 'API create regions' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
-    @ApiOkResponse({ description: 'Success to create regions.', type: RegionResponse })
+    @ApiCreatedResponse({ description: 'Success to create regions.', type: RegionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() regionDto: RegionDTO): Promise<Region> {
         const region: Region = await this.regionServices.create(regionDto);
@@ -38,6 +38,7 @@ export class RegionController {
     @ApiOperation({ title: 'UPDATE Region', description: 'API update region' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update region.', type: RegionResponse })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: string, @Body() regionDto: RegionDTO): Promise<Region> {
         const region: Region = await this.regionServices.update(id, regionDto);
@@ -47,6 +48,7 @@ export class RegionController {
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ title: 'DELETE Region', description: 'API delete region' })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: string): Promise<any> {
         const { affected }: DeleteResult = await this.regionServices.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

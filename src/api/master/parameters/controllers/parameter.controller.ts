@@ -2,7 +2,7 @@ import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpC
 import { ParameterService } from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { CookieAuthGuard } from 'src/api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
@@ -34,7 +34,7 @@ export class ParameterController {
 
     @Post()
     @ApiOperation({ title: 'CREATE Parameter', description: 'API to create Parameter' })
-    @ApiOkResponse({ description: 'If success insert parameter', type: ParameterResponse })
+    @ApiCreatedResponse({ description: 'If success insert parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() parameterDto: ParameterDTO): Promise<Parameter> {
@@ -46,6 +46,7 @@ export class ParameterController {
     @ApiOperation({ title: 'UPDATE Parameter', description: 'API to update Parameter' })
     @ApiOkResponse({ description: 'If success update Parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: number, @Body() parameterDto: ParameterDTO): Promise<Parameter> {
         const parameter: Parameter = await this.parameterService.update(id, parameterDto);
@@ -55,6 +56,7 @@ export class ParameterController {
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ title: 'DELETE Paramter', description: 'API to delete Parameter' })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.parameterService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

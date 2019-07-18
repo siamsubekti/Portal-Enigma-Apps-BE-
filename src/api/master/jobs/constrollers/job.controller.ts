@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors } from '@nestjs/common';
 import { JobService } from '../services/job.service';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
@@ -27,7 +27,7 @@ export class JobController {
     @Post()
     @ApiOperation({ title: 'CREATE Job', description: 'API insert into Jobs' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
-    @ApiOkResponse({ description: 'Success to create jobs.', type: JobResponse })
+    @ApiCreatedResponse({ description: 'Success to create jobs.', type: JobResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() jobDto: JobDTO): Promise<Job> {
         const job: Job = await this.jobService.create(jobDto);
@@ -38,6 +38,7 @@ export class JobController {
     @ApiOperation({ title: 'UPDATE Job', description: 'API update Job' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update jobs.', type: JobResponse })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: number, @Body() jobDto: JobDTO): Promise<Job> {
         const updatedJob: Job = await this.jobService.update(id, jobDto);
@@ -47,6 +48,7 @@ export class JobController {
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ title: 'DELETE Job', description: 'API delete Job by ID' })
+    @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: DeleteResult = await this.jobService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;
