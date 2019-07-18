@@ -7,10 +7,10 @@ import ConfigModule from '../config/config.module';
 import LibraryModule from '../libraries/library.module';
 import AccountModule from './accounts/account.module';
 import AuthModule from './auth/auth.module';
-import { AcademyModule } from './academies/academy.module';
-import { MajorModule } from './majors/major.module';
-import { DegreeModule } from './degrees/degree.module';
-import { RoleModule } from './roles/role.module';
+import { AcademyModule } from './master/academies/academy.module';
+import { MajorModule } from './master/majors/major.module';
+import { DegreeModule } from './master/degrees/degree.module';
+import { RoleModule } from './master/roles/role.module';
 
 @Module({
   imports: [

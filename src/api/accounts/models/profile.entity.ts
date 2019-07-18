@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Generated, Column } from 'typeorm';
+import { Entity, PrimaryColumn, Generated, Column, OneToOne } from 'typeorm';
 
 @Entity('profiles')
 export default class Profile {
