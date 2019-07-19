@@ -32,8 +32,8 @@ export default class AppConfig {
     process.env.SSL_CERT = config['SSL_CERT'] = join(root.get(), config['SSL_CERT']);
 
     Logger.log(`${Object.keys(config).length} configuration items loaded.`, 'AppConfig', true);
-    Logger.debug(`SECRET: ${config['HASH_SECRET']}`, 'AppConfig', true);
-    Logger.debug(JSON.stringify(config), 'AppConfig', true);
+    // Logger.debug(`SECRET: ${config['HASH_SECRET']}`, 'AppConfig', true);
+    // Logger.debug(JSON.stringify(config), 'AppConfig', true);
 
     return config;
   }
