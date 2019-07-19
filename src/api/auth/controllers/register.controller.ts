@@ -1,12 +1,13 @@
-import { Controller, Post, Body, Delete, HttpCode, Get, Param } from '@nestjs/common';
+import { Controller, Post, Body, Delete, HttpCode, Get, Param, UseInterceptors } from '@nestjs/common';
 import { ApiUseTags, ApiOperation, ApiCreatedResponse, ApiImplicitBody, ApiBadRequestResponse, ApiImplicitParam } from '@nestjs/swagger';
-import { AccountRegisterResponse, AccountRegisterDTO, AccountRegisterResponseDTO } from '../models/auth.dto';
+import { AccountRegisterResponse, AccountRegisterDTO, AccountRegisterResponseDTO } from '../models/register.dto';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
+import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import AuthService from '../services/auth.service';
-import ResponseUtil from '../../../libraries/responses/response.util';
 
 @ApiUseTags('Portal')
 @Controller('candidate')
+@UseInterceptors(ResponseRebuildInterceptor)
 export default class RegisterController {
   constructor( private readonly authService: AuthService ) {}
 
@@ -23,7 +24,7 @@ export default class RegisterController {
     }
   }
 
-  @Get('activation/:key/:token')
+  @Post('activation/:key/:token')
   @ApiOperation({title: 'Activate Candidate Account.', description: 'Activate new candidate account based on two parameters.'})
   @ApiImplicitParam({name: 'token', description: 'Activation token.', required: true})
   @ApiImplicitParam({name: 'key', description: 'Activation key.', required: true})
