@@ -4,7 +4,7 @@ import { Get, Controller, Param, Post, Body, Delete, Put, Logger, UseInterceptor
 import { ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiOperation, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { CookieAuthGuard } from '../../../../api/auth/guards/cookie.guard';
 
 @UseGuards(CookieAuthGuard)

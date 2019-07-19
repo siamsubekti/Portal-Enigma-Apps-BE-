@@ -1,7 +1,7 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
-import { IApiPagedResponse, IApiResponse } from 'src/libraries/responses/response.interface';
+import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
+import { IApiPagedResponse, IApiResponse } from '../../../../libraries/responses/response.interface';
 
 export class MajorDTO {
     @ApiModelProperty()

@@ -5,7 +5,7 @@ import { ApiUseTags, ApiOperation, ApiCreatedResponse, ApiImplicitParam,
 import { MajorPagedResponse, MajorResponse, MajorDTO, MajorResponseDTO } from '../models/major.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { CookieAuthGuard } from '../../../../api/auth/guards/cookie.guard';
 
 @UseGuards(CookieAuthGuard)
