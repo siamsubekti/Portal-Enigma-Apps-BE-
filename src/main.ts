@@ -48,7 +48,7 @@ function generateSwagger(app: NestApplication): void {
     .setDescription(`Description of ${config.get('API_NAME')}`)
     .setVersion(config.getPackageInfo('version'))
     .setHost(config.get('API_BASE_URL').replace('https://', '').replace('http://', ''))
-    .setSchemes('https');
+    .setSchemes('http', 'https');
 
   const document: SwaggerDocument = SwaggerModule.createDocument(app, options.build());
   SwaggerModule.setup('swagger-ui', app, document);
