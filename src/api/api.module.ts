@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseConnectionConfig from '../config/database.config';
 import { ApiController } from './main/api.controller';
-import { ApiService } from './main/api.service';
 import ConfigModule from '../config/config.module';
 import LibraryModule from '../libraries/library.module';
 import AccountModule from './accounts/account.module';
@@ -28,6 +27,5 @@ import { RoleModule } from './master/roles/role.module';
     AuthModule,
   ],
   controllers: [ ApiController ],
-  providers: [ ApiService ],
 })
 export default class ApiModule {}

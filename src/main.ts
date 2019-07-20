@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
   app.setBaseViewsDir(join(__dirname, 'views'));
   app.setViewEngine('hbs');
 
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(process.env.API_PORT, '0.0.0.0');
 }
 
 function getServerOptions(): NestApplicationOptions {

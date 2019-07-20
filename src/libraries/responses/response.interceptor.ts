@@ -1,3 +1,4 @@
+import { some } from 'lodash';
 import { Response as ResponseContext } from 'express';
 import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -29,7 +30,7 @@ export default class ResponseRebuildInterceptor<T> implements NestInterceptor<T,
       description: responseContext.statusMessage || HttpStatusMessage[responseContext.statusCode] || '-',
     };
 
-    if (status) {
+    if (status && typeof status === 'object') {
       const { code, description } = status;
       responseStatus = { code, description };
     }
@@ -42,7 +43,11 @@ export default class ResponseRebuildInterceptor<T> implements NestInterceptor<T,
     const status: ResponseStatus = this.rebuildResponseStatus(responseStatus, responseContext);
 
     // Logger.log(body, 'ResponseInterceptor @rebuildResponseBody');
-    if (paging || status) body = data;
-    return { status, data: body, paging};
+    if (typeof responseStatus === 'object' && responseStatus.code && responseStatus.description)
+      delete body.status;
+
+    const respone: Response<T> = { status, data: ( data || body ), paging};
+
+    return respone;
   }
 }
