@@ -30,4 +30,4 @@ import { RoleModule } from './master/roles/role.module';
   controllers: [ ApiController ],
   providers: [ ApiService ],
 })
-export class ApiModule {}
+export default class ApiModule {}

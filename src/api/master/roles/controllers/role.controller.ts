@@ -5,8 +5,8 @@ import { ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
      ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
-import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { CookieAuthGuard } from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Roles')

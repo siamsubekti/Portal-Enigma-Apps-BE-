@@ -18,9 +18,9 @@ import { PasswordResetRequestDTO, PasswordResetDTO } from '../models/password-re
 import { ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
 import ResponseUtil from '../../../libraries/responses/response.util';
 import AuthService from '../services/auth.service';
-import { CookieAuthGuard } from '../guards/cookie.guard';
+import CookieAuthGuard from '../guards/cookie.guard';
 import AppConfig from '../../../config/app.config';
-import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
+import ResponseRebuildInterceptor from '../../../libraries/responses/response.interceptor';
 
 @ApiUseTags('Authentication')
 @Controller('auth')

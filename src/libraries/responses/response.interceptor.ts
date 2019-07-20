@@ -12,25 +12,37 @@ export interface Response<T> {
 }
 
 @Injectable()
-export class ResponseRebuildInterceptor<T> implements NestInterceptor<T, Response<T>> {
+export default class ResponseRebuildInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
-    const response: ResponseContext = context.switchToHttp().getResponse();
-    const status: ResponseStatus = {
-      code: `${response.statusCode}`,
-      description: response.statusMessage || HttpStatusMessage[response.statusCode] || '-',
-    };
+    const responseContext: ResponseContext = context.switchToHttp().getResponse();
 
     // Logger.log(response, 'ResponseInterceptor @intercept', true);
     // Logger.log(status, 'ResponseInterceptor @intercept', true);
 
     return next.handle().pipe(
-      map((body: any) => this.rebuildResponseBody(body, status)));
+      map((body: any) => this.rebuildResponseBody(body, responseContext)));
   }
 
-  private rebuildResponseBody(body: any, status: ResponseStatus): Response<T> {
-    const { data, paging } = body;
+  private rebuildResponseStatus(status: ResponseStatus, responseContext: ResponseContext): ResponseStatus {
+    let responseStatus: ResponseStatus = {
+      code: `${responseContext.statusCode}`,
+      description: responseContext.statusMessage || HttpStatusMessage[responseContext.statusCode] || '-',
+    };
 
-    Logger.log(body, 'ResponseInterceptor @rebuildResponseBody');
-    return { status, data: ( paging ? data : body ), paging};
+    if (status) {
+      const { code, description } = status;
+      responseStatus = { code, description };
+    }
+
+    return responseStatus;
+  }
+
+  private rebuildResponseBody(body: any, responseContext: ResponseContext): Response<T> {
+    const { status: responseStatus, data, paging } = body || { status: undefined, data: undefined, paging: undefined };
+    const status: ResponseStatus = this.rebuildResponseStatus(responseStatus, responseContext);
+
+    // Logger.log(body, 'ResponseInterceptor @rebuildResponseBody');
+    if (paging || status) body = data;
+    return { status, data: body, paging};
   }
 }

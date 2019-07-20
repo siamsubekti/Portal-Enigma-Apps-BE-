@@ -6,8 +6,8 @@ import { ApiUseTags, ApiOperation, ApiImplicitParam,
 import { AcademyResponse, AcademyDTO, AcademiesPagedResponse, AcademyResponseDTO } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { CookieAuthGuard } from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Academies')

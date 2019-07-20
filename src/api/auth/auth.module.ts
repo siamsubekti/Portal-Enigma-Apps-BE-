@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+import { PassportModule } from '@nestjs/passport';
 import AccountModule from '../accounts/account.module';
 import AuthService from './services/auth.service';
 import RegisterController from './controllers/register.controller';
 import ConfigModule from '../../config/config.module';
 import AuthController from './controllers/auth.controller';
-import { PassportModule } from '@nestjs/passport';
 import CookieStrategy from './strategies/cookie.strategy';
+import RegisterService from './services/register.service';
 
 @Module({
   imports: [
@@ -13,8 +14,8 @@ import CookieStrategy from './strategies/cookie.strategy';
     AccountModule,
     PassportModule.register({defaultStrategy: 'cookie', property: 'account', session: false}),
   ],
-  exports: [ AuthService, CookieStrategy ],
-  providers: [ AuthService, CookieStrategy ],
+  exports: [ AuthService, RegisterService, CookieStrategy ],
+  providers: [ AuthService, RegisterService, CookieStrategy ],
   controllers: [ AuthController, RegisterController ],
 })
 export default class AuthModule {}
