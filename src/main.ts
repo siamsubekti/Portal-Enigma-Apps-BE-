@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import * as cookieParser from 'cookie-parser';
+import * as limiter from 'express-rate-limit';
 import * as compression from 'compression';
 import * as helmet from 'helmet';
 // import * as csurf from 'csurf';
-import * as limiter from 'express-rate-limit';
 import { join } from 'path';
 import { NestFactory, NestApplication } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
@@ -22,14 +22,14 @@ async function bootstrap(): Promise<void> {
   app.use(compression());
   app.use(helmet());
   app.use(cookieParser());
-  // app.use(csurf());
-  app.use(limiter({ windowMS: 10 * 60 * 1000, max: 100 }));
+  app.use(limiter({ windowMS: 600000, max: 100 }));
+  // app.use(csurf({ cookie: { secure: true, httpOnly: true, maxAge: 3600, key: process.env.CSRF_TOKEN_NAME} }));
 
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(new ValidationPipe());
   app.useStaticAssets(join(__dirname, '..', 'assets'));
-  app.setBaseViewsDir(join(__dirname, 'views'));
-  app.setViewEngine('hbs');
+  // app.setBaseViewsDir(join(__dirname, 'views'));
+  // app.setViewEngine('hbs');
 
   await app.listen(process.env.API_PORT, '0.0.0.0');
 }

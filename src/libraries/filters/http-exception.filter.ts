@@ -14,6 +14,8 @@ export default class HttpExceptionFilter implements ExceptionFilter {
     const { error } = exception.getResponse() as any;
     let { message } = exception.getResponse() as any;
 
+    // Logger.log(exception.getResponse(), 'HttpExceptionFilter@catch', true);
+
     if (Array.isArray(message)) message = this.extractValidationMessages(message);
 
     body.status = new ResponseStatus();
