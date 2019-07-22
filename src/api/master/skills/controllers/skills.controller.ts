@@ -6,11 +6,11 @@ import Skill from '../models/skill.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
-import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
+import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 
 @Controller('skills')
 @ApiUseTags('Skills')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export class SkillsController {
 
     constructor(private skillService: SkillService) { }

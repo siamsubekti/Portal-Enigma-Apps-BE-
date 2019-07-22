@@ -6,11 +6,11 @@ import Job from '../models/job.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
-import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
+import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export class JobController {
 
     constructor(

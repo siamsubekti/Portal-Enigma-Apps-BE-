@@ -5,11 +5,11 @@ import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/t
 import Template from '../models/template.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
-import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
+import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 
 @Controller('templates')
 @ApiUseTags('Templates')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export class TemplateController {
 
     constructor(private templateService: TemplateService) { }
