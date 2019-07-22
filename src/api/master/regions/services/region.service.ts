@@ -13,6 +13,10 @@ export class RegionService {
         return await this.regionRepository.find();
     }
 
+    async findById(id: string): Promise<Region> {
+        return await this.regionRepository.findOne(id);
+    }
+
     async create(regionDto: RegionDTO): Promise<Region> {
         const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
         if (exist) throw new BadRequestException('Data ini telah ada.');

@@ -13,6 +13,10 @@ export class JobService {
         return await this.jobRepository.find();
     }
 
+    async findById(id: number): Promise<Job> {
+        return await this.jobRepository.findOne(id);
+    }
+
     async create(jobDto: JobDTO): Promise<Job> {
         const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
         if (exist) throw new BadRequestException('Data ini telah ada.');

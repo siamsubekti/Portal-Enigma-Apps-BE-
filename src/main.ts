@@ -4,14 +4,14 @@ import * as compression from 'compression';
 import * as helmet from 'helmet';
 // import * as csurf from 'csurf';
 import * as limiter from 'express-rate-limit';
-import { NestFactory, NestApplication } from '@nestjs/core';
 import { join } from 'path';
+import { NestFactory, NestApplication } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface';
 import { SwaggerModule, DocumentBuilder, SwaggerDocument } from '@nestjs/swagger';
 import AppConfig from './config/app.config';
-import { ApiModule } from './api/api.module';
-import { HttpExceptionFilter } from './libraries/filters/http-exception.filter';
-import { NestApplicationOptions } from '@nestjs/common/interfaces/nest-application-options.interface';
+import ApiModule from './api/api.module';
+import HttpExceptionFilter from './libraries/filters/http-exception.filter';
 
 async function bootstrap(): Promise<void> {
   const app: NestApplication = await NestFactory.create(ApiModule, getServerOptions());
@@ -31,7 +31,7 @@ async function bootstrap(): Promise<void> {
   app.setBaseViewsDir(join(__dirname, 'views'));
   app.setViewEngine('hbs');
 
-  await app.listen(3000, '0.0.0.0');
+  await app.listen(process.env.API_PORT, '0.0.0.0');
 }
 
 function getServerOptions(): NestApplicationOptions {
@@ -48,7 +48,7 @@ function generateSwagger(app: NestApplication): void {
     .setDescription(`Description of ${config.get('API_NAME')}`)
     .setVersion(config.getPackageInfo('version'))
     .setHost(config.get('API_BASE_URL').replace('https://', '').replace('http://', ''))
-    .setSchemes('https');
+    .setSchemes('http', 'https');
 
   const document: SwaggerDocument = SwaggerModule.createDocument(app, options.build());
   SwaggerModule.setup('swagger-ui', app, document);

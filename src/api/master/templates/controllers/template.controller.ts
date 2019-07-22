@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards } from '@nestjs/common';
 import { TemplateService } from '../services/template.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
 
 @Controller('templates')
 @ApiUseTags('Templates')
+// @UseGuards(CookieAuthGuard)
 export class TemplateController {
 
     constructor(private templateService: TemplateService) { }
@@ -20,6 +22,15 @@ export class TemplateController {
     async get(): Promise<Template[]> {
         const templates: Template[] = await this.templateService.findAll();
         return templates;
+    }
+
+    @Get(':id')
+    @ApiOperation({ title: 'GET Template By Id', description: 'API Get template by id.' })
+    @ApiOkResponse({ description: 'Success to get template by id.', type: TemplateResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getById(@Param('id') id : number ): Promise<Template> {
+        const template : Template = await this.templateService.findById(id);
+        return template;
     }
 
     @Post()

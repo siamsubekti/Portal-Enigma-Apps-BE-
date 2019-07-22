@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
 @Injectable()
-export class CookieAuthGuard extends AuthGuard('cookie') {
+export default class CookieAuthGuard extends AuthGuard('cookie') {
   canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
     // Add your custom authentication logic here
     // for example, call super.logIn(request) to establish a session.

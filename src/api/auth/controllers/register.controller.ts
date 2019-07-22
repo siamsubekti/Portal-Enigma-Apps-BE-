@@ -2,14 +2,14 @@ import { Controller, Post, Body, Delete, HttpCode, Get, Param, UseInterceptors }
 import { ApiUseTags, ApiOperation, ApiCreatedResponse, ApiImplicitBody, ApiBadRequestResponse, ApiImplicitParam } from '@nestjs/swagger';
 import { AccountRegisterResponse, AccountRegisterDTO, AccountRegisterResponseDTO } from '../models/register.dto';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
-import AuthService from '../services/auth.service';
+import ResponseRebuildInterceptor from '../../../libraries/responses/response.interceptor';
+import RegisterService from '../services/register.service';
 
 @ApiUseTags('Portal')
 @Controller('candidate')
 @UseInterceptors(ResponseRebuildInterceptor)
 export default class RegisterController {
-  constructor( private readonly authService: AuthService ) {}
+  constructor( private readonly registerService: RegisterService ) {}
 
   @Post('register')
   @ApiOperation({title: 'Register Candidate.', description: 'Register new candidate based on received form data.'})
@@ -18,7 +18,7 @@ export default class RegisterController {
   @ApiImplicitBody({name: 'AccountRegisterDTO', description: 'Candidate form data.', type: AccountRegisterDTO})
   async register(@Body() form: AccountRegisterDTO): Promise<AccountRegisterResponseDTO> {
     try {
-      return await this.authService.preRegister(form);
+      return await this.registerService.preRegister(form);
     } catch (exception) {
       throw exception;
     }
@@ -32,8 +32,8 @@ export default class RegisterController {
   @ApiBadRequestResponse({description: 'Parameter validation failed.', type: ApiExceptionResponse})
   async activate(@Param('key') key: string, @Param('token') token: string): Promise<AccountRegisterResponseDTO> {
     try {
-      const account: AccountRegisterDTO = await this.authService.preActivation(key, token);
-      return await this.authService.register(key, account);
+      const account: AccountRegisterDTO = await this.registerService.preActivation(key, token);
+      return await this.registerService.register(key, account);
 
     } catch (exception) {
       throw exception;

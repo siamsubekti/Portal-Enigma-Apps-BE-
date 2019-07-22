@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards } from '@nestjs/common';
 import { JobService } from '../services/job.service';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
+// @UseGuards(CookieAuthGuard)
 export class JobController {
 
     constructor(
@@ -22,6 +24,15 @@ export class JobController {
     async get(): Promise<Job[]> {
         const jobs: Job[] = await this.jobService.findAll();
         return jobs;
+    }
+
+    @Get(':id')
+    @ApiOperation({ title: 'GET Job By Id', description: 'API get job by id' })
+    @ApiOkResponse({ description: 'Success to get job by id', type: JobResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getById(@Param('id') id: number): Promise<Job> {
+        const job: Job = await this.jobService.findById(id);
+        return job;
     }
 
     @Post()

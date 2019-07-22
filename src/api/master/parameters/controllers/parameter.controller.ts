@@ -2,9 +2,9 @@ import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpC
 import { ParameterService } from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
-import { CookieAuthGuard } from 'src/api/auth/guards/cookie.guard';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
 
 @Controller('parameters')

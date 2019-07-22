@@ -13,6 +13,10 @@ export class SkillService {
         return await this.skillRepository.find();
     }
 
+    async findById(id: number): Promise<Skill> {
+        return await this.skillRepository.findOne(id);
+    }
+
     async create(skillDto: SkillDTO): Promise<Skill> {
         const skill: Skill = await this.skillRepository.findOne({
             where: { name: skillDto.name },

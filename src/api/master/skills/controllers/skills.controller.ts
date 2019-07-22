@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards } from '@nestjs/common';
 import { SkillService } from '../services/skill.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { SkillDTO, SkillPageResponse, SkillResponse } from '../models/skill.dto';
 import Skill from '../models/skill.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
 
 @Controller('skills')
 @ApiUseTags('Skills')
+// @UseGuards(CookieAuthGuard)
 export class SkillsController {
 
     constructor(private skillService: SkillService) { }
@@ -20,6 +22,15 @@ export class SkillsController {
     async get(): Promise<Skill[]> {
         const skills: Skill[] = await this.skillService.findAll();
         return skills;
+    }
+
+    @Get(':id')
+    @ApiOperation({ title: 'GET Skill By Id', description: 'API Get skill by id.' })
+    @ApiOkResponse({ description: 'Success to get skill by id.', type: SkillResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getById(@Param('id') id: number): Promise<Skill> {
+        const skill: Skill = await this.skillService.findById(id);
+        return skill;
     }
 
     @Post()

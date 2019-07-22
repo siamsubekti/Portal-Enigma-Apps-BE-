@@ -13,6 +13,10 @@ export class TemplateService {
         return await this.templateRepository.find();
     }
 
+    async findById(id: number): Promise<Template> {
+        return await this.templateRepository.findOne(id);
+    }
+
     async create(templateDto: TemplateDTO): Promise<Template> {
         const template: Template = await this.templateRepository.findOne({
             where: { name: templateDto.name },

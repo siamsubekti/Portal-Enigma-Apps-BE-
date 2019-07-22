@@ -6,7 +6,7 @@ import { ResponseStatus } from '../responses/response.class';
 import { ValidationError } from 'class-validator';
 
 @Catch(HttpException)
-export class HttpExceptionFilter implements ExceptionFilter {
+export default class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost): void {
     const ctx: HttpArgumentsHost = host.switchToHttp();
     const response: Response = ctx.getResponse<Response>();

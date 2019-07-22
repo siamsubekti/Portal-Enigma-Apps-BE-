@@ -1,14 +1,16 @@
-import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards } from '@nestjs/common';
 import { RegionService } from '../services/region.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import ResponseRebuildInterceptor from '../../../../libraries/responses/response.interceptor';
 
 @Controller('regions')
 @ApiUseTags('Regions')
+// @UseGuards(CookieAuthGuard)
 export class RegionController {
 
     constructor(
@@ -22,6 +24,15 @@ export class RegionController {
     async get(): Promise<Region[]> {
         const regions: Region[] = await this.regionServices.findAll();
         return regions;
+    }
+
+    @Get(':id')
+    @ApiOperation({ title: 'GET Region By Id', description: 'API Get region by Id' })
+    @ApiOkResponse({ description: 'Success to get region by Id.', type: RegionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getById(@Param('id') id: string): Promise<Region> {
+        const region: Region = await this.regionServices.findById(id);
+        return region;
     }
 
     @Post()
