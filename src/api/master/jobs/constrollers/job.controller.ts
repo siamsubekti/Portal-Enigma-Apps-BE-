@@ -3,7 +3,7 @@ import { JobService } from '../services/job.service';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
-import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';

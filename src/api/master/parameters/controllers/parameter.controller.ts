@@ -5,7 +5,7 @@ import Parameter from '../models/parameter.entity';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 
 @Controller('parameters')
 @ApiUseTags('Parameters')

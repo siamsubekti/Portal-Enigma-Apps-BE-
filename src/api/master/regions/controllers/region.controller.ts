@@ -4,7 +4,7 @@ import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCrea
 import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
-import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 

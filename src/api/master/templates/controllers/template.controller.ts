@@ -3,7 +3,7 @@ import { TemplateService } from '../services/template.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
 import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
-import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 
