@@ -1,22 +1,30 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import DatabaseConnectionConfig from '../config/database.config';
 import { ApiController } from './main/api.controller';
-import { ApiService } from './main/api.service';
-import ConfigModule from '../config/config.module';
-import LibraryModule from '../libraries/library.module';
-import AccountModule from './accounts/account.module';
-import AuthModule from './auth/auth.module';
+import { JobModule } from './master/jobs/job.module';
+import { RegionsModule } from './master/regions/regions.module';
+import { SkillsModule } from './master/skills/skills.module';
+import { TemplateModule } from './master/templates/template.module';
+import { ParameterModule } from './master/parameters/parameter.module';
 import { AcademyModule } from './master/academies/academy.module';
 import { MajorModule } from './master/majors/major.module';
 import { DegreeModule } from './master/degrees/degree.module';
 import { RoleModule } from './master/roles/role.module';
 import { MenuModule } from './master/menus/menu.module';
+import DatabaseConnectionConfig from '../config/database.config';
+import ConfigModule from '../config/config.module';
+import LibraryModule from '../libraries/library.module';
+import AccountModule from './accounts/account.module';
+import AuthModule from './auth/auth.module';
 
 @Module({
   imports: [
     ConfigModule,
     LibraryModule,
+    JobModule,
+    RegionsModule,
+    SkillsModule,
+    TemplateModule,
     AcademyModule,
     MajorModule,
     DegreeModule,
@@ -28,8 +36,8 @@ import { MenuModule } from './master/menus/menu.module';
     }),
     AccountModule,
     AuthModule,
+    ParameterModule,
   ],
   controllers: [ ApiController ],
-  providers: [ ApiService ],
 })
-export class ApiModule {}
+export default class ApiModule {}

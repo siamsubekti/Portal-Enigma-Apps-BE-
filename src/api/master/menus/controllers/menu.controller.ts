@@ -27,7 +27,7 @@ export class MenuController {
         }
     }
 
-    @Post('/create')
+    @Post('')
     @ApiOperation({title: 'Create Menu', description: 'Create Menu'})
     @ApiCreatedResponse({description: 'OK', type: MenuResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})

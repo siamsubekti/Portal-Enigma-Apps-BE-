@@ -13,6 +13,7 @@ export class RoleService {
 
     async getRoles(): Promise<RoleResponseDTO[]> {
         const role: Role[] = await this.roleRepository.find();
+        Logger.log(role);
         try {
             return role;
         } catch (error) {
