@@ -11,6 +11,7 @@ import { AcademyModule } from './master/academies/academy.module';
 import { MajorModule } from './master/majors/major.module';
 import { DegreeModule } from './master/degrees/degree.module';
 import { RoleModule } from './master/roles/role.module';
+import { MenuModule } from './master/menus/menu.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RoleModule } from './master/roles/role.module';
     MajorModule,
     DegreeModule,
     RoleModule,
+    MenuModule,
     TypeOrmModule.forRootAsync({
       imports: [ ConfigModule ],
       useClass: DatabaseConnectionConfig,
