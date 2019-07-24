@@ -10,7 +10,7 @@ export default class Account {
   @Column({type: 'varchar', length: 255, unique: true, nullable: false})
   username: string;
 
-  @Column({type: 'varchar', length: 64, nullable: false})
+  @Column({type: 'varchar', length: 64, nullable: false, select: false })
   password: string;
 
   @Column({type: 'varchar', length: 15, nullable: false, default: 'INACTIVE'})

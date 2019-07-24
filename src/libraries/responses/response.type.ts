@@ -3,7 +3,7 @@ import { IApiResponse, IApiPagedResponse } from './response.interface';
 import { ResponseStatus, PagingData } from './response.class';
 
 export class ApiResponse implements IApiResponse {
-  @ApiModelProperty({type: ResponseStatus})
+  @ApiModelProperty({ type: ResponseStatus })
   status: ResponseStatus;
 
   @ApiModelProperty()
@@ -11,17 +11,17 @@ export class ApiResponse implements IApiResponse {
 }
 
 export class ApiExceptionResponse {
-  @ApiModelProperty({type: ResponseStatus})
+  @ApiModelProperty({ type: ResponseStatus })
   status: ResponseStatus;
 }
 
 export class ApiPagedResponse implements IApiPagedResponse {
-  @ApiModelProperty()
+  @ApiModelProperty({ type: ResponseStatus })
   status: ResponseStatus;
 
-  @ApiModelProperty({type: []})
+  @ApiModelProperty({ type: Array })
   data: any[];
 
-  @ApiModelProperty()
+  @ApiModelProperty({ type: PagingData })
   paging: PagingData;
 }

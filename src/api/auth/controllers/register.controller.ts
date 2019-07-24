@@ -32,7 +32,7 @@ export default class RegisterController {
   @ApiBadRequestResponse({description: 'Parameter validation failed.', type: ApiExceptionResponse})
   async activate(@Param('key') key: string, @Param('token') token: string): Promise<AccountRegisterResponseDTO> {
     try {
-      const account: AccountRegisterDTO = await this.registerService.preActivation(key, token);
+      const account: AccountRegisterDTO = await this.registerService.preActivation(decodeURI(key), decodeURI(token));
       return await this.registerService.register(key, account);
 
     } catch (exception) {

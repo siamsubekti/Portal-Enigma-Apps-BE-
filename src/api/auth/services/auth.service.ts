@@ -33,6 +33,7 @@ export default class AuthService {
   async login(credential: LoginCredentialDTO): Promise<LoginResponseDTO> {
     let loginResponse: LoginResponseDTO = null;
     const account: Account = await this.accountService.findByUsername(credential.username);
+
     try {
       if ( account && await this.hashUtil.compare(credential.password, account.password) )
         loginResponse = {
@@ -155,7 +156,7 @@ export default class AuthService {
   private async sendPasswordResetEmail(credential: PasswordResetCredential): Promise<boolean> {
     try {
       const { account: { profile: { fullname: name }, username: to }, key, token } = credential;
-      const resetPasswordLink: string = `${this.config.get('API_BASE_URL')}/password-reset/${encodeURI(key)}/${encodeURI(token)}`;
+      const resetPasswordLink: string = encodeURI(`${this.config.get('API_BASE_URL')}/password-reset/${key}/${token}`);
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
         name, resetPasswordLink, baseUrl: this.config.get('API_BASE_URL'),
       });

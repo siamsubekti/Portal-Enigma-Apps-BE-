@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, Put, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, Put, Param, UseInterceptors, Logger } from '@nestjs/common';
 import { Response, Request } from 'express';
 import {
   ApiUseTags,
@@ -47,6 +47,7 @@ export default class AuthController {
         httpOnly: true,
         secure: true,
       });
+
       response.json(body);
     } else
       throw new ForbiddenException('Invalid account credential.');
