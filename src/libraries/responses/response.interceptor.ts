@@ -13,7 +13,7 @@ export interface Response<T> {
 }
 
 @Injectable()
-export default class ResponseRebuildInterceptor<T> implements NestInterceptor<T, Response<T>> {
+export class ResponseRebuildInterceptor<T> implements NestInterceptor<T, Response<T>> {
   intercept(context: ExecutionContext, next: CallHandler): Observable<Response<T>> {
     const responseContext: ResponseContext = context.switchToHttp().getResponse();
 
@@ -46,7 +46,7 @@ export default class ResponseRebuildInterceptor<T> implements NestInterceptor<T,
     if (typeof responseStatus === 'object' && responseStatus.code && responseStatus.description)
       delete body.status;
 
-    const respone: Response<T> = { status, data: ( data || body ), paging};
+    const respone: Response<T> = { status, data: (data || body), paging };
 
     return respone;
   }

@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, Logger } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { ApiResponse } from '../responses/response.type';
@@ -31,6 +31,6 @@ export default class HttpExceptionFilter implements ExceptionFilter {
     const error: ValidationError = errors.shift();
     const constraint: string = Object.keys(error.constraints).shift();
 
-    return `Form validation failed: ${error.constraints[ constraint ]}.`;
+    return `Form validation failed: ${error.constraints[constraint]}.`;
   }
 }

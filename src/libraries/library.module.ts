@@ -20,4 +20,4 @@ import TemplateUtil from './utilities/template.util';
   exports: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
   providers: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
 })
-export default class LibraryModule {}
+export default class LibraryModule { }

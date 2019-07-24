@@ -1,6 +1,6 @@
 {
   "name": "ms-enigma-backend",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "Enigma Portal backend service.",
   "author": "Enigma Portal Developer Team",
   "repository": {
@@ -13,7 +13,7 @@
     "format": "prettier --write \"src/**/*.ts\"",
     "oy": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\"",
     "start": "ts-node -r tsconfig-paths/register src/main.ts",
-    "start:dev": "concurrently --handle-input \"wait-on dist/main.js && nodemon\" \"tsc -w -p tsconfig.build.json\" ",
+    "start:dev": "nodemon",
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && npm run build",
     "start:prod": "node dist/main.js",
