@@ -1,10 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import * as moment from 'moment-timezone';
+import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AccountQueryDTO, AccountQueryResult } from '../models/account.dto';
+import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO } from '../models/account.dto';
 import { AccountStatus } from '../../../config/constants';
-import Account from '../models/account.entity';
 import AppConfig from '../../../config/app.config';
+import Account from '../models/account.entity';
+import Profile from '../models/profile.entity';
 
 @Injectable()
 export default class AccountService {
@@ -54,6 +56,30 @@ export default class AccountService {
       result: result[0],
       totalRows: result[1],
     };
+  }
+
+  async update(id: string, data: AccountProfileDTO): Promise<Account> {
+    const account: Account = await this.get(id);
+    if (!account) throw new HttpException(
+      {
+        status: HttpStatus.NOT_FOUND,
+        error: `Account not found with ID ${id}`,
+      }, 404);
+
+    const profile: Profile = account.profile;
+    profile.fullname = data.fullname;
+    profile.nickname = data.nickname || data.fullname.substring(0, data.fullname.indexOf(' '));
+    profile.email = data.email;
+    profile.phone = data.phone;
+    profile.birthdate = moment(`${data.birthdate} 00:00:00`, 'DD-MM-YYYY HH:mm:ss').toDate();
+    profile.gender = data.gender;
+    profile.religion = data.religion;
+    profile.maritalStatus = data.maritalStatus;
+
+    account.username = data.username;
+    account.profile = profile;
+
+    return account;
   }
 
   async countByUsername(username: string): Promise<number> {

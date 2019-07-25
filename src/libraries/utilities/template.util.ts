@@ -1,6 +1,7 @@
 import * as hbs from 'express-handlebars';
+import { existsSync } from 'fs';
 import { join, normalize } from 'path';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, HttpException } from '@nestjs/common';
 import AppConfig from '../../config/app.config';
 
 @Injectable()
@@ -15,11 +16,13 @@ export default class TemplateUtil {
     this.engine = hbs.create(this.config.viewEngine());
   }
 
-  async renderToString(viewPath: string, data: any): Promise<string> {
-    viewPath = join(this.config.get('SRC_PATH'), 'views', viewPath);
-    viewPath = normalize(viewPath);
+  async renderToString(view: string, data: any): Promise<string> {
+    view = join(this.config.get('BASE_PATH'), 'views', view);
+    view = normalize(view);
 
-    Logger.log(`Render: ${viewPath}`, 'TemplateUtil @renderToString', true);
-    return await this.engine.render(viewPath, data);
+    Logger.log(`Render: ${view}`, 'TemplateUtil @renderToString', true);
+    if (!existsSync(view)) throw new Error(`File not found ${view}.`);
+
+    return await this.engine.render(view, data);
   }
 }
