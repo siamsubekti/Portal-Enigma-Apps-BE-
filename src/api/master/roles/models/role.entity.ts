@@ -27,7 +27,7 @@ export default class Role {
   @JoinTable({
     name: 'roles_has_menus',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' }
+    inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' },
   })
   menus: Menu[];
 }
