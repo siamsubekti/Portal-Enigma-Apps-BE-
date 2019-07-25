@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Generated, Column, ManyToMany, JoinColumn, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinColumn } from 'typeorm';
 import Role from '../../roles/models/role.entity';
 
 @Entity('mst_menus')
@@ -12,9 +12,16 @@ export default class Menu {
     @Column({type: 'varchar', length: 255, nullable: false})
     name: string;
 
+    @Column({type: 'smallint', length: 3})
+    order: number;
+
     @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 
-    @ManyToMany((type: Role) => Role, (role: Role) => role.menus)
+    @OneToMany(() => Menu, (menu: Menu) => menu.children)
+    @JoinColumn({name: 'children_id'})
+    children: Menu;
+
+    @ManyToMany(() => Role, (role: Role) => role.menus)
     roles: Role[];
 }
