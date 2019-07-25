@@ -9,10 +9,8 @@ import {
   ApiNotFoundResponse,
   ApiImplicitBody,
   ApiBadRequestResponse,
-  ApiNoContentResponse,
-  ApiExcludeEndpoint,
 } from '@nestjs/swagger';
-import { Controller, UseGuards, Get, Put, Delete, Query, Param, Body } from '@nestjs/common';
+import { Controller, UseGuards, Get, Put, Query, Param, Body } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
 import { AccountResponse, AccountProfileDTO } from '../models/account.dto';
@@ -23,6 +21,7 @@ import Account from '../models/account.entity';
 
 @Controller('accounts')
 @ApiUseTags('Accounts')
+@UseGuards(CookieAuthGuard)
 export default class AccountController {
   constructor(
     private readonly accountService: AccountService,
@@ -83,39 +82,39 @@ export default class AccountController {
     return { data };
   }
 
-  @Put(':id/suspend')
-  @ApiExcludeEndpoint()
-  @ApiOperation({ title: 'Suspend an account.', description: 'Suspend account, prevents a user from logging in using own account credential.' })
-  @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
-  @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
-  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-  async suspend(@Param('id') id: string): Promise<void> {
-    return undefined;
-  }
+  // @Put(':id/suspend')
+  // @ApiExcludeEndpoint()
+  // @ApiOperation({ title: 'Suspend an account.', description: 'Suspend account, prevents a user from logging in using own account credential.' })
+  // @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
+  // @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
+  // @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
+  // @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  // @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  // async suspend(@Param('id') id: string): Promise<void> {
+  //   return undefined;
+  // }
 
-  @Put(':id/blacklist')
-  @ApiExcludeEndpoint()
-  @ApiOperation({ title: 'Blacklist an account.', description: 'Effectively block an account, prevents a user from logging in using own account credential.' })
-  @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
-  @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
-  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-  async blacklist(@Param('id') id: string): Promise<void> {
-    return undefined;
-  }
+  // @Put(':id/blacklist')
+  // @ApiExcludeEndpoint()
+  // @ApiOperation({ title: 'Blacklist an account.', description: 'Effectively block an account, prevents a user from logging in using own account credential.' })
+  // @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
+  // @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
+  // @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
+  // @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  // @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  // async blacklist(@Param('id') id: string): Promise<void> {
+  //   return undefined;
+  // }
 
-  @Delete(':id')
-  @ApiExcludeEndpoint()
-  @ApiOperation({ title: 'Delete an account', description: 'Delete account and all of its related content.' })
-  @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiNoContentResponse({ description: 'Account data has beend deleted.'})
-  @ApiNotFoundResponse({ description: 'Account data not found.', type: ApiExceptionResponse })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-  async delete(@Param('id') id: string): Promise<void> {
-    return undefined;
-  }
+  // @Delete(':id')
+  // @ApiExcludeEndpoint()
+  // @ApiOperation({ title: 'Delete an account', description: 'Delete account and all of its related content.' })
+  // @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
+  // @ApiNoContentResponse({ description: 'Account data has beend deleted.'})
+  // @ApiNotFoundResponse({ description: 'Account data not found.', type: ApiExceptionResponse })
+  // @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  // @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  // async delete(@Param('id') id: string): Promise<void> {
+  //   return undefined;
+  // }
 }

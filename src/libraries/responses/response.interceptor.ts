@@ -1,6 +1,5 @@
-import { some } from 'lodash';
 import { Response as ResponseContext } from 'express';
-import { Injectable, NestInterceptor, ExecutionContext, CallHandler, Logger } from '@nestjs/common';
+import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ResponseStatus, PagingData } from './response.class';

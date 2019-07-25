@@ -1,7 +1,10 @@
+import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail } from 'class-validator';
+import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
 import Account from './account.entity';
-import { ApiModelProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail } from 'class-validator';
+import Role from '../../master/roles/models/role.entity';
+import Menu from '../../master/menus/models/menu.entity';
+import Service from '../../master/services/models/service.entity';
 
 export class AccountResponse {
   status?: ResponseStatus;
@@ -79,4 +82,10 @@ export class AccountQueryDTO {
 export class AccountQueryResult {
   result: Account[] | Account;
   totalRows: number;
+}
+
+export class AccountPrivilege {
+  roles: Role[];
+  menus: Menu[];
+  services: Service[];
 }

@@ -1,5 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsDefined, IsNotEmpty, MaxLength, MinLength, IsEmail } from 'class-validator';
+import { IsDefined, IsNotEmpty, IsEmail } from 'class-validator';
 import { IApiResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
 
