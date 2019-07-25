@@ -23,7 +23,6 @@ import Account from '../models/account.entity';
 
 @Controller('accounts')
 @ApiUseTags('Accounts')
-@UseGuards(CookieAuthGuard)
 export default class AccountController {
   constructor(
     private readonly accountService: AccountService,

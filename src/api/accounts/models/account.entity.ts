@@ -1,5 +1,6 @@
-import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import Profile from './profile.entity';
+import Role from '../../../api/master/roles/models/role.entity';
 
 @Entity('accounts')
 export default class Account {
@@ -25,4 +26,12 @@ export default class Account {
   @OneToOne((type: Profile) => Profile, (profile: Profile) => profile.account)
   @JoinColumn({name: 'profile_id'})
   profile: Profile;
+
+  @ManyToMany((type: Role) => Role, (role: Role) => role.account)
+  @JoinTable({
+    name: 'accounts_has_roles',
+    joinColumn: { name: 'role_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'account_id', referencedColumnName: 'id' },
+  })
+  roles: Role[];
 }
