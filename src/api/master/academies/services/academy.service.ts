@@ -1,8 +1,8 @@
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { Injectable, Logger, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Academy from '../models/academy.entity';
-import { AcademyResponseDTO, AcademyDTO } from '../models/academy.dto';
+import { AcademyResponseDTO, AcademyDTO, AcademiesQueryDTO, AcademiesQueryResult } from '../models/academy.dto';
 
 @Injectable()
 export class AcademyService {
@@ -11,13 +11,40 @@ export class AcademyService {
     private readonly academyRepository: Repository<Academy>,
     ) {}
 
-    async getAcademies(): Promise<AcademyResponseDTO[]>  {
-        try {
-            const Result: Academy[] = await this.academyRepository.find();
-            return Result;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+    async all(queryParams: AcademiesQueryDTO): Promise<AcademiesQueryResult> {
+        let query: SelectQueryBuilder<Academy> = this.academyRepository.createQueryBuilder('a').select('a');
+
+        if (queryParams.term) {
+          let { term } = queryParams;
+          term = `%${term}%`;
+          query = query
+            .orWhere('a.code LIKE :term', { term })
+            .orWhere('a.name LIKE :term', { term })
+            .orWhere('a.phone LIKE :term', { term });
         }
+
+        if (queryParams.order && queryParams.sort) {
+          const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+          const orderCols: { [key: string]: string } = {
+            code: 'a.code',
+            name: 'a.name',
+            phone: 'a.phone',
+          };
+
+          query = query.orderBy( orderCols[ queryParams.order ], sort );
+        } else
+          query = query.orderBy( 'a.name', 'ASC' );
+
+        query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
+        query.limit( queryParams.rowsPerPage );
+
+        const result: [ Academy[], number ] = await query.getManyAndCount();
+        Logger.log(queryParams, 'AcademiesService@all', true);
+
+        return {
+          result: result[0],
+          totalRows: result[1],
+        };
     }
 
     async insertAcademy(academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {

@@ -1,32 +1,55 @@
 import { AcademyService } from '../services/academy.service';
-import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiImplicitParam,
     ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse,
-    ApiOkResponse, ApiNotFoundResponse
+    ApiOkResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AcademyResponse, AcademyDTO, AcademiesPagedResponse, AcademyResponseDTO } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
-import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { ApiExceptionResponse, ApiPagedResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import { PagingData } from 'src/libraries/responses/response.class';
+import AppConfig from '../../../../config/app.config';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Academies')
 @Controller('academies')
 export class AcademyController {
     constructor(
-        private academyService: AcademyService) { }
+        private academyService: AcademyService,
+        private readonly config: AppConfig) { }
 
-    @Get('list')
-    @ApiOperation({ title: 'List Academies', description: 'All Academies' })
-    @ApiOkResponse({ description: 'OK', type: AcademiesPagedResponse })
-    @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
+    @Get()
+    @ApiOperation({ title: 'List of Academies.', description: 'Get list of academies from database.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, or phone)', type: ['code', 'name', 'phone'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'List of academies.', type: ApiPagedResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async listAcademies(): Promise<AcademyDTO[]> {
-        const academy: AcademyDTO[] = await this.academyService.getAcademies();
-        Logger.log(academy);
-        return academy;
+    async all(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' | 'phone' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<AcademiesPagedResponse> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.academyService.all({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+        page,
+        rowsPerPage,
+        totalPages: Math.ceil( totalRows / rowsPerPage ),
+        totalRows,
+        };
+        return {
+            status: {
+                code: '200',
+                description: 'Success',
+            }, data, paging };
     }
 
     @Post('create')
