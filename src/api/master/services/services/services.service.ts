@@ -24,7 +24,7 @@ export class ServicesService {
                 .orWhere('s.code LIKE :term', { term })
                 .orWhere('s.name LIKE :term', { term })
                 .orWhere('r.code LIKE :term', { term })
-                .orWhere('r.name LIKE :term', { term })
+                .orWhere('r.name LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
@@ -61,13 +61,13 @@ export class ServicesService {
     }
 
     async remove(id: number): Promise<DeleteResult> {
-        const service = await this.serviceRepository.count({ where: { id } }) === 1;
+        const service: boolean = await this.serviceRepository.count({ where: { id } }) === 1;
         if (!service) throw new NotFoundException(`Service with id : ${id} not found.`);
         return await this.serviceRepository.delete(id);
     }
 
     async update(id: number, serviceDto: ServiceDTO): Promise<Service> {
-        let service = await this.serviceRepository.findOne({ where: { id } });
+        let service: Service = await this.serviceRepository.findOne({ where: { id } });
         if (!service) throw new NotFoundException(`Service with id : ${id} not found.`);
         else {
             service = await this.serviceRepository.merge(serviceDto);
