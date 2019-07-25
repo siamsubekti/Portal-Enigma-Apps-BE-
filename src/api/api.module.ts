@@ -10,6 +10,7 @@ import { AcademyModule } from './master/academies/academy.module';
 import { MajorModule } from './master/majors/major.module';
 import { DegreeModule } from './master/degrees/degree.module';
 import { RoleModule } from './master/roles/role.module';
+import { ServicesModule } from './master/services/services.module';
 import DatabaseConnectionConfig from '../config/database.config';
 import ConfigModule from '../config/config.module';
 import LibraryModule from '../libraries/library.module';
@@ -35,7 +36,8 @@ import AuthModule from './auth/auth.module';
     AccountModule,
     AuthModule,
     ParameterModule,
+    ServicesModule,
   ],
-  controllers: [ ApiController ],
+  controllers: [ ApiController],
 })
 export default class ApiModule {}

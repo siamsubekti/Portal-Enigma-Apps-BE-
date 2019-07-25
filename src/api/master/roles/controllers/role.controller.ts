@@ -9,8 +9,9 @@ import { ApiExceptionResponse } from '../../../../libraries/responses/response.t
 import { DeleteResult } from 'typeorm';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import Role from '../models/role.entity';
 
-@UseGuards(CookieAuthGuard)
+// @UseGuards(CookieAuthGuard)
 @ApiUseTags('Roles')
 @Controller('roles')
 export class RoleController {
@@ -22,8 +23,8 @@ export class RoleController {
     @ApiOkResponse({ description: 'List Roles', type: RolePagedResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async list(): Promise<RoleDTO[]> {
-        const role: RoleDTO[] = await this.roleService.getRoles();
+    async list(): Promise<Role[]> {
+        const role: Role[] = await this.roleService.getRoles();
         Logger.log(role);
         return role;
     }

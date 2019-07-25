@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards } from '@nestjs/common';
 import { JobService } from '../services/job.service';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -10,7 +10,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
-@UseGuards(CookieAuthGuard)
+// @UseGuards(CookieAuthGuard)
 export class JobController {
 
     constructor(
@@ -20,15 +20,26 @@ export class JobController {
     @Get()
     @ApiOperation({ title: 'GET Jobs', description: 'API get list Jobs' })
     @ApiOkResponse({ description: 'Success to get list of jobs.', type: JobPageResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async get(): Promise<Job[]> {
         const jobs: Job[] = await this.jobService.findAll();
         return jobs;
     }
 
+    // @Get(':keyword')
+    // @ApiOperation({ title: 'GET Jobs', description: 'API get list Jobs' })
+    // @ApiOkResponse({ description: 'Success to get list of jobs.', type: JobPageResponse })
+    // @UseInterceptors(ResponseRebuildInterceptor)
+    // async search(@Param('keyword')keyword: string): Promise<Job[]> {
+    //     const jobs: Job[] = await this.jobService.search(keyword);
+    //     return jobs;
+    // }
+
     @Get(':id')
     @ApiOperation({ title: 'GET Job By Id', description: 'API get job by id' })
     @ApiOkResponse({ description: 'Success to get job by id', type: JobResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async getById(@Param('id') id: number): Promise<Job> {
         const job: Job = await this.jobService.findById(id);
@@ -39,6 +50,7 @@ export class JobController {
     @ApiOperation({ title: 'CREATE Job', description: 'API insert into Jobs' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiCreatedResponse({ description: 'Success to create jobs.', type: JobResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() jobDto: JobDTO): Promise<Job> {
         const job: Job = await this.jobService.create(jobDto);
@@ -50,6 +62,7 @@ export class JobController {
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update jobs.', type: JobResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: number, @Body() jobDto: JobDTO): Promise<Job> {
         const updatedJob: Job = await this.jobService.update(id, jobDto);

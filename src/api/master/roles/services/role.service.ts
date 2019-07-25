@@ -11,7 +11,7 @@ export class RoleService {
         private readonly roleRepository: Repository<Role>,
     ) {}
 
-    async getRoles(): Promise<RoleResponseDTO[]> {
+    async getRoles(): Promise<Role[]> {
         const role: Role[] = await this.roleRepository.find();
         try {
             return role;

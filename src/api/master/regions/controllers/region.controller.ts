@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards } from '@nestjs/common';
 import { RegionService } from '../services/region.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
@@ -20,6 +20,7 @@ export class RegionController {
     @Get()
     @ApiOperation({ title: 'GET Regions', description: 'API Get list of regions' })
     @ApiOkResponse({ description: 'Success to get list of regions.', type: RegionPageResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async get(): Promise<Region[]> {
         const regions: Region[] = await this.regionServices.findAll();
@@ -29,6 +30,7 @@ export class RegionController {
     @Get(':id')
     @ApiOperation({ title: 'GET Region By Id', description: 'API Get region by Id' })
     @ApiOkResponse({ description: 'Success to get region by Id.', type: RegionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async getById(@Param('id') id: string): Promise<Region> {
         const region: Region = await this.regionServices.findById(id);
@@ -39,6 +41,7 @@ export class RegionController {
     @ApiOperation({ title: 'CREATE Region', description: 'API create regions' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiCreatedResponse({ description: 'Success to create regions.', type: RegionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() regionDto: RegionDTO): Promise<Region> {
         const region: Region = await this.regionServices.create(regionDto);
@@ -50,6 +53,7 @@ export class RegionController {
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update region.', type: RegionResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: string, @Body() regionDto: RegionDTO): Promise<Region> {
         const region: Region = await this.regionServices.update(id, regionDto);

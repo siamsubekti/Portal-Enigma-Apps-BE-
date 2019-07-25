@@ -2,7 +2,7 @@ import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpC
 import { ParameterService } from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -18,6 +18,7 @@ export class ParameterController {
 
     @Get(':key')
     @ApiOperation({ title: 'GET Parameters by key', description: 'API to get value of parameter by key' })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     async get(@Param('key') key: string): Promise<string> {
         const value: string = await this.parameterService.get(key);
         return value;
@@ -26,6 +27,7 @@ export class ParameterController {
     @Get()
     @ApiOperation({ title: 'GET Parameters', description: 'API to get list Parameters' })
     @ApiOkResponse({ description: 'If success to get list Parameters', type: ParameterPageResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async getAll(): Promise<Parameter[]> {
         const parameters: Parameter[] = await this.parameterService.findAll();
@@ -36,6 +38,7 @@ export class ParameterController {
     @ApiOperation({ title: 'CREATE Parameter', description: 'API to create Parameter' })
     @ApiCreatedResponse({ description: 'If success insert parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async insert(@Body() parameterDto: ParameterDTO): Promise<Parameter> {
         const parameter: Parameter = await this.parameterService.create(parameterDto);
@@ -47,6 +50,7 @@ export class ParameterController {
     @ApiOkResponse({ description: 'If success update Parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async update(@Param('id') id: number, @Body() parameterDto: ParameterDTO): Promise<Parameter> {
         const parameter: Parameter = await this.parameterService.update(id, parameterDto);

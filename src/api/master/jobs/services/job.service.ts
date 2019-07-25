@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, Like } from 'typeorm';
 import Job from '../models/job.entity';
 import { JobDTO } from '../models/job.dto';
 
@@ -16,6 +16,19 @@ export class JobService {
     async findById(id: number): Promise<Job> {
         return await this.jobRepository.findOne(id);
     }
+
+    // async search(keyword: string): Promise<Job[]> {
+    //     return await this.jobRepository.find({
+    //         where: [
+    //             {
+    //                 name: Like(`%${keyword}%`)
+    //             },
+    //             {
+    //                 description: Like(`%${keyword}%`)
+    //             }
+    //         ]
+    //     });
+    // }
 
     async create(jobDto: JobDTO): Promise<Job> {
         const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
