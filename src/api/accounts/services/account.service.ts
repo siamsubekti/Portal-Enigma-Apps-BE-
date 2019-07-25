@@ -4,14 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO } from '../models/account.dto';
 import { AccountStatus } from '../../../config/constants';
-import AppConfig from '../../../config/app.config';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
 
 @Injectable()
 export default class AccountService {
   constructor(
-    private readonly config: AppConfig,
     @InjectRepository(Account) private readonly account: Repository<Account>,
   ) {}
 

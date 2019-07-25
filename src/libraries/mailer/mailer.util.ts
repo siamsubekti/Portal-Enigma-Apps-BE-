@@ -8,10 +8,10 @@ export default class MailerUtil {
   private readonly mailer: any;
   constructor(private readonly config: AppConfig) {
     this.mailer = nodemailer.createTransport({
-      service: config.get('MAIL_SERVICE'),
+      service: this.config.get('MAIL_SERVICE'),
       auth: {
-        user: config.get('MAIL_USERNAME'),
-        pass: config.get('MAIL_PASSWORD'),
+        user: this.config.get('MAIL_USERNAME'),
+        pass: this.config.get('MAIL_PASSWORD'),
       },
     });
   }

@@ -1,7 +1,7 @@
 import * as hbs from 'express-handlebars';
 import { existsSync } from 'fs';
 import { join, normalize } from 'path';
-import { Injectable, Logger, HttpException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import AppConfig from '../../config/app.config';
 
 @Injectable()

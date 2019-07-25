@@ -15,7 +15,7 @@ export default class CookieAuthGuard extends AuthGuard('cookie') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, account: any, info: any): any {
+  handleRequest(err: any, account: any): any {
     if (err || !account) throw err || new UnauthorizedException('Unauthorized access.');
     return account;
   }

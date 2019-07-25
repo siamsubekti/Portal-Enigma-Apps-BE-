@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Generated, Column, OneToOne } from 'typeorm';
 import Account from './account.entity';
 
 @Entity('profiles')
@@ -37,6 +37,6 @@ export default class Profile {
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
-  @OneToOne((type: Account) => Account, (account: Account) => account.profile)
+  @OneToOne(() => Account, (account: Account) => account.profile)
   account: Account;
 }
