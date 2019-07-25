@@ -5,8 +5,8 @@ import { ApiExceptionResponse } from '../../../libraries/responses/response.type
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import RegisterService from '../services/register.service';
 
-@ApiUseTags('Portal')
-@Controller('candidate')
+@ApiUseTags('Accounts')
+@Controller('accounts')
 @UseInterceptors(ResponseRebuildInterceptor)
 export default class RegisterController {
   constructor(private readonly registerService: RegisterService) { }

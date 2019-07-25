@@ -156,7 +156,7 @@ export default class AuthService {
   private async sendPasswordResetEmail(credential: PasswordResetCredential): Promise<boolean> {
     try {
       const { account: { profile: { fullname: name }, username: to }, key, token } = credential;
-      const resetPasswordLink: string = encodeURI(`${this.config.get('API_BASE_URL')}/password-reset/${key}/${token}`);
+      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/auth/forgot-password/${key}/${token}`);
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
         name, resetPasswordLink, baseUrl: this.config.get('API_BASE_URL'),
       });
