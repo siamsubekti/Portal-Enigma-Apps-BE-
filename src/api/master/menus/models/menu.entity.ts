@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Generated, Column, ManyToMany, JoinColumn, PrimaryGeneratedColumn, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 import Role from '../../roles/models/role.entity';
 
 @Entity('mst_menus')
@@ -15,6 +15,6 @@ export default class Menu {
     @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 
-    @ManyToMany((type: Role) => Role, (role: Role) => role.menus)
+    @ManyToMany(() => Role, (role: Role) => role.menus)
     roles: Role[];
 }

@@ -1,6 +1,6 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, IsDefined, IsEnum } from 'class-validator';
-import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
+import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Academy from './academy.entity';
 
