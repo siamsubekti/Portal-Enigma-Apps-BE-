@@ -1,6 +1,6 @@
-import { Injectable, Logger, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DeleteResult, Like } from 'typeorm';
+import { Repository, DeleteResult } from 'typeorm';
 import Job from '../models/job.entity';
 import { JobDTO } from '../models/job.dto';
 

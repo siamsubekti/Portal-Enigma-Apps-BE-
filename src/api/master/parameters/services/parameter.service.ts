@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException,  BadRequestException } from '@nestjs/common';
 import { Repository, DeleteResult } from 'typeorm';
 import Parameter from '../models/parameter.entity';
 import { InjectRepository } from '@nestjs/typeorm';

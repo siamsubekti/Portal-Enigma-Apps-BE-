@@ -10,7 +10,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export class JobController {
 
     constructor(
@@ -26,15 +26,6 @@ export class JobController {
         const jobs: Job[] = await this.jobService.findAll();
         return jobs;
     }
-
-    // @Get(':keyword')
-    // @ApiOperation({ title: 'GET Jobs', description: 'API get list Jobs' })
-    // @ApiOkResponse({ description: 'Success to get list of jobs.', type: JobPageResponse })
-    // @UseInterceptors(ResponseRebuildInterceptor)
-    // async search(@Param('keyword')keyword: string): Promise<Job[]> {
-    //     const jobs: Job[] = await this.jobService.search(keyword);
-    //     return jobs;
-    // }
 
     @Get(':id')
     @ApiOperation({ title: 'GET Job By Id', description: 'API get job by id' })
