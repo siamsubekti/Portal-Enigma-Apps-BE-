@@ -38,7 +38,12 @@
     ],
     "deprecation": {
       "severity": "warn"
-    }
+    },
+    "indent": [
+      true,
+      "spaces",
+      2
+    ]
   },
   "rulesDirectory": []
 }
