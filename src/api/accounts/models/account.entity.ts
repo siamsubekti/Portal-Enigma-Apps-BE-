@@ -33,5 +33,5 @@ export default class Account {
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'account_id', referencedColumnName: 'id' },
   })
-  roles: Role;
+  roles: Role[];
 }

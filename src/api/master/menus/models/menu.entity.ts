@@ -16,5 +16,5 @@ export default class Menu {
     createdAt: Date;
 
     @ManyToMany((type: Role) => Role, (role: Role) => role.menus)
-    roles: Role;
+    roles: Role[];
 }

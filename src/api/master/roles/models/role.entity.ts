@@ -20,7 +20,7 @@ export default class Role {
   @ManyToMany((type: Account) => Account, (account: Account) => account.roles)
   account: Account;
 
-  @ManyToMany(() => Service, (service: Service) => service.roles)
+  @ManyToMany(() => Service, (service: Service) => service.roles, { eager: true })
   services: Service[];
 
   @ManyToMany((type: Menu) => Menu, (menu: Menu) => menu.roles, { eager: true })
@@ -29,5 +29,5 @@ export default class Role {
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' }
   })
-  menus: Menu;
+  menus: Menu[];
 }

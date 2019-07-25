@@ -19,7 +19,7 @@ export default class Service {
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
-    @ManyToMany(() => Role, roles => roles.services, { eager: true })
+    @ManyToMany(() => Role, (role: Role) => role.services)
     @JoinTable({ name: 'services_has_roles', joinColumn: { name: 'serviceId', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'rolesId', referencedColumnName: 'id' } })
     roles?: Role[];
 }
