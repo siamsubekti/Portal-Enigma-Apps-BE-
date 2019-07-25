@@ -5,6 +5,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
+import Menu from '../models/menu.entity';
 
 @ApiUseTags('Menus')
 @Controller('menus')
@@ -18,9 +19,9 @@ export class MenuController {
     @ApiOkResponse({description: 'OK', type: MenuPagedResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
     @UseInterceptors(ResponseRebuildInterceptor)
-    async listMenu(): Promise<MenuResponseDTO[]> {
+    async listMenu(): Promise<Menu[]> {
         try {
-            const menus: MenuResponseDTO[] = await this.menuService.getMenus();
+            const menus: Menu[] = await this.menuService.getMenus();
             return menus;
         } catch (error) {
             throw new InternalServerErrorException('Internal Server Error');

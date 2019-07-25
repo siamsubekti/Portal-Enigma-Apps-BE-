@@ -9,6 +9,7 @@ import { ApiExceptionResponse } from '../../../../libraries/responses/response.t
 import { DeleteResult } from 'typeorm';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import Role from '../models/role.entity';
 
 @ApiUseTags('Roles')
 @Controller('roles')
@@ -21,8 +22,8 @@ export class RoleController {
     @ApiOkResponse({ description: 'List Roles', type: RolePagedResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async list(): Promise<RoleResponseDTO[]> {
-        const role: RoleResponseDTO[] = await this.roleService.getRoles();
+    async list(): Promise<Role[]> {
+        const role: Role[] = await this.roleService.getRoles();
         Logger.log(role);
         return role;
     }
@@ -41,11 +42,11 @@ export class RoleController {
 
     @Get(':id')
     @ApiOperation({ title: 'Detail Role', description: 'Detail Role' })
-    @ApiOkResponse({ description: 'Detail Degree', type: RoleResponse })
+    @ApiOkResponse({ description: 'Detail Role', type: RoleResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getAcademyById(@Param('id') id: number): Promise<RoleResponseDTO> {
-        const role: RoleResponseDTO = await this.roleService.getRole(id);
+    async getAcademyById(@Param('id') id: number): Promise<Role> {
+        const role: Role = await this.roleService.getRole(id);
         Logger.log(role);
         return role;
     }

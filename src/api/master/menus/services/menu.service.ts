@@ -3,6 +3,7 @@ import Menu from '../models/menu.entity';
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuResponseDTO, MenuDTO } from '../models/menu.dto';
+import Role from '../../roles/models/role.entity';
 
 @Injectable()
 export class MenuService {
@@ -11,13 +12,22 @@ export class MenuService {
         private readonly menuRepository: Repository<Menu>,
     ) {}
 
-    async getMenus(): Promise<MenuResponseDTO[]> {
+    async getMenus(): Promise<Menu[]> {
         const result: Menu[] = await this.menuRepository.find();
         return result;
     }
 
     async addMenu(form: MenuDTO): Promise<MenuResponseDTO> {
-        const result: Menu = await this.menuRepository.save(form);
+        const role: Role = new Role();
+        role.code = form.code;
+        await this.menuRepository.save(role);
+
+        const menu: Menu = new Menu();
+        menu.code = form.code;
+        menu.name = form.name;
+        menu.roles = (role);
+        const result: Menu = await this.menuRepository.save(menu);
+
         return result;
     }
 
