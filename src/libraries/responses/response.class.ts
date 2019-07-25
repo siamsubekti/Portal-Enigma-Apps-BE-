@@ -1,19 +1,19 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 
 export class ResponseStatus {
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'HTTP status code.', type: 'string' })
   code: string;
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'HTTP status description/message.', type: 'string' })
   description: string;
 }
 
 export class PagingData {
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'Current page number.', type: 'number' })
   page: number;
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'The total of all pages.', type: 'number' })
   totalPages: number;
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'The total of all rows.', type: 'number' })
   totalRows: number;
-  @ApiModelProperty()
+  @ApiModelProperty({ description: 'Rows displayed per page.', type: 'number' })
   rowsPerPage: number;
 }

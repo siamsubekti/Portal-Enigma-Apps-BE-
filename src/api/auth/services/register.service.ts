@@ -126,7 +126,7 @@ export default class RegisterService {
   private async sendActivationEmail(credential: AccountRegistrationCredential): Promise<boolean> {
     try {
       const { account: { username: to, fullname: name }, key, token } = credential;
-      const activationLink: string = `${this.config.get('API_BASE_URL')}/portal/activation/${encodeURI(key)}/${encodeURI(token)}`;
+      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/register/activation/${encodeURI(key)}/${encodeURI(token)}`;
       const html: string = await this.templateUtil.renderToString('auth/account-activation.mail.hbs', {
         name, activationLink, baseUrl: this.config.get('API_BASE_URL'),
       });
