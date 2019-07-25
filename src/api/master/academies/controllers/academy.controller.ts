@@ -3,7 +3,7 @@ import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptor
 import {
     ApiUseTags, ApiOperation, ApiImplicitParam,
     ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse,
-    ApiOkResponse, ApiNotFoundResponse
+    ApiOkResponse, ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { AcademyResponse, AcademyDTO, AcademiesPagedResponse, AcademyResponseDTO } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';

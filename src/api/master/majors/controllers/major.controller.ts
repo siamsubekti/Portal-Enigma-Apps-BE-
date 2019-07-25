@@ -2,7 +2,7 @@ import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptor
 import { MajorService } from '../services/major.service';
 import {
     ApiUseTags, ApiOperation, ApiCreatedResponse, ApiImplicitParam,
-    ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse
+    ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { MajorPagedResponse, MajorResponse, MajorDTO, MajorResponseDTO } from '../models/major.dto';
 import { DeleteResult } from 'typeorm';

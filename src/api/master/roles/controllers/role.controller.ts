@@ -3,7 +3,7 @@ import { RoleResponse, RolePagedResponse, RoleDTO, RoleResponseDTO } from '../mo
 import { Get, Controller, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards } from '@nestjs/common';
 import {
     ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
-    ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse
+    ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';

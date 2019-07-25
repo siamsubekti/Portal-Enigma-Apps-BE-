@@ -74,7 +74,7 @@ export class ServicesController {
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.service.remove(id);
-        return (affected !== 1) ? new InternalServerErrorException : null;
+        return (affected !== 1) ? new InternalServerErrorException() : null;
     }
 
 
