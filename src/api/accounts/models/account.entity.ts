@@ -23,11 +23,11 @@ export default class Account {
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
-  @OneToOne((type: Profile) => Profile, (profile: Profile) => profile.account)
+  @OneToOne(() => Profile, (profile: Profile) => profile.account)
   @JoinColumn({name: 'profile_id'})
   profile: Profile;
 
-  @ManyToMany((type: Role) => Role, (role: Role) => role.account)
+  @ManyToMany(() => Role, (role: Role) => role.account)
   @JoinTable({
     name: 'accounts_has_roles',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },

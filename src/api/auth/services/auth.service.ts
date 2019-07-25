@@ -4,25 +4,19 @@ import { IORedis } from 'redis';
 import { Validator } from 'class-validator';
 import { RedisService } from 'nestjs-redis';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
-import {
-  LoginCredentialDTO,
-  LoginResponseDTO,
-  JwtPayload,
-} from '../models/auth.dto';
+import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
-import Account from '../../accounts/models/account.entity';
-import AccountService from '../../accounts/services/account.service';
-import ProfileService from '../../accounts/services/profile.service';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
+import Account from '../../accounts/models/account.entity';
+import AccountService from '../../accounts/services/account.service';
 
 @Injectable()
 export default class AuthService {
   constructor(
     private readonly accountService: AccountService,
-    private readonly profileService: ProfileService,
     private readonly hashUtil: HashUtil,
     private readonly mailUtil: MailerUtil,
     private readonly templateUtil: TemplateUtil,
