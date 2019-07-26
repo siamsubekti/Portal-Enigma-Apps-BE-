@@ -45,7 +45,7 @@ export class RoleService {
         };
     }
 
-    async insertRole(roleDTO: RoleDTO): Promise<RoleResponseDTO> {
+    async insert(roleDTO: RoleDTO): Promise<RoleResponseDTO> {
         const checkCode: Role = await this.roleRepository.findOne({
             where: {code: roleDTO.code}});
         Logger.log(checkCode);
@@ -59,7 +59,7 @@ export class RoleService {
         }
     }
 
-    async getRole(id: number): Promise<Role> {
+    async get(id: number): Promise<Role> {
         const role: Role = await this.roleRepository.findOne(id);
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
@@ -69,7 +69,7 @@ export class RoleService {
         }
     }
 
-    async updateRole(id: number, roleDTO: RoleDTO): Promise<RoleResponseDTO> {
+    async update(id: number, roleDTO: RoleDTO): Promise<RoleResponseDTO> {
         let role: Role = await this.roleRepository.findOne({where: {id}});
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
@@ -81,7 +81,7 @@ export class RoleService {
         }
     }
 
-    async deleteRole(id: number): Promise<DeleteResult> {
+    async delete(id: number): Promise<DeleteResult> {
         const countId: boolean = await this.roleRepository.count({id}) > 0;
         if (!countId) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {

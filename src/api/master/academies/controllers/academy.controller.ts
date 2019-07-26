@@ -52,15 +52,15 @@ export class AcademyController {
             }, data, paging };
     }
 
-    @Post('create')
+    @Post()
     @ApiOperation({ title: 'Create Academy', description: 'Create Academy' })
     @ApiCreatedResponse({ description: 'OK', type: AcademyResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiBadRequestResponse({ description: 'Code has been use', type: ApiExceptionResponse })
     @ApiBadRequestResponse({ description: 'Phone has been use', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async addAcademy(@Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
-        const academy: AcademyResponseDTO = await this.academyService.insertAcademy(form);
+    async add(@Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
+        const academy: AcademyResponseDTO = await this.academyService.insert(form);
         Logger.log(academy);
         return academy;
     }
@@ -72,8 +72,8 @@ export class AcademyController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Academy Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getAcademyById(@Param('id') id: number): Promise<AcademyResponseDTO> {
-        const academy: AcademyResponseDTO = await this.academyService.getAcademy(id);
+    async get(@Param('id') id: number): Promise<AcademyResponseDTO> {
+        const academy: AcademyResponseDTO = await this.academyService.get(id);
         Logger.log(academy);
         return academy;
     }
@@ -84,7 +84,7 @@ export class AcademyController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Academy Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async updateAcademy(@Param('id') id: number, @Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
+    async edit(@Param('id') id: number, @Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
         const academy: AcademyResponseDTO = await this.academyService.update(id, form);
         Logger.log(academy);
         return academy;
@@ -94,7 +94,7 @@ export class AcademyController {
     @ApiOperation({ title: 'Delete Academy', description: 'Delete Academy' })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: `Academy Not Found`, type: ApiExceptionResponse })
-    async DeleteAcademy(@Param('id') id: number): Promise<DeleteResult> {
+    async remove(@Param('id') id: number): Promise<DeleteResult> {
         const { affected }: DeleteResult = await this.academyService.delete(id);
         Logger.log(affected);
         if (affected === 1) return null;

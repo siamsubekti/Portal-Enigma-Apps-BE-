@@ -17,7 +17,7 @@ export class MajorController {
     constructor(
         private readonly majorService: MajorService) { }
 
-    @Get('list')
+    @Get('')
     @ApiOperation({ title: 'List Majors', description: 'All Majors' })
     @ApiOkResponse({ description: 'OK', type: MajorPagedResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
@@ -27,7 +27,7 @@ export class MajorController {
         return major;
     }
 
-    @Post('create')
+    @Post('')
     @ApiOperation({ title: 'Create Major', description: 'Create Major' })
     @ApiCreatedResponse({ description: 'OK', type: MajorResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })

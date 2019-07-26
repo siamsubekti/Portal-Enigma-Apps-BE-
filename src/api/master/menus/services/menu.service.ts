@@ -11,12 +11,12 @@ export class MenuService {
         private readonly menuRepository: Repository<Menu>,
     ) {}
 
-    async getMenus(): Promise<Menu[]> {
+    async all(): Promise<Menu[]> {
         const result: Menu[] = await this.menuRepository.find();
         return result;
     }
 
-    async addMenu(form: MenuDTO): Promise<MenuResponseDTO> {
+    async add(form: MenuDTO): Promise<MenuResponseDTO> {
         const result: Menu = await this.menuRepository.save(form);
         return result;
         // const role: Role = new Role();
@@ -31,7 +31,7 @@ export class MenuService {
         // return result;
     }
 
-    async getMenu(id: number): Promise<MenuResponseDTO> {
+    async get(id: number): Promise<MenuResponseDTO> {
         const result: Menu = await this.menuRepository.findOne(id);
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {

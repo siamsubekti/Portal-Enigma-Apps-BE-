@@ -31,7 +31,7 @@ export class RoleController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async all(
+  async allRole(
       @Query('term') term?: string,
       @Query('order') order: 'code' | 'name' = 'name',
       @Query('sort') sort: 'asc' | 'desc' = 'asc',
@@ -52,14 +52,14 @@ export class RoleController {
           }, data, paging };
   }
 
-  @Post('')
+  @Post()
   @ApiOperation({ title: 'Create Role', description: 'Create Role' })
   @ApiCreatedResponse({ description: 'Role successfuly created.', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
   @ApiBadRequestResponse({ description: 'Code has been use' })
-  async Create(@Body() form: RoleDTO): Promise<RoleResponseDTO> {
-    const role: RoleResponseDTO = await this.roleService.insertRole(form);
+  async addRole(@Body() form: RoleDTO): Promise<RoleResponseDTO> {
+    const role: RoleResponseDTO = await this.roleService.insert(form);
     Logger.log(role);
     return role;
   }
@@ -69,8 +69,8 @@ export class RoleController {
   @ApiOkResponse({ description: 'Detail Role', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async getById(@Param('id') id: number): Promise<Role> {
-    const role: Role = await this.roleService.getRole(id);
+  async getRole(@Param('id') id: number): Promise<Role> {
+    const role: Role = await this.roleService.get(id);
     Logger.log(role);
     return role;
   }
@@ -80,8 +80,8 @@ export class RoleController {
   @ApiOkResponse({ description: 'Updated successfuly.', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async update(@Param('id') id: number, @Body() form: RoleDTO): Promise<RoleResponseDTO> {
-    const role: RoleResponseDTO = await this.roleService.updateRole(id, form);
+  async editRole(@Param('id') id: number, @Body() form: RoleDTO): Promise<RoleResponseDTO> {
+    const role: RoleResponseDTO = await this.roleService.update(id, form);
     Logger.log(role);
     return role;
   }
@@ -90,8 +90,8 @@ export class RoleController {
   @ApiOperation({ title: 'Delete Role', description: 'Delete Role' })
   @ApiNotFoundResponse({ description: 'Role Not Found', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
-  async removeDegree(@Param('id') params: number): Promise<DeleteResult> {
-    const { affected }: DeleteResult = await this.roleService.deleteRole(params);
+  async deleteRole(@Param('id') params: number): Promise<DeleteResult> {
+    const { affected }: DeleteResult = await this.roleService.delete(params);
     if (affected === 1) return null;
   }
 }

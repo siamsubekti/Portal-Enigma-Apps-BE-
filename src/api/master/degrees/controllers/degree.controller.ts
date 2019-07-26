@@ -15,24 +15,24 @@ export class DegreeController {
         private readonly degreeService: DegreeService,
     ) { }
 
-    @Get('list')
+    @Get()
     @ApiOperation({ title: 'List Degrees', description: 'All Degrees' })
     @ApiOkResponse({ description: 'OK', type: DegreePagedResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async listDegrees(): Promise<DegreeResponseDTO[]> {
-        const degrees: DegreeResponseDTO[] = await this.degreeService.getDegrees();
+    async all(): Promise<DegreeResponseDTO[]> {
+        const degrees: DegreeResponseDTO[] = await this.degreeService.all();
         Logger.log(degrees);
         return degrees;
     }
 
-    @Post('create')
+    @Post()
     @ApiOperation({ title: 'Create Degree', description: 'Create Degree' })
     @ApiCreatedResponse({ description: 'OK', type: DegreeResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async newDegree(@Body() form: DegreeDTO): Promise<DegreeResponseDTO> {
-        const degree: DegreeResponseDTO = await this.degreeService.insertDegree(form);
+    async add(@Body() form: DegreeDTO): Promise<DegreeResponseDTO> {
+        const degree: DegreeResponseDTO = await this.degreeService.insert(form);
         Logger.log(degree);
         return degree;
     }
@@ -43,8 +43,8 @@ export class DegreeController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Degree Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async DetailDegree(@Param('id') params: number): Promise<DegreeResponseDTO> {
-        const degree: DegreeResponseDTO = await this.degreeService.getDegree(params);
+    async get(@Param('id') params: number): Promise<DegreeResponseDTO> {
+        const degree: DegreeResponseDTO = await this.degreeService.get(params);
         Logger.log(degree);
         return degree;
     }
@@ -55,8 +55,8 @@ export class DegreeController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Degree Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async updateDegree(@Param('id') params: number, @Body() form: DegreeDTO): Promise<DegreeResponseDTO> {
-        const degree: DegreeResponseDTO = await this.degreeService.updateDegree(params, form);
+    async edit(@Param('id') params: number, @Body() form: DegreeDTO): Promise<DegreeResponseDTO> {
+        const degree: DegreeResponseDTO = await this.degreeService.update(params, form);
         Logger.log(degree);
         return degree;
     }
@@ -65,8 +65,8 @@ export class DegreeController {
     @ApiOperation({ title: 'Delete Degree', description: 'Delete Degree' })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Degree Not Found', type: ApiExceptionResponse })
-    async removeDegree(@Param('id') params: number): Promise<DeleteResult> {
-        const { affected }: DeleteResult = await this.degreeService.deleteDegree(params);
+    async remove(@Param('id') params: number): Promise<DeleteResult> {
+        const { affected }: DeleteResult = await this.degreeService.delete(params);
         Logger.log({ affected });
         if (affected === 1) return null;
     }
