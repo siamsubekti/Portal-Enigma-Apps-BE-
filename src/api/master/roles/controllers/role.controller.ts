@@ -58,7 +58,7 @@ export class RoleController {
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
   @ApiBadRequestResponse({ description: 'Code has been use' })
-  async newRole(@Body() form: RoleDTO): Promise<RoleResponseDTO> {
+  async Create(@Body() form: RoleDTO): Promise<RoleResponseDTO> {
     const role: RoleResponseDTO = await this.roleService.insertRole(form);
     Logger.log(role);
     return role;
@@ -69,7 +69,7 @@ export class RoleController {
   @ApiOkResponse({ description: 'Detail Role', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async getAcademyById(@Param('id') id: number): Promise<Role> {
+  async getById(@Param('id') id: number): Promise<Role> {
     const role: Role = await this.roleService.getRole(id);
     Logger.log(role);
     return role;
@@ -80,7 +80,7 @@ export class RoleController {
   @ApiOkResponse({ description: 'Updated successfuly.', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async updateAcademy(@Param('id') id: number, @Body() form: RoleDTO): Promise<RoleResponseDTO> {
+  async update(@Param('id') id: number, @Body() form: RoleDTO): Promise<RoleResponseDTO> {
     const role: RoleResponseDTO = await this.roleService.updateRole(id, form);
     Logger.log(role);
     return role;
