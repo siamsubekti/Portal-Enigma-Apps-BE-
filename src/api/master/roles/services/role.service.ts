@@ -1,8 +1,8 @@
 import { Injectable, InternalServerErrorException, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
-import { Repository, DeleteResult } from 'typeorm';
-import { RoleResponseDTO, RoleDTO } from '../models/role.dto';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
+import { RoleResponseDTO, RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
 
 @Injectable()
 export class RoleService {
@@ -10,6 +10,40 @@ export class RoleService {
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
     ) {}
+
+    async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
+        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r').select('r');
+
+        if (queryParams.term) {
+          let { term } = queryParams;
+          term = `%${term}%`;
+          query = query
+            .orWhere('r.code LIKE :term', { term })
+            .orWhere('r.name LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+          const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+          const orderCols: { [key: string]: string } = {
+            code: 'r.code',
+            name: 'r.name',
+          };
+
+          query = query.orderBy( orderCols[ queryParams.order ], sort );
+        } else
+          query = query.orderBy( 'r.name', 'ASC' );
+
+        query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
+        query.limit( queryParams.rowsPerPage );
+
+        const result: [ Role[], number ] = await query.getManyAndCount();
+        Logger.log(queryParams, 'RoleService@all', true);
+
+        return {
+          result: result[0],
+          totalRows: result[1],
+        };
+    }
 
     async getRoles(): Promise<Role[]> {
         const role: Role[] = await this.roleRepository.find();

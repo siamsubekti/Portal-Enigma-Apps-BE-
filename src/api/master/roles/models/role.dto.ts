@@ -1,9 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
-import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
+import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-// import Service from '../../services/models/service.entity';
-// import Menu from '../../menus/models/menu.entity';
+import Role from './role.entity';
 
 export class RoleDTO {
 
@@ -24,6 +23,10 @@ export class RoleResponseDTO {
   name: string;
 }
 
+export class RoleIdDTO {
+  id: number;
+}
+
 export class RoleResponse implements IApiResponse {
   @ApiModelProperty()
   status: ResponseStatus;
@@ -31,28 +34,24 @@ export class RoleResponse implements IApiResponse {
   data: RoleDTO;
 }
 
-export class RolePagedResponse implements IApiPagedResponse {
+export class RolePagedResponse {
   @ApiModelProperty()
-  status: ResponseStatus;
+  status?: ResponseStatus;
   @ApiModelProperty()
-  data: RoleDTO[];
+  data: Role[] | Role;
   @ApiModelProperty()
-  paging: PagingData;
+  paging?: PagingData;
 }
 
-// export class RoleObject {
+export class RoleQueryDTO {
+  term?: string;
+  order?: 'code' | 'name';
+  sort?: 'asc' | 'desc';
+  page?: number;
+  rowsPerPage?: number;
+}
 
-//     @ApiModelProperty()
-//     id: number;
-
-//     @ApiModelProperty()
-//     code: string;
-
-//     @ApiModelProperty()
-//     name: string;
-
-//     @ApiModelProperty()
-//     createdAt: Date;
-
-//     services: Service[];
-// }
+export class RoleQueryResult {
+  result: Role[] | Role;
+  totalRows: number;
+}
