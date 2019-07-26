@@ -52,17 +52,6 @@ export class RoleController {
           }, data, paging };
   }
 
-  @Get('')
-  @ApiOperation({ title: 'List Roles', description: 'All Roles' })
-  @ApiOkResponse({ description: 'List Roles', type: RolePagedResponse })
-  @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
-  @UseInterceptors(ResponseRebuildInterceptor)
-  async list(): Promise<Role[]> {
-    const role: Role[] = await this.roleService.getRoles();
-    Logger.log(role);
-    return role;
-  }
-
   @Post('')
   @ApiOperation({ title: 'Create Role', description: 'Create Role' })
   @ApiCreatedResponse({ description: 'Role successfuly created.', type: RoleResponse })

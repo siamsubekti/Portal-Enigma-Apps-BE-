@@ -45,16 +45,6 @@ export class RoleService {
         };
     }
 
-    async getRoles(): Promise<Role[]> {
-        const role: Role[] = await this.roleRepository.find();
-        Logger.log(role);
-        try {
-            return role;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
-        }
-    }
-
     async insertRole(roleDTO: RoleDTO): Promise<RoleResponseDTO> {
         const checkCode: Role = await this.roleRepository.findOne({
             where: {code: roleDTO.code}});
