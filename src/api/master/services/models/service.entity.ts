@@ -20,6 +20,6 @@ export default class Service {
     createdAt: Date;
 
     @ManyToMany(() => Role, (role: Role) => role.services)
-    @JoinTable({ name: 'services_has_roles', joinColumn: { name: 'serviceId', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'rolesId', referencedColumnName: 'id' } })
+    @JoinTable({ name: 'services_has_roles', joinColumn: { name: 'service_id', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' } })
     roles?: Role[];
 }

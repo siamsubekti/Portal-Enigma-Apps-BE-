@@ -2,7 +2,7 @@ import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, 
 import { ServicesService } from '../services/services.service';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery } from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses } from '../models/service.dto';
+import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses, UpdateServiceDTO } from '../models/service.dto';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import Service from '../models/service.entity';
 import { PagingData } from '../../../../libraries/responses/response.class';
@@ -64,8 +64,8 @@ export class ServicesController {
     @ApiOperation({ title: 'UPDATE Service', description: 'API to create service.' })
     @ApiOkResponse({ description: 'If success update service', type: ServiceResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async update(@Param('id') id: number, @Body() serviceDto: ServiceDTO): Promise<Service> {
-        return await this.service.update(id, serviceDto);
+    async update(@Param('id') id: number, @Body() form: UpdateServiceDTO): Promise<Service> {
+        return await this.service.update(id, form);
     }
 
     @Delete(':id')

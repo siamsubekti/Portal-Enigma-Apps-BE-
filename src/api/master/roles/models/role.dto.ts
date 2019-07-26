@@ -2,8 +2,8 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-// import Service from '../../services/models/service.entity';
-// import Menu from '../../menus/models/menu.entity';
+import Service from '../../services/models/service.entity';
+import { ServiceDTO } from '../../services/models/service.dto';
 
 export class RoleDTO {
 
@@ -14,6 +14,15 @@ export class RoleDTO {
   @ApiModelProperty()
   @IsNotEmpty()
   name: string;
+
+  @ApiModelProperty()
+  services: Service[];
+}
+
+export class RoleServiceDTO {
+
+  @ApiModelProperty()
+  id: number;
 }
 
 export class RoleResponseDTO {
@@ -22,6 +31,9 @@ export class RoleResponseDTO {
 
   @ApiModelProperty()
   name: string;
+
+  @ApiModelProperty()
+  services: Service[];
 }
 
 export class RoleResponse implements IApiResponse {
@@ -39,20 +51,3 @@ export class RolePagedResponse implements IApiPagedResponse {
   @ApiModelProperty()
   paging: PagingData;
 }
-
-// export class RoleObject {
-
-//     @ApiModelProperty()
-//     id: number;
-
-//     @ApiModelProperty()
-//     code: string;
-
-//     @ApiModelProperty()
-//     name: string;
-
-//     @ApiModelProperty()
-//     createdAt: Date;
-
-//     services: Service[];
-// }

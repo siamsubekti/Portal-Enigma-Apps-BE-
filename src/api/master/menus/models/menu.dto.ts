@@ -8,7 +8,7 @@ export class MenuDTO {
     code: string;
     @ApiModelProperty()
     name: string;
-    roles: Role;
+    roles: Role[];
 }
 
 export class MenuResponseDTO {
@@ -16,7 +16,7 @@ export class MenuResponseDTO {
     code: string;
     @ApiModelProperty()
     name: string;
-    roles: Role;
+    roles: Role[];
 }
 
 export class MenuResponse implements IApiResponse {

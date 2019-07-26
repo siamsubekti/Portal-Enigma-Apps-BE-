@@ -25,7 +25,7 @@ export class MenuService {
         const menu: Menu = new Menu();
         menu.code = form.code;
         menu.name = form.name;
-        menu.roles = (role);
+        menu.roles = [role];
         const result: Menu = await this.menuRepository.save(menu);
 
         return result;
