@@ -2,7 +2,8 @@ import { Repository, DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MenuResponseDTO, MenuDTO } from '../models/menu.dto';
+import { MenuDTO } from '../models/menu.dto';
+import { RoleService } from '../../roles/services/role.service';
 import Role from '../../roles/models/role.entity';
 
 @Injectable()
@@ -10,28 +11,32 @@ export class MenuService {
     constructor(
         @InjectRepository(Menu)
         private readonly menuRepository: Repository<Menu>,
-    ) {}
+        private readonly roleService: RoleService,
+    ) { }
 
-    async getMenus(): Promise<Menu[]> {
-        const result: Menu[] = await this.menuRepository.find();
+    async all(): Promise<Menu[]> {
+        const result: Menu[] = await this.menuRepository.find({ relations: ['roles'] });
         return result;
     }
 
-    async addMenu(form: MenuDTO): Promise<MenuResponseDTO> {
+    async add(form: MenuDTO): Promise<Menu> {
+
         const role: Role = new Role();
         role.code = form.code;
-        await this.menuRepository.save(role);
+        const savedRole: Role = await this.roleService.insert(role);
 
         const menu: Menu = new Menu();
         menu.code = form.code;
         menu.name = form.name;
-        menu.roles = [role];
+        menu.order = form.order;
+        menu.icon = form.icon;
+        menu.roles = [savedRole];
         const result: Menu = await this.menuRepository.save(menu);
 
         return result;
     }
 
-    async getMenu(id: number): Promise<MenuResponseDTO> {
+    async get(id: number): Promise<Menu> {
         const result: Menu = await this.menuRepository.findOne(id);
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
@@ -41,8 +46,8 @@ export class MenuService {
         }
     }
 
-    async update(id: number, form: MenuDTO): Promise<MenuResponseDTO> {
-        const result: Menu = await this.menuRepository.findOne({where: {id}});
+    async update(id: number, form: MenuDTO): Promise<Menu> {
+        const result: Menu = await this.menuRepository.findOne({ where: { id } });
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             const data: Menu = this.menuRepository.merge(result, form);
@@ -54,7 +59,7 @@ export class MenuService {
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        const result: boolean = await this.menuRepository.count({id}) >  0;
+        const result: boolean = await this.menuRepository.count({ id }) > 0;
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             const removeMenu: DeleteResult = await this.menuRepository.delete(id);

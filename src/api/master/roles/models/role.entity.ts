@@ -17,13 +17,13 @@ export default class Role {
   @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @ManyToMany((type: Account) => Account, (account: Account) => account.roles)
+  @ManyToMany(() => Account, (account: Account) => account.roles)
   account: Account;
 
   @ManyToMany(() => Service, (service: Service) => service.roles, { eager: true })
   services: Service[];
 
-  @ManyToMany((type: Menu) => Menu, (menu: Menu) => menu.roles, { eager: true })
+  @ManyToMany(() => Menu, (menu: Menu) => menu.roles, { eager: true })
   @JoinTable({
     name: 'roles_has_menus',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
