@@ -2,10 +2,11 @@ import * as moment from 'moment-timezone';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO } from '../models/account.dto';
+import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivilege } from '../models/account.dto';
 import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
+import Role from '../../master/roles/models/role.entity';
 
 @Injectable()
 export default class AccountService {
@@ -90,6 +91,21 @@ export default class AccountService {
 
   async get(id: string): Promise<Account> {
     return this.account.findOne(id, { where: { status: AccountStatus.ACTIVE }, relations: [ 'profile' ] });
+  }
+
+  async buildAccountPrivileges(id: string): Promise<AccountPrivilege> {
+    const account: Account = await this.get(id);
+    const roles: Role[] = await account.roles;
+
+    if (!account) return undefined;
+
+    const privileges: AccountPrivilege = {
+      roles,
+      menus: [],
+      services: [],
+    };
+
+    return privileges;
   }
 
   async suspend(id: string): Promise<Account> {

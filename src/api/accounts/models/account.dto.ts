@@ -89,3 +89,8 @@ export class AccountPrivilege {
   menus: Menu[];
   services: Service[];
 }
+
+export class AccountPrivilegeResponse {
+  status?: ResponseStatus;
+  data: AccountPrivilege;
+}

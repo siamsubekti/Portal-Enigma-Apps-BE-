@@ -11,7 +11,7 @@ export class DegreeService {
         private readonly degreeRepository: Repository<Degree>,
     ) {}
 
-    async getDegrees(): Promise<DegreeResponseDTO[]> {
+    async all(): Promise<DegreeResponseDTO[]> {
         const degrees: Degree[] = await this.degreeRepository.find();
         try {
         return degrees;
@@ -20,7 +20,7 @@ export class DegreeService {
         }
     }
 
-    async getDegree(id: number): Promise<DegreeResponseDTO> {
+    async get(id: number): Promise<DegreeResponseDTO> {
         const degree: Degree = await this.degreeRepository.findOne(id);
         Logger.log(degree);
         if (!degree) throw new NotFoundException(`Degree with id: ${id} Not Found`);
@@ -31,7 +31,7 @@ export class DegreeService {
         }
     }
 
-    async insertDegree(degreeDTO: DegreeDTO): Promise<DegreeResponseDTO> {
+    async insert(degreeDTO: DegreeDTO): Promise<DegreeResponseDTO> {
         try {
             const degree: Degree = await this.degreeRepository.save(degreeDTO);
             return degree;
@@ -40,7 +40,7 @@ export class DegreeService {
         }
     }
 
-    async updateDegree(id: number, degreeDTO: DegreeDTO): Promise<DegreeResponseDTO> {
+    async update(id: number, degreeDTO: DegreeDTO): Promise<DegreeResponseDTO> {
         let degree: Degree = await this.degreeRepository.findOne({where: {id}});
         if (!degree) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         try {
@@ -52,7 +52,7 @@ export class DegreeService {
         }
     }
 
-    async deleteDegree(id: number): Promise<DeleteResult> {
+    async delete(id: number): Promise<DeleteResult> {
         const countId: boolean = await this.degreeRepository.count({id}) > 0;
         if (!countId) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         const result: DeleteResult = await this.degreeRepository.delete(id);

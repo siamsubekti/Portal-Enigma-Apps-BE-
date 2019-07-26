@@ -13,7 +13,7 @@ import {
 import { Controller, UseGuards, Get, Put, Query, Param, Body } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
-import { AccountResponse, AccountProfileDTO } from '../models/account.dto';
+import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege } from '../models/account.dto';
 import AccountService from '../services/account.service';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
@@ -117,4 +117,16 @@ export default class AccountController {
   // async delete(@Param('id') id: string): Promise<void> {
   //   return undefined;
   // }
+
+  @Get('privileges/:id')
+  @ApiOperation({ title: 'Get current account privileges.', description: 'Get current account roles, available menus, and available services.' })
+  @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
+  @ApiOkResponse({ description: 'Account privileges.', type: ApiResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async privileges(@Param('id') id: string): Promise<AccountPrivilegeResponse> {
+    const data: AccountPrivilege = await this.accountService.buildAccountPrivileges(id);
+
+    return { data };
+  }
 }

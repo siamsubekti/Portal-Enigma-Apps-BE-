@@ -51,7 +51,7 @@ export class ServicesService {
     }
 
     async findById(id: number): Promise<Service> {
-        return await this.serviceRepository.findOne({ where: { id } });
+        return await this.serviceRepository.findOne({ where: { id }, relations: ['roles'] });
     }
 
     async create(serviceDto: ServiceDTO): Promise<Service> {
@@ -76,7 +76,7 @@ export class ServicesService {
             service.code = form.code;
             service.name = form.name;
             service.endpointUrl = form.endpointUrl;
-            let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
+            const query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
                 .leftJoin('s.roles', 'r');
 
             await query

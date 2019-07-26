@@ -47,7 +47,7 @@ export class AcademyService {
         };
     }
 
-    async insertAcademy(academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
+    async insert(academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
         const checkCode: Academy = await this.academyRepository.findOne({
             where: {code: academyDTO.code}});
         const checkPhone: Academy = await this.academyRepository.findOne({
@@ -63,7 +63,7 @@ export class AcademyService {
         }
     }
 
-    async getAcademy(id: number): Promise<AcademyResponseDTO> {
+    async get(id: number): Promise<AcademyResponseDTO> {
         const academy: Academy = await this.academyRepository.findOne(id);
         if (!academy) throw new NotFoundException(`Academy with id: ${id} Not Found`);
         try {

@@ -12,6 +12,7 @@ import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
+import { AccountPrivilege } from 'src/api/accounts/models/account.dto';
 
 @Injectable()
 export default class AuthService {
@@ -23,6 +24,15 @@ export default class AuthService {
     private readonly redisService: RedisService,
     private readonly config: AppConfig,
   ) {}
+
+  async getAccountPrivileges(accountId: string): Promise<AccountPrivilege> {
+    try {
+      return this.accountService.buildAccountPrivileges(accountId);
+    } catch (error) {
+      Logger.error('');
+      return undefined;
+    }
+  }
 
   async login(credential: LoginCredentialDTO): Promise<LoginResponseDTO> {
     let loginResponse: LoginResponseDTO = null;
