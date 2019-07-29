@@ -15,7 +15,7 @@ import { PagingData } from 'src/libraries/responses/response.class';
 
 @ApiUseTags('Roles')
 @Controller('roles')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export class RoleController {
   constructor(
     private readonly roleService: RoleService,
