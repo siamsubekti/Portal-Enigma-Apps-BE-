@@ -3,15 +3,12 @@ import Menu from '../models/menu.entity';
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO } from '../models/menu.dto';
-import { RoleService } from '../../roles/services/role.service';
-import Role from '../../roles/models/role.entity';
 
 @Injectable()
 export class MenuService {
     constructor(
         @InjectRepository(Menu)
         private readonly menuRepository: Repository<Menu>,
-        private readonly roleService: RoleService,
     ) { }
 
     async all(): Promise<Menu[]> {
