@@ -9,7 +9,7 @@ import { ApiExceptionResponse } from '../../../../libraries/responses/response.t
 
 @Controller('parameters')
 @ApiUseTags('Parameters')
-// @UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard)
 export default class ParameterController {
 
     constructor(
