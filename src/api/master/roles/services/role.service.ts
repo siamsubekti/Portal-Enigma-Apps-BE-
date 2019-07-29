@@ -47,7 +47,7 @@ export class RoleService {
 
     async insert(roleDTO: RoleDTO): Promise<Role> {
         const checkCode: Role = await this.roleRepository.findOne({
-            where: { code: roleDTO.code }
+            where: { code: roleDTO.code },
         });
         Logger.log(checkCode);
         if (checkCode) throw new BadRequestException('Code Has Been Use');
