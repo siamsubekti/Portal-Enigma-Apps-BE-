@@ -47,7 +47,7 @@ export default class RoleService {
 
     async insert(roleDTO: RoleDTO): Promise<Role> {
         const checkCode: Role = await this.roleRepository.findOne({
-            where: { code: roleDTO.code }
+            where: { code: roleDTO.code },
         });
         Logger.log(checkCode);
         if (checkCode) throw new BadRequestException('Code Has Been Use');
@@ -71,7 +71,7 @@ export default class RoleService {
     }
 
     async update(id: number, roleDTO: RoleDTO): Promise<Role> {
-        let role: Role = await this.roleRepository.findOne({where: {id}});
+        let role: Role = await this.roleRepository.findOne({ where: { id } });
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             role = this.roleRepository.merge(role, roleDTO);
