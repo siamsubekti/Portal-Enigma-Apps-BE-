@@ -1,15 +1,17 @@
-import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, InternalServerErrorException, Put, Query } from '@nestjs/common';
+import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, InternalServerErrorException, Put, Query, UseGuards } from '@nestjs/common';
 import ServicesService from '../services/services.service';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiBadRequestResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses, UpdateServiceDTO } from '../models/service.dto';
+import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses } from '../models/service.dto';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import Service from '../models/service.entity';
 import { PagingData } from '../../../../libraries/responses/response.class';
 import AppConfig from '../../../../config/app.config';
+import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
 
 @Controller('services')
 @ApiUseTags('Services')
+@UseGuards(CookieAuthGuard)
 export default class ServicesController {
 
     constructor(
@@ -69,7 +71,7 @@ export default class ServicesController {
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async update(@Param('id') id: number, @Body() form: UpdateServiceDTO): Promise<Service> {
+    async update(@Param('id') id: number, @Body() form: ServiceDTO): Promise<Service> {
         return await this.service.update(id, form);
     }
 

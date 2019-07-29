@@ -2,7 +2,7 @@ import { Injectable, BadRequestException, NotFoundException, Logger } from '@nes
 import Service from '../models/service.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult, UpdateServiceDTO } from '../models/service.dto';
+import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult } from '../models/service.dto';
 
 @Injectable()
 export default class ServicesService {
@@ -66,16 +66,14 @@ export default class ServicesService {
         return await this.serviceRepository.delete(id);
     }
 
-    async update(id: number, form: UpdateServiceDTO): Promise<Service> {
+    async update(id: number, form: ServiceDTO): Promise<Service> {
         const service: Service = await this.serviceRepository.findOne({ where: { id } });
         if (!service) throw new NotFoundException(`Service with id : ${id} not found.`);
         else {
-            // service = await this.serviceRepository.merge(serviceDto);
-            // console.log('INI SERVICE MERGE',service);
-            // return await this.serviceRepository.save(service);
             service.code = form.code;
             service.name = form.name;
             service.endpointUrl = form.endpointUrl;
+            service.method = form.method;
             const query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
                 .leftJoin('s.roles', 'r');
 
