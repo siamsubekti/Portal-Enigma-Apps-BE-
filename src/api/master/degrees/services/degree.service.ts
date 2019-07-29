@@ -5,7 +5,7 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { DegreesQueryDTO, DegreesQueryResult, DegreeDTO } from '../models/degree.dto';
 
 @Injectable()
-export class DegreeService {
+export default class DegreeService {
     constructor(
         @InjectRepository(Degree)
         private readonly degreeRepository: Repository<Degree>,

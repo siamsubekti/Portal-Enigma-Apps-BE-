@@ -5,7 +5,7 @@ import Academy from '../models/academy.entity';
 import { AcademyDTO, AcademiesQueryDTO, AcademiesQueryResult } from '../models/academy.dto';
 
 @Injectable()
-export class AcademyService {
+export default class AcademyService {
     constructor(
     @InjectRepository(Academy)
     private readonly academyRepository: Repository<Academy>,

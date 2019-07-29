@@ -1,4 +1,4 @@
-import { AcademyService } from '../services/academy.service';
+import AcademyService from '../services/academy.service';
 import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiImplicitParam,
@@ -17,7 +17,7 @@ import Academy from '../models/academy.entity';
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Academies')
 @Controller('academies')
-export class AcademyController {
+export default class AcademyController {
     constructor(
         private academyService: AcademyService,
         private readonly config: AppConfig) { }

@@ -5,7 +5,7 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { MajorDTO, MajorsQueryDTO, MajorsQueryResult } from '../models/major.dto';
 
 @Injectable()
-export class MajorService {
+export default class MajorService {
     constructor(
         @InjectRepository(Major)
         private readonly majorRepository: Repository<Major>,

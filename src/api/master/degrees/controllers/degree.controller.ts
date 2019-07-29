@@ -1,4 +1,4 @@
-import { DegreeService } from '../services/degree.service';
+import DegreeService from '../services/degree.service';
 import { DegreePagedResponse, DegreeResponse, DegreeDTO } from '../models/degree.dto';
 import { Get, Controller, Param, Post, Body, Delete, Put, Logger, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse,
@@ -14,7 +14,7 @@ import { PagingData } from 'src/libraries/responses/response.class';
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Degrees')
 @Controller('degrees')
-export class DegreeController {
+export default class DegreeController {
     constructor(
         private readonly degreeService: DegreeService,
         private readonly config: AppConfig,

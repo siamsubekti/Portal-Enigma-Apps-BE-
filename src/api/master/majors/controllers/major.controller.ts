@@ -1,5 +1,5 @@
+import MajorService from '../services/major.service';
 import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
-import { MajorService } from '../services/major.service';
 import {
     ApiUseTags, ApiOperation, ApiCreatedResponse,
     ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
@@ -16,7 +16,7 @@ import { PagingData } from 'src/libraries/responses/response.class';
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Majors')
 @Controller('majors')
-export class MajorController {
+export default class MajorController {
     constructor(
         private readonly majorService: MajorService,
         private readonly config: AppConfig,

@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO } from '../models/menu.dto';
 
 @Injectable()
-export class MenuService {
+export default class MenuService {
     constructor(
         @InjectRepository(Menu)
         private readonly menuRepository: Repository<Menu>,

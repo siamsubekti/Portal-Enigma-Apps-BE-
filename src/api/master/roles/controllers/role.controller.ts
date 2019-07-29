@@ -1,4 +1,4 @@
-import { RoleService } from '../services/role.service';
+import RoleService from '../services/role.service';
 import { RoleResponse, RolePagedResponse, RoleDTO } from '../models/role.dto';
 import { Get, Controller, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
@@ -16,7 +16,7 @@ import { PagingData } from 'src/libraries/responses/response.class';
 @ApiUseTags('Roles')
 @Controller('roles')
 @UseGuards(CookieAuthGuard)
-export class RoleController {
+export default class RoleController {
   constructor(
     private readonly roleService: RoleService,
     private readonly config: AppConfig) { }

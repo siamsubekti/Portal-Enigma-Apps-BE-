@@ -1,4 +1,4 @@
-import { MenuService } from '../services/menu.service';
+import MenuService from '../services/menu.service';
 import { MenuResponseDTO, MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
 import { UseInterceptors, Get, InternalServerErrorException, Controller, Post, Body, Param, Put, Logger, Delete } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
@@ -9,7 +9,7 @@ import Menu from '../models/menu.entity';
 
 @ApiUseTags('Menus')
 @Controller('menus')
-export class MenuController {
+export default class MenuController {
     constructor(
         private readonly menuService: MenuService,
     ) {}
