@@ -1,27 +1,39 @@
 import { Repository, DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO } from '../models/menu.dto';
 
 @Injectable()
-export class MenuService {
+export default class MenuService {
     constructor(
         @InjectRepository(Menu)
         private readonly menuRepository: Repository<Menu>,
     ) { }
 
     async all(): Promise<Menu[]> {
-        const result: Menu[] = await this.menuRepository.find({ relations: ['roles'] });
+        const result: Menu[] = await this.menuRepository.find({ relations: ['childrenMenu'] });
         return result;
     }
 
     async add(form: MenuDTO): Promise<Menu> {
-        return await this.menuRepository.save(form);
+        const checkCode: Menu = await this.menuRepository.findOne({where: {code: form.code}});
+        if (checkCode) throw new BadRequestException('Code has been use');
+        const parent: Menu = await this.menuRepository.findOne(form.parentId);
+        Logger.log(parent);
+        const menu: Menu = new Menu();
+        menu.code = form.code;
+        menu.name = form.name;
+        menu.order = form.order;
+        menu.icon = form.icon;
+        menu.parentMenu = parent;
+        const result: Menu = await this.menuRepository.save(menu);
+
+        return result;
     }
 
     async get(id: number): Promise<Menu> {
-        const result: Menu = await this.menuRepository.findOne(id);
+        const result: Menu = await this.menuRepository.findOne(id, {relations: ['childrenMenu']});
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             return result;
@@ -38,7 +50,7 @@ export class MenuService {
             const updateData: Menu = await this.menuRepository.save(data);
             return updateData;
         } catch (error) {
-            throw new InternalServerErrorException();
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 

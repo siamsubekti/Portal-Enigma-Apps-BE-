@@ -2,10 +2,10 @@ import { Injectable, InternalServerErrorException, BadRequestException, Logger, 
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
-import { RoleResponseDTO, RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
+import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
 
 @Injectable()
-export class RoleService {
+export default class RoleService {
     constructor(
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
@@ -70,7 +70,7 @@ export class RoleService {
         }
     }
 
-    async update(id: number, roleDTO: RoleDTO): Promise<RoleResponseDTO> {
+    async update(id: number, roleDTO: RoleDTO): Promise<Role> {
         let role: Role = await this.roleRepository.findOne({ where: { id } });
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {

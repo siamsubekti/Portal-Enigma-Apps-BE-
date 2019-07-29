@@ -1,15 +1,17 @@
-import { MenuService } from '../services/menu.service';
-import { MenuResponseDTO, MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
-import { UseInterceptors, Get, InternalServerErrorException, Controller, Post, Body, Param, Put, Logger, Delete } from '@nestjs/common';
+import MenuService from '../services/menu.service';
+import { MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
+import { UseInterceptors, Get, InternalServerErrorException, Controller, Post, Body, Param, Put, Logger, Delete, UseGuards } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
+import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
 
+@UseGuards(CookieAuthGuard)
 @ApiUseTags('Menus')
 @Controller('menus')
-export class MenuController {
+export default class MenuController {
     constructor(
         private readonly menuService: MenuService,
     ) {}
@@ -33,12 +35,13 @@ export class MenuController {
     @ApiCreatedResponse({description: 'OK', type: MenuResponse})
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
     @UseInterceptors(ResponseRebuildInterceptor)
-    async addMenu(@Body() form: MenuDTO): Promise<MenuResponseDTO> {
+    async addMenu(@Body() form: MenuDTO): Promise<Menu> {
         try {
-            const menu: MenuResponseDTO = await this.menuService.add(form);
+            const menu: Menu = await this.menuService.add(form);
+            Logger.log(menu);
             return menu;
         } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+            throw error;
         }
     }
 
@@ -48,12 +51,12 @@ export class MenuController {
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
     @ApiNotFoundResponse({description: 'Menu Not Found', type: ApiExceptionResponse})
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getMenu(@Param('id') id: number): Promise<MenuResponseDTO> {
+    async getMenu(@Param('id') id: number): Promise<Menu> {
         try {
-            const menu: MenuResponseDTO = await this.menuService.get(id);
+            const menu: Menu = await this.menuService.get(id);
             return menu;
         } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+            throw error;
         }
     }
 
@@ -63,12 +66,12 @@ export class MenuController {
     @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
     @ApiNotFoundResponse({description: 'Menu Not Found', type: ApiExceptionResponse})
     @UseInterceptors(ResponseRebuildInterceptor)
-    async editMenu(@Param('id') id: number, @Body() form: MenuDTO): Promise<MenuResponseDTO> {
+    async editMenu(@Param('id') id: number, @Body() form: MenuDTO): Promise<Menu> {
         try {
-            const menu: MenuResponseDTO = await this.menuService.update(id, form);
+            const menu: Menu = await this.menuService.update(id, form);
             return menu;
         } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+            throw error;
         }
     }
 

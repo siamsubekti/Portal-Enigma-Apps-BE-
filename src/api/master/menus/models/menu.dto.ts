@@ -1,8 +1,7 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
-import Role from '../../roles/models/role.entity';
-import { RoleIdDTO } from '../../roles/models/role.dto';
+import Menu from './menu.entity';
 
 export class MenuDTO {
     @ApiModelProperty()
@@ -16,6 +15,9 @@ export class MenuDTO {
 
     @ApiModelProperty()
     icon: string;
+
+    @ApiModelProperty()
+    parentId?: string;
 }
 
 export class MenuResponseDTO {
@@ -27,8 +29,8 @@ export class MenuResponseDTO {
     order: number;
     @ApiModelProperty()
     icon: string;
-    @ApiModelProperty({type: RoleIdDTO})
-    roles: Role[];
+    @ApiModelProperty()
+    menus: Menu[];
 }
 
 export class MenuResponse implements IApiResponse {

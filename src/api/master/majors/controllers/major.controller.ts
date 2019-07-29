@@ -1,30 +1,56 @@
-import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards } from '@nestjs/common';
-import { MajorService } from '../services/major.service';
+import MajorService from '../services/major.service';
+import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiCreatedResponse,
-    ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse,
+    ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { MajorPagedResponse, MajorResponse, MajorDTO, MajorResponseDTO } from '../models/major.dto';
+import { MajorResponse, MajorDTO, MajorsPagedResponse } from '../models/major.dto';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
+import Major from '../models/major.entity';
+import AppConfig from 'src/config/app.config';
+import { PagingData } from 'src/libraries/responses/response.class';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Majors')
 @Controller('majors')
-export class MajorController {
+export default class MajorController {
     constructor(
-        private readonly majorService: MajorService) { }
+        private readonly majorService: MajorService,
+        private readonly config: AppConfig,
+        ) { }
 
-    @Get('')
-    @ApiOperation({ title: 'List Majors', description: 'All Majors' })
-    @ApiOkResponse({ description: 'OK', type: MajorPagedResponse })
-    @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
+    @Get()
+    @ApiOperation({ title: 'List of Majors.', description: 'Get list of majors from database.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: 'name', required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'List of majors.', type: MajorsPagedResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async listAcademies(): Promise<MajorDTO[]> {
-        const major: MajorDTO[] = await this.majorService.getMajors();
-        return major;
+    async all(
+        @Query('term') term?: string,
+        @Query('order') order: 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<MajorsPagedResponse> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.majorService.all({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+        page,
+        rowsPerPage,
+        totalPages: Math.ceil( totalRows / rowsPerPage ),
+        totalRows,
+        };
+        return {
+            status: {
+                code: '200',
+                description: 'Success',
+            }, data, paging };
     }
 
     @Post('')
@@ -32,8 +58,8 @@ export class MajorController {
     @ApiCreatedResponse({ description: 'OK', type: MajorResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async addAcademy(@Body() form: MajorDTO): Promise<MajorResponseDTO> {
-        const major: MajorResponseDTO = await this.majorService.insertMajor(form);
+    async addAcademy(@Body() form: MajorDTO): Promise<Major> {
+        const major: Major = await this.majorService.insertMajor(form);
         return major;
     }
 
@@ -43,8 +69,8 @@ export class MajorController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Major Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getAcademyById(@Param('id') params: number): Promise<MajorResponseDTO> {
-        const major: MajorResponseDTO = await this.majorService.getDetailMajor(params);
+    async getAcademyById(@Param('id') params: number): Promise<Major> {
+        const major: Major = await this.majorService.getDetailMajor(params);
         Logger.log(major);
         return major;
     }
@@ -55,8 +81,8 @@ export class MajorController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Major Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async updateAcademy(@Param('id') id: number, @Body() form: MajorDTO): Promise<MajorResponseDTO> {
-        const major: MajorResponseDTO = await this.majorService.update(id, form);
+    async updateAcademy(@Param('id') id: number, @Body() form: MajorDTO): Promise<Major> {
+        const major: Major = await this.majorService.update(id, form);
         return major;
     }
 

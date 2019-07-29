@@ -1,7 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
+import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsNotEmpty } from 'class-validator';
+import Degree from './degree.entity';
 
 export class DegreeDTO {
     @ApiModelProperty()
@@ -21,11 +22,24 @@ export class DegreeResponse implements IApiResponse {
     data: DegreeDTO;
 }
 
-export class DegreePagedResponse implements IApiPagedResponse {
+export class DegreePagedResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: DegreeDTO[];
+    data: Degree[] | Degree;
     @ApiModelProperty()
-    paging: PagingData;
+    paging?: PagingData;
+}
+
+export class DegreesQueryDTO {
+    term?: string;
+    order?: 'name';
+    sort?: 'asc' | 'desc';
+    page?: number;
+    rowsPerPage?: number;
+}
+
+export class DegreesQueryResult {
+    result: Degree[] | Degree;
+    totalRows: number;
 }

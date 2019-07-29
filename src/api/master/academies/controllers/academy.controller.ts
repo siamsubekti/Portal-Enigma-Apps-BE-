@@ -1,22 +1,23 @@
-import { AcademyService } from '../services/academy.service';
+import AcademyService from '../services/academy.service';
 import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiImplicitParam,
     ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse,
     ApiOkResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { AcademyResponse, AcademyDTO, AcademiesPagedResponse, AcademyResponseDTO } from '../models/academy.dto';
+import { AcademyResponse, AcademyDTO, AcademiesPagedResponse } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
-import { ApiExceptionResponse, ApiPagedResponse } from '../../../../libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { PagingData } from 'src/libraries/responses/response.class';
 import AppConfig from '../../../../config/app.config';
+import Academy from '../models/academy.entity';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Academies')
 @Controller('academies')
-export class AcademyController {
+export default class AcademyController {
     constructor(
         private academyService: AcademyService,
         private readonly config: AppConfig) { }
@@ -27,7 +28,7 @@ export class AcademyController {
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, or phone)', type: ['code', 'name', 'phone'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
-    @ApiOkResponse({ description: 'List of academies.', type: ApiPagedResponse })
+    @ApiOkResponse({ description: 'List of academies.', type: AcademiesPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
@@ -59,8 +60,8 @@ export class AcademyController {
     @ApiBadRequestResponse({ description: 'Code has been use', type: ApiExceptionResponse })
     @ApiBadRequestResponse({ description: 'Phone has been use', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async add(@Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
-        const academy: AcademyResponseDTO = await this.academyService.insert(form);
+    async add(@Body() form: AcademyDTO): Promise<Academy> {
+        const academy: Academy = await this.academyService.insert(form);
         Logger.log(academy);
         return academy;
     }
@@ -72,8 +73,8 @@ export class AcademyController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Academy Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async get(@Param('id') id: number): Promise<AcademyResponseDTO> {
-        const academy: AcademyResponseDTO = await this.academyService.get(id);
+    async get(@Param('id') id: number): Promise<Academy> {
+        const academy: Academy = await this.academyService.get(id);
         Logger.log(academy);
         return academy;
     }
@@ -84,8 +85,8 @@ export class AcademyController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Academy Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async edit(@Param('id') id: number, @Body() form: AcademyDTO): Promise<AcademyResponseDTO> {
-        const academy: AcademyResponseDTO = await this.academyService.update(id, form);
+    async edit(@Param('id') id: number, @Body() form: AcademyDTO): Promise<Academy> {
+        const academy: Academy = await this.academyService.update(id, form);
         Logger.log(academy);
         return academy;
     }
