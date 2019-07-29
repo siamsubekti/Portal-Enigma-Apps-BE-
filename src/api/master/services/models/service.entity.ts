@@ -16,6 +16,9 @@ export default class Service {
     @Column({ name: 'endpoint_url', type: 'varchar', length: 128, nullable: false })
     endpointUrl: string;
 
+    @Column({ type: 'varchar', length: 6, nullable: false })
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
