@@ -24,6 +24,7 @@ export class RoleResponseDTO {
 }
 
 export class RoleIdDTO {
+  @ApiModelProperty()
   id: number;
 }
 

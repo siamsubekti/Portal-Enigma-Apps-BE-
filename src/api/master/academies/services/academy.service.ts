@@ -2,7 +2,7 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { Injectable, Logger, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Academy from '../models/academy.entity';
-import { AcademyResponseDTO, AcademyDTO, AcademiesQueryDTO, AcademiesQueryResult } from '../models/academy.dto';
+import { AcademyDTO, AcademiesQueryDTO, AcademiesQueryResult } from '../models/academy.dto';
 
 @Injectable()
 export class AcademyService {
@@ -47,7 +47,7 @@ export class AcademyService {
         };
     }
 
-    async insert(academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
+    async insert(academyDTO: AcademyDTO): Promise<Academy> {
         const checkCode: Academy = await this.academyRepository.findOne({
             where: {code: academyDTO.code}});
         const checkPhone: Academy = await this.academyRepository.findOne({
@@ -63,7 +63,7 @@ export class AcademyService {
         }
     }
 
-    async get(id: number): Promise<AcademyResponseDTO> {
+    async get(id: number): Promise<Academy> {
         const academy: Academy = await this.academyRepository.findOne(id);
         if (!academy) throw new NotFoundException(`Academy with id: ${id} Not Found`);
         try {
@@ -73,7 +73,7 @@ export class AcademyService {
         }
     }
 
-    async update(id: number, academyDTO: AcademyDTO): Promise<AcademyResponseDTO> {
+    async update(id: number, academyDTO: AcademyDTO): Promise<Academy> {
         const academy: Academy = await this.academyRepository.findOne({where: {id}});
         if (!academy) throw new NotFoundException(`Academy with id: ${id} Not Found`);
         try {

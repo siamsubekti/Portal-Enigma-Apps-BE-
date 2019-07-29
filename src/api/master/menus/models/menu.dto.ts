@@ -13,7 +13,7 @@ export class MenuDTO {
     order: number;
     @ApiModelProperty()
     icon: string;
-    @ApiModelProperty({type: RoleIdDTO})
+    @ApiModelProperty({type: [RoleIdDTO]})
     roles: Role[];
 }
 

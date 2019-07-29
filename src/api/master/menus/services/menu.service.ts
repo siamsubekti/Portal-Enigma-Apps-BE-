@@ -2,7 +2,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
 import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MenuResponseDTO, MenuDTO } from '../models/menu.dto';
+import { MenuDTO } from '../models/menu.dto';
 
 @Injectable()
 export class MenuService {
@@ -16,7 +16,7 @@ export class MenuService {
         return result;
     }
 
-    async add(form: MenuDTO): Promise<MenuResponseDTO> {
+    async add(form: MenuDTO): Promise<Menu> {
         const result: Menu = await this.menuRepository.save(form);
         return result;
         // const role: Role = new Role();
@@ -31,7 +31,7 @@ export class MenuService {
         // return result;
     }
 
-    async get(id: number): Promise<MenuResponseDTO> {
+    async get(id: number): Promise<Menu> {
         const result: Menu = await this.menuRepository.findOne(id);
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
@@ -41,7 +41,7 @@ export class MenuService {
         }
     }
 
-    async update(id: number, form: MenuDTO): Promise<MenuResponseDTO> {
+    async update(id: number, form: MenuDTO): Promise<Menu> {
         const result: Menu = await this.menuRepository.findOne({where: {id}});
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
