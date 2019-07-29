@@ -5,7 +5,7 @@ import { TemplateDTO } from '../models/template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-export class TemplateService {
+export default class TemplateService {
 
     constructor(@InjectRepository(Template) private templateRepository: Repository<Template>) { }
 

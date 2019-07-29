@@ -5,7 +5,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import { SkillDTO } from '../models/skill.dto';
 
 @Injectable()
-export class SkillService {
+export default class SkillService {
 
     constructor(@InjectRepository(Skill) private skillRepository: Repository<Skill>) { }
 

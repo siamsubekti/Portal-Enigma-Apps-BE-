@@ -5,7 +5,7 @@ import Job from '../models/job.entity';
 import { JobDTO } from '../models/job.dto';
 
 @Injectable()
-export class JobService {
+export default class JobService {
 
     constructor(@InjectRepository(Job) private jobRepository: Repository<Job>) { }
 

@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import ParameterDTO from '../models/parameter.dto';
 
 @Injectable()
-export class ParameterService {
+export default class ParameterService {
 
     constructor(@InjectRepository(Parameter) private parameterRepository: Repository<Parameter>) { }
 

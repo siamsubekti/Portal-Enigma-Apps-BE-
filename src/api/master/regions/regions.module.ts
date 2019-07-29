@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Region from './models/region.entity';
-import { RegionController } from './controllers/region.controller';
-import { RegionService } from './services/region.service';
+import RegionController from './controllers/region.controller';
+import RegionService from './services/region.service';
 
 @Module({
     imports: [
@@ -15,4 +15,4 @@ import { RegionService } from './services/region.service';
         RegionService,
     ],
 })
-export class RegionsModule { }
+export default class RegionsModule { }

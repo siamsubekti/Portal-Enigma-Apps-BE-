@@ -2,10 +2,10 @@ import { Injectable, BadRequestException, NotFoundException, Logger } from '@nes
 import Service from '../models/service.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult } from '../models/service.dto';
+import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult, UpdateServiceDTO } from '../models/service.dto';
 
 @Injectable()
-export class ServicesService {
+export default class ServicesService {
 
     constructor(@InjectRepository(Service)
     private serviceRepository: Repository<Service>,
@@ -51,7 +51,7 @@ export class ServicesService {
     }
 
     async findById(id: number): Promise<Service> {
-        return await this.serviceRepository.findOne({ where: { id } });
+        return await this.serviceRepository.findOne({ where: { id }, relations: ['roles'] });
     }
 
     async create(serviceDto: ServiceDTO): Promise<Service> {
@@ -66,12 +66,25 @@ export class ServicesService {
         return await this.serviceRepository.delete(id);
     }
 
-    async update(id: number, serviceDto: ServiceDTO): Promise<Service> {
-        let service: Service = await this.serviceRepository.findOne({ where: { id } });
+    async update(id: number, form: UpdateServiceDTO): Promise<Service> {
+        const service: Service = await this.serviceRepository.findOne({ where: { id } });
         if (!service) throw new NotFoundException(`Service with id : ${id} not found.`);
         else {
-            service = await this.serviceRepository.merge(serviceDto);
-            return await this.serviceRepository.save(service);
+            // service = await this.serviceRepository.merge(serviceDto);
+            // console.log('INI SERVICE MERGE',service);
+            // return await this.serviceRepository.save(service);
+            service.code = form.code;
+            service.name = form.name;
+            service.endpointUrl = form.endpointUrl;
+            const query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
+                .leftJoin('s.roles', 'r');
+
+            await query
+                .update(service)
+                .where('id = :id', { id })
+                .execute();
+
+            return service;
         }
     }
 }

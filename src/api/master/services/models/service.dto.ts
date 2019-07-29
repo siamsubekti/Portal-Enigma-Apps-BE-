@@ -3,10 +3,11 @@ import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Role from '../../roles/models/role.entity';
 import Service from './service.entity';
+import { RoleIdDTO } from '../../roles/models/role.dto';
 
 export class ServiceDTO {
 
-  id: number;
+  id?: number;
 
   @ApiModelProperty({ uniqueItems: true })
   code: string;
@@ -17,10 +18,22 @@ export class ServiceDTO {
   @ApiModelProperty()
   endpointUrl: string;
 
-  @ApiModelProperty()
+  @ApiModelProperty({ type: [RoleIdDTO] })
   roles: Role[];
 
-  createdAt: Date;
+  createdAt?: Date;
+}
+
+export class UpdateServiceDTO {
+
+  @ApiModelProperty({ uniqueItems: true })
+  code: string;
+
+  @ApiModelProperty()
+  name: string;
+
+  @ApiModelProperty()
+  endpointUrl: string;
 }
 
 export class ServiceResponse implements IApiResponse {

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards } from '@nestjs/common';
-import { SkillService } from '../services/skill.service';
+import SkillService from '../services/skill.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { SkillDTO, SkillPageResponse, SkillResponse } from '../models/skill.dto';
 import Skill from '../models/skill.entity';
@@ -11,7 +11,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 @Controller('skills')
 @ApiUseTags('Skills')
 @UseGuards(CookieAuthGuard)
-export class SkillsController {
+export default class SkillsController {
 
     constructor(private skillService: SkillService) { }
 

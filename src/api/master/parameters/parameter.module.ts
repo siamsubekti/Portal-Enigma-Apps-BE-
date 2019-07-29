@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Parameter from './models/parameter.entity';
-import { ParameterController } from './controllers/parameter.controller';
-import { ParameterService } from './services/parameter.service';
+import ParameterController from './controllers/parameter.controller';
+import ParameterService from './services/parameter.service';
 
 @Module({
     imports: [
@@ -15,6 +15,6 @@ import { ParameterService } from './services/parameter.service';
         ParameterService,
     ],
 })
-export class ParameterModule {
+export default class ParameterModule {
 
 }
