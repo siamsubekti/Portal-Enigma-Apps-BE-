@@ -35,16 +35,3 @@ export class JobPageResponse implements IApiPagedResponse {
     @ApiModelProperty({ type: JobDTO })
     data: JobDTO[];
 }
-
-// export class JobQueryDTO {
-//     term?: string;
-//     order?: 'name' | 'description';
-//     sort?: 'asc' | 'desc';
-//     page?: number;
-//     rowsPerPage?: number;
-//   }
-
-//   export class JobQueryResult {
-//     result: Job[] | Job;
-//     totalRows: number;
-//   }
