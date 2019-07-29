@@ -9,6 +9,7 @@ import Service from './models/service.entity';
     TypeOrmModule.forFeature([Service]),
   ],
   controllers: [ServicesController],
+  exports: [ServicesService],
   providers: [ServicesService],
 })
 export default class ServicesModule { }

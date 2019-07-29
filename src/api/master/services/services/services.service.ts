@@ -87,4 +87,10 @@ export default class ServicesService {
             return service;
         }
     }
+
+    async createBulk(data: ServiceDTO[]): Promise<Service[]> {
+        const services: Service[] = data.map( (service: ServiceDTO) => this.serviceRepository.create(service) );
+
+        return await this.serviceRepository.save(services);
+    }
 }
