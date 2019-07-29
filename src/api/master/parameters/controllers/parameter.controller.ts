@@ -1,5 +1,5 @@
 import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpCode, Param, Body, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ParameterService } from '../services/parameter.service';
+import ParameterService from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
@@ -10,7 +10,7 @@ import { ApiExceptionResponse } from '../../../../libraries/responses/response.t
 @Controller('parameters')
 @ApiUseTags('Parameters')
 @UseGuards(CookieAuthGuard)
-export class ParameterController {
+export default class ParameterController {
 
     constructor(
         private readonly parameterService: ParameterService,

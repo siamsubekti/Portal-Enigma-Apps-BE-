@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import Template from './models/template.entity';
-import { TemplateController } from './controllers/template.controller';
-import { TemplateService } from './services/template.service';
+import TemplateController from './controllers/template.controller';
+import TemplateService from './services/template.service';
 
 @Module({
     imports: [
@@ -12,5 +12,5 @@ import { TemplateService } from './services/template.service';
     providers: [TemplateService],
 })
 
-export class TemplateModule {
+export default class TemplateModule {
 }

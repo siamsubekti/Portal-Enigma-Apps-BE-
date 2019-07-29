@@ -5,7 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult, UpdateServiceDTO } from '../models/service.dto';
 
 @Injectable()
-export class ServicesService {
+export default class ServicesService {
 
     constructor(@InjectRepository(Service)
     private serviceRepository: Repository<Service>,

@@ -1,5 +1,5 @@
 import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, InternalServerErrorException, Put, Query } from '@nestjs/common';
-import { ServicesService } from '../services/services.service';
+import ServicesService from '../services/services.service';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery } from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses, UpdateServiceDTO } from '../models/service.dto';
@@ -10,7 +10,7 @@ import AppConfig from '../../../../config/app.config';
 
 @Controller('services')
 @ApiUseTags('Services')
-export class ServicesController {
+export default class ServicesController {
 
     constructor(
         private service: ServicesService,

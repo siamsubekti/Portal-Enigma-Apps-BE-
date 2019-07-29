@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards } from '@nestjs/common';
-import { RegionService } from '../services/region.service';
+import RegionService from '../services/region.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
@@ -11,7 +11,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 @Controller('regions')
 @ApiUseTags('Regions')
 @UseGuards(CookieAuthGuard)
-export class RegionController {
+export default class RegionController {
 
     constructor(
         private readonly regionServices: RegionService,

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards } from '@nestjs/common';
-import { JobService } from '../services/job.service';
+import JobService from '../services/job.service';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
@@ -11,7 +11,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 @Controller('jobs')
 @ApiUseTags('Jobs')
 @UseGuards(CookieAuthGuard)
-export class JobController {
+export default class JobController {
 
     constructor(
         private readonly jobService: JobService,

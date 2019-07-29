@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import Job from './models/job.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { JobController } from './constrollers/job.controller';
-import { JobService } from './services/job.service';
+import JobController from './constrollers/job.controller';
+import JobService from './services/job.service';
 
 @Module({
     imports: [
@@ -11,6 +11,6 @@ import { JobService } from './services/job.service';
     controllers: [JobController],
     providers: [JobService],
 })
-export class JobModule {
+export default class JobModule {
 
 }

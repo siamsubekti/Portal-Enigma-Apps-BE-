@@ -7,7 +7,7 @@ import { RoleIdDTO } from '../../roles/models/role.dto';
 
 export class ServiceDTO {
 
-  id: number;
+  id?: number;
 
   @ApiModelProperty({ uniqueItems: true })
   code: string;
@@ -21,7 +21,7 @@ export class ServiceDTO {
   @ApiModelProperty({ type: [RoleIdDTO] })
   roles: Role[];
 
-  createdAt: Date;
+  createdAt?: Date;
 }
 
 export class UpdateServiceDTO {

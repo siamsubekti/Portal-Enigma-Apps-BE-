@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards } from '@nestjs/common';
-import { TemplateService } from '../services/template.service';
+import TemplateService from '../services/template.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
@@ -10,7 +10,7 @@ import { ResponseRebuildInterceptor } from '../../../../libraries/responses/resp
 @Controller('templates')
 @ApiUseTags('Templates')
 @UseGuards(CookieAuthGuard)
-export class TemplateController {
+export default class TemplateController {
 
     constructor(private templateService: TemplateService) { }
 

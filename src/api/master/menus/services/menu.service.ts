@@ -20,20 +20,7 @@ export class MenuService {
     }
 
     async add(form: MenuDTO): Promise<Menu> {
-
-        const role: Role = new Role();
-        role.code = form.code;
-        const savedRole: Role = await this.roleService.insert(role);
-
-        const menu: Menu = new Menu();
-        menu.code = form.code;
-        menu.name = form.name;
-        menu.order = form.order;
-        menu.icon = form.icon;
-        menu.roles = [savedRole];
-        const result: Menu = await this.menuRepository.save(menu);
-
-        return result;
+        return await this.menuRepository.save(form);
     }
 
     async get(id: number): Promise<Menu> {

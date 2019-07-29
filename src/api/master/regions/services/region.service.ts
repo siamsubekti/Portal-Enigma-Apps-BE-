@@ -5,7 +5,7 @@ import { Repository, DeleteResult } from 'typeorm';
 import { RegionDTO } from '../models/region.dto';
 
 @Injectable()
-export class RegionService {
+export default class RegionService {
 
     constructor(@InjectRepository(Region) private regionRepository: Repository<Region>) { }
 
