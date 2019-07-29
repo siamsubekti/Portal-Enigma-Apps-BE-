@@ -1,13 +1,9 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-import Role from '../../roles/models/role.entity';
 import Service from './service.entity';
-import { RoleIdDTO } from '../../roles/models/role.dto';
 
 export class ServiceDTO {
-
-  id?: number;
 
   @ApiModelProperty({ uniqueItems: true })
   code: string;
@@ -18,10 +14,7 @@ export class ServiceDTO {
   @ApiModelProperty()
   endpointUrl: string;
 
-  @ApiModelProperty({ type: [RoleIdDTO] })
-  roles: Role[];
-
-  createdAt?: Date;
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
 }
 
 export class UpdateServiceDTO {
