@@ -87,8 +87,13 @@ export default class ServicesService {
     }
 
     async createBulk(data: ServiceDTO[]): Promise<Service[]> {
-        const services: Service[] = data.map( (service: ServiceDTO) => this.serviceRepository.create(service) );
+        const services: Service[] = data.map((service: ServiceDTO) => this.serviceRepository.create(service));
 
         return await this.serviceRepository.save(services);
+    }
+
+    async findAllRelated(services: Service[]): Promise<Service[]> {
+        const serviceIds: number[] = services.map((item: Service) => item.id);
+        return this.serviceRepository.findByIds(serviceIds);
     }
 }

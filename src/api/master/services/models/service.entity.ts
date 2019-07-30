@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
 import Role from '../../roles/models/role.entity';
 
 @Entity({ name: 'mst_services' })
@@ -23,6 +23,5 @@ export default class Service {
     createdAt: Date;
 
     @ManyToMany(() => Role, (role: Role) => role.services)
-    @JoinTable({ name: 'services_has_roles', joinColumn: { name: 'service_id', referencedColumnName: 'id' }, inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' } })
     roles?: Role[];
 }

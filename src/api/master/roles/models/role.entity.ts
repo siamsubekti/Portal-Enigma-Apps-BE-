@@ -21,6 +21,11 @@ export default class Role {
   account: Account;
 
   @ManyToMany(() => Service, (service: Service) => service.roles, { eager: true })
+  @JoinTable({
+    name: 'roles_has_services',
+    joinColumn: { name: 'role_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'service_id', referencedColumnName: 'id' },
+  })
   services: Service[];
 
   @ManyToMany(() => Menu, (menu: Menu) => menu.roles, { eager: true })

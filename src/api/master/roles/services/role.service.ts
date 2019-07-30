@@ -3,12 +3,18 @@ import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
+import ServicesService from '../../services/services/services.service';
+import MenuService from '../../menus/services/menu.service';
+import Service from '../../services/models/service.entity';
+import Menu from '../../menus/models/menu.entity';
 
 @Injectable()
 export default class RoleService {
     constructor(
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
+        private readonly serviceServices: ServicesService,
+        private readonly menuServices: MenuService,
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
@@ -46,17 +52,15 @@ export default class RoleService {
     }
 
     async insert(roleDTO: RoleDTO): Promise<Role> {
-        const checkCode: Role = await this.roleRepository.findOne({
-            where: { code: roleDTO.code },
-        });
-        Logger.log(checkCode);
-        if (checkCode) throw new BadRequestException('Code Has Been Use');
-        try {
-            const role: Role = await this.roleRepository.save(roleDTO);
-            Logger.log(role);
-            return role;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+        const isExist: boolean = await this.roleRepository.count({ where: { code: roleDTO.code } }) > 0;
+        if (isExist) throw new BadRequestException('Code Has Been Use');
+        else {
+            const role: Role = await this.roleRepository.create(roleDTO);
+            const services: Service[] = await this.serviceServices.findAllRelated(roleDTO.services);
+            const menus: Menu[] = await this.menuServices.findAllRelated(roleDTO.menus);
+            role.services = services;
+            role.menus = menus;
+            return await this.roleRepository.save(role);
         }
     }
 
