@@ -3,6 +3,7 @@ import { IsNotEmpty } from 'class-validator';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Service from '../../services/models/service.entity';
 import Role from './role.entity';
+import Menu from '../../menus/models/menu.entity';
 
 export class RoleDTO {
 
@@ -16,6 +17,9 @@ export class RoleDTO {
 
   @ApiModelProperty()
   services: Service[];
+
+  @ApiModelProperty()
+  menus: Menu[];
 }
 
 export class RoleResponseDTO {

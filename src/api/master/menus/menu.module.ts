@@ -9,6 +9,7 @@ import RoleService from '../roles/services/role.service';
 @Module({
   imports: [TypeOrmModule.forFeature([Menu, Role])],
   providers: [MenuService, RoleService],
+  exports: [MenuService],
   controllers: [MenuController],
 })
 export class MenuModule {}

@@ -17,6 +17,7 @@ import ConfigModule from '../config/config.module';
 import LibraryModule from '../libraries/library.module';
 import AccountModule from './accounts/account.module';
 import AuthModule from './auth/auth.module';
+import MigrationModule from './migrations/migration.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import AuthModule from './auth/auth.module';
     AuthModule,
     ParameterModule,
     ServicesModule,
+    MigrationModule,
   ],
   controllers: [ ApiController],
 })

@@ -17,7 +17,10 @@ export class MenuDTO {
     icon: string;
 
     @ApiModelProperty()
-    parentId?: string;
+    parentId?: number;
+
+    @ApiModelProperty()
+    parentMenu?: Menu;
 }
 
 export class MenuResponseDTO {

@@ -64,4 +64,10 @@ export default class MenuService {
             throw new InternalServerErrorException();
         }
     }
+
+    async createBulk(data: MenuDTO[]): Promise<Menu[]> {
+        const menus: Menu[] = data.map((item: MenuDTO) => this.menuRepository.create(item));
+
+        return await this.menuRepository.save(menus);
+    }
 }

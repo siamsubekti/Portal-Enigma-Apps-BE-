@@ -92,4 +92,10 @@ export default class RoleService {
             throw new InternalServerErrorException('Internal Server Error');
         }
     }
+
+    async createBulk(data: RoleDTO[]): Promise<Role[]> {
+        const roles: Role[] = data.map((item: RoleDTO) => this.roleRepository.create(item));
+
+        return await this.roleRepository.save(roles);
+    }
 }
