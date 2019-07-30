@@ -11,7 +11,7 @@ import { MajorModule } from './master/majors/major.module';
 import { DegreeModule } from './master/degrees/degree.module';
 import { RoleModule } from './master/roles/role.module';
 import ServicesModule from './master/services/services.module';
-import { MenuModule } from './master/menus/menu.module';
+import MenuModule from './master/menus/menu.module';
 import DatabaseConnectionConfig from '../config/database.config';
 import ConfigModule from '../config/config.module';
 import LibraryModule from '../libraries/library.module';
