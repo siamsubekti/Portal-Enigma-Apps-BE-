@@ -1,17 +1,21 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
+import { IsDefined, IsNotEmpty, MaxLength } from 'class-validator';
 
 export default class ParameterDTO {
-    id?: number;
 
-    @ApiModelProperty({ uniqueItems: true })
+    @ApiModelProperty({ type: 'string', uniqueItems: true, maxLength: 255, required: true })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(255)
     key: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ type: 'string', maxLength: 255, required: true })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(255)
     value: string;
-
-    createdAt: Date;
 }
 
 export class ParameterResponse implements IApiResponse {

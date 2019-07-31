@@ -17,7 +17,7 @@ export default class MenuService {
     }
 
     async add(form: MenuDTO): Promise<Menu> {
-        const checkCode: Menu = await this.menuRepository.findOne({where: {code: form.code}});
+        const checkCode: Menu = await this.menuRepository.findOne({ where: { code: form.code } });
         if (checkCode) throw new BadRequestException('Code has been use');
         const parent: Menu = await this.menuRepository.findOne(form.parentId);
         Logger.log(parent);
@@ -33,7 +33,7 @@ export default class MenuService {
     }
 
     async get(id: number): Promise<Menu> {
-        const result: Menu = await this.menuRepository.findOne(id, {relations: ['childrenMenu']});
+        const result: Menu = await this.menuRepository.findOne(id, { relations: ['childrenMenu'] });
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             return result;
@@ -69,5 +69,10 @@ export default class MenuService {
         const menus: Menu[] = data.map((item: MenuDTO) => this.menuRepository.create(item));
 
         return await this.menuRepository.save(menus);
+    }
+
+    async findAllRelated(menu: Menu[]): Promise<Menu[]> {
+        const menuIds: number[] = menu.map((item: Menu) => item.id);
+        return this.menuRepository.findByIds(menuIds);
     }
 }

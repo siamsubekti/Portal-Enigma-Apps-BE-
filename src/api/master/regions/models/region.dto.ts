@@ -1,21 +1,22 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-import { IsDefined, IsEnum } from 'class-validator';
+import { IsDefined, IsEnum, IsNotEmpty, MaxLength } from 'class-validator';
 
 export class RegionDTO {
 
-    id?: string;
-
+    @ApiModelProperty({ enum: ['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'], maxLength: 32, required: true })
     @IsDefined()
     @IsEnum(['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'])
-    @ApiModelProperty({ enum: ['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'] })
+    @IsNotEmpty()
+    @MaxLength(32)
     type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
 
-    @ApiModelProperty({ uniqueItems: true })
+    @ApiModelProperty({ type: 'string', uniqueItems: true, maxLength: 255, required: true })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(255)
     name: string;
-
-    createdAt: Date;
 }
 
 export class RegionResponse implements IApiResponse {

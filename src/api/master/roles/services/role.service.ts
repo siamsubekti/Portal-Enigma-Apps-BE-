@@ -3,12 +3,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
+import ServicesService from '../../services/services/services.service';
+import MenuService from '../../menus/services/menu.service';
 
 @Injectable()
 export default class RoleService {
     constructor(
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
+        private readonly serviceServices: ServicesService,
+        private readonly menuServices: MenuService,
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
@@ -56,8 +60,8 @@ export default class RoleService {
             let role: Role = new Role();
             role.code = code;
             role.name = name;
-            role.menus = Promise.resolve(menus);
-            role.services = Promise.resolve(services);
+            role.menus = this.menuServices.findAllRelated(menus);
+            role.services = this.serviceServices.findAllRelated(services);
 
             role = await this.roleRepository.save(role);
             return role;

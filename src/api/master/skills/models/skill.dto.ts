@@ -1,18 +1,20 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
+import { IsDefined, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 
 export class SkillDTO {
 
-    id?: number;
-
-    @ApiModelProperty({ uniqueItems: true })
+    @ApiModelProperty({ type: 'string', maxLength: 255, required: true, uniqueItems: true })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(255)
     name: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ type: 'string', required: false })
+    @IsOptional()
+    @IsDefined()
     description: string;
-
-    createdAt: Date;
 }
 
 export class SkillResponse implements IApiResponse {

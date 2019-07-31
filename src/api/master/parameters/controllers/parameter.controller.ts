@@ -18,6 +18,7 @@ export default class ParameterController {
 
     @Get(':key')
     @ApiOperation({ title: 'GET Parameters by key', description: 'API to get value of parameter by key' })
+    @ApiOkResponse({ description: 'If keyword found Parameters', type: 'string' })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     async get(@Param('key') key: string): Promise<string> {
         const value: string = await this.parameterService.get(key);

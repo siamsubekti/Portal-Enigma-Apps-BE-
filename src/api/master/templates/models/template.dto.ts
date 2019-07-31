@@ -1,24 +1,32 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
+import { IsDefined, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 
 export class TemplateDTO {
 
-    id?: number;
-
-    @ApiModelProperty({ uniqueItems: true })
+    @ApiModelProperty({ type: 'string', uniqueItems: true, required: true, maxLength: 255 })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(255)
     name: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ type: 'string', required: true, maxLength: 50 })
+    @IsDefined()
+    @IsNotEmpty()
+    @MaxLength(50)
     type: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ type: 'string', required: false, maxLength: 255 })
+    @IsOptional()
+    @IsDefined()
+    @MaxLength(255)
     subject: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({ type: 'string', required: true })
+    @IsDefined()
+    @IsNotEmpty()
     body: string;
-
-    createdAt: Date;
 }
 
 export class TemplateResponse implements IApiResponse {

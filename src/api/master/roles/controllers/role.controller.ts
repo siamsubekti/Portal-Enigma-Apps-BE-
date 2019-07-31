@@ -10,8 +10,8 @@ import { DeleteResult } from 'typeorm';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import Role from '../models/role.entity';
-import AppConfig from 'src/config/app.config';
-import { PagingData } from 'src/libraries/responses/response.class';
+import AppConfig from '../../../../config/app.config';
+import { PagingData } from '../../../../libraries/responses/response.class';
 
 @ApiUseTags('Roles')
 @Controller('roles')

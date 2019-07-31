@@ -17,19 +17,6 @@ export default class JobService {
         return await this.jobRepository.findOne(id);
     }
 
-    // async search(keyword: string): Promise<Job[]> {
-    //     return await this.jobRepository.find({
-    //         where: [
-    //             {
-    //                 name: Like(`%${keyword}%`)
-    //             },
-    //             {
-    //                 description: Like(`%${keyword}%`)
-    //             }
-    //         ]
-    //     });
-    // }
-
     async create(jobDto: JobDTO): Promise<Job> {
         const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
         if (exist) throw new BadRequestException('Data ini telah ada.');
