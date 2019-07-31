@@ -1,31 +1,42 @@
 import { Injectable, Logger } from '@nestjs/common';
+import HashUtil from '../../../libraries/utilities/hash.util';
 import ServicesService from '../../master/services/services/services.service';
 import MenuService from '../../master/menus/services/menu.service';
 import RoleService from '../../master/roles/services/role.service';
+import ProfileService from '../../accounts/services/profile.service';
+import AccountService from '../../accounts/services/account.service';
 
 import Service from '../../master/services/models/service.entity';
 import Menu from '../../master/menus/models/menu.entity';
 import Role from '../../master/roles/models/role.entity';
+import Account from '../../accounts/models/account.entity';
+import Profile from '../../accounts/models/profile.entity';
 
 import { ServiceDTO } from '../../master/services/models/service.dto';
 import { MenuDTO } from '../../master/menus/models/menu.dto';
 import { RoleDTO } from '../../master/roles/models/role.dto';
+import { ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountStatus } from 'src/config/constants';
 
 @Injectable()
 export default class MigrationService {
   private services: Service[] = [];
   private menus: Menu[] = [];
+  private roles: { [key: string]: Role } = {};
 
   constructor(
     private readonly service: ServicesService,
     private readonly menu: MenuService,
     private readonly role: RoleService,
+    private readonly account: AccountService,
+    private readonly profile: ProfileService,
+    private readonly hash: HashUtil,
   ) {}
 
   async start(): Promise<void> {
     await this.createDefaultServices();
     await this.createDefaultMenus();
     await this.createRoles();
+    await this.createAccount();
   }
 
   private async createDefaultServices(): Promise<void> {
@@ -268,6 +279,38 @@ export default class MigrationService {
     Logger.log(`Creating ${data.length} roles...`);
     const roles: Role[] = await this.role.createBulk(data);
 
-    roles.forEach((role: Role) => Logger.log(`Role ${role.code} created.`));
+    roles.forEach((role: Role) => {
+      Logger.log(`Role ${role.code} created.`);
+      this.roles[ role.code ] = role;
+    });
+  }
+
+  private async createAccount(): Promise<void> {
+    Logger.log(`Creating new account..`);
+
+    const profile: Profile = this.profile.repository().create({
+      fullname: 'Adisthya Rahmadyan',
+      nickname: 'Adis',
+      email: 'adisthya.rahmadyan@sqrtechno.com',
+      phone: '087887202505',
+      gender: ProfileGender.MALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.MARRIED,
+      birthdate: new Date(1986, 3, 16, 0, 0, 0, 0),
+    });
+
+    let account: Account = this.account.repository().create({
+      username: profile.email,
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['SUDO'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
   }
 }

@@ -23,15 +23,15 @@ export default class Account {
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
-  @OneToOne(() => Profile, (profile: Profile) => profile.account)
+  @OneToOne(() => Profile, (profile: Profile) => profile.account, { cascade: true })
   @JoinColumn({name: 'profile_id'})
   profile: Profile;
 
-  @ManyToMany(() => Role, (role: Role) => role.account)
+  @ManyToMany(() => Role, (role: Role) => role.account, { cascade: true })
   @JoinTable({
     name: 'accounts_has_roles',
-    joinColumn: { name: 'role_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'account_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'account_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
   })
-  roles: Role[];
+  roles: Promise<Role[]>;
 }

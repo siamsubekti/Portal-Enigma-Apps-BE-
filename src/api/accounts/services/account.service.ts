@@ -6,13 +6,10 @@ import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivileg
 import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
-import Role from '../../master/roles/models/role.entity';
 
 @Injectable()
 export default class AccountService {
-  constructor(
-    @InjectRepository(Account) private readonly account: Repository<Account>,
-  ) {}
+  constructor( @InjectRepository(Account) private readonly account: Repository<Account> ) {}
 
   repository(): Repository<Account> {
     return this.account;
@@ -49,7 +46,7 @@ export default class AccountService {
     query.limit( queryParams.rowsPerPage );
 
     const result: [ Account[], number ] = await query.getManyAndCount();
-    Logger.log(queryParams, 'AccountService@all', true);
+    // Logger.log(queryParams, 'AccountService@all', true);
 
     return {
       result: result[0],
@@ -95,15 +92,21 @@ export default class AccountService {
 
   async buildAccountPrivileges(id: string): Promise<AccountPrivilege> {
     const account: Account = await this.get(id);
-    const roles: Role[] = await account.roles;
 
     if (!account) return undefined;
 
     const privileges: AccountPrivilege = {
-      roles,
+      roles: [],
       menus: [],
       services: [],
     };
+
+    for (const role of await account.roles) {
+      // role = await this.roleService.get(role.id);
+      privileges.roles.push(role);
+      privileges.menus.push( ...(await role.menus) );
+      privileges.services.push( ...(await role.services) );
+    }
 
     return privileges;
   }
@@ -123,6 +126,18 @@ export default class AccountService {
     account.updatedAt = new Date();
 
     return await this.save(account);
+  }
+
+  async cleanDelete(id: string): Promise<void> {
+    try {
+      const account: Account = await this.account.findOneOrFail(id);
+
+      await this.account.delete(account);
+    } catch (error) {
+      Logger.log(error);
+
+      throw error;
+    }
   }
 
   async save(account: Account): Promise<Account> {
