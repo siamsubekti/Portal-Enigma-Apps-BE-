@@ -5,8 +5,6 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
 import ServicesService from '../../services/services/services.service';
 import MenuService from '../../menus/services/menu.service';
-import Service from '../../services/models/service.entity';
-import Menu from '../../menus/models/menu.entity';
 
 @Injectable()
 export default class RoleService {
@@ -18,14 +16,20 @@ export default class RoleService {
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
-        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r').select('r');
+        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r')
+        .leftJoinAndSelect('r.services', 's').leftJoinAndSelect('r.menus', 'm');
 
         if (queryParams.term) {
             let { term } = queryParams;
             term = `%${term}%`;
             query = query
                 .orWhere('r.code LIKE :term', { term })
-                .orWhere('r.name LIKE :term', { term });
+                .orWhere('r.name LIKE :term', { term })
+                .orWhere('s.code LIKE :term', { term })
+                .orWhere('s.name LIKE :term', { term })
+                .orWhere('m.code LIKE :term', { term })
+                .orWhere('m.name LIKE :term', { term })
+                .orWhere('m.order LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
@@ -52,15 +56,23 @@ export default class RoleService {
     }
 
     async insert(roleDTO: RoleDTO): Promise<Role> {
-        const isExist: boolean = await this.roleRepository.count({ where: { code: roleDTO.code } }) > 0;
-        if (isExist) throw new BadRequestException('Code Has Been Use');
-        else {
-            const role: Role = await this.roleRepository.create(roleDTO);
-            const services: Service[] = await this.serviceServices.findAllRelated(roleDTO.services);
-            const menus: Menu[] = await this.menuServices.findAllRelated(roleDTO.menus);
-            role.services = services;
-            role.menus = menus;
-            return await this.roleRepository.save(role);
+        const checkCode: Role = await this.roleRepository.findOne({
+            where: { code: roleDTO.code },
+        });
+        // Logger.log(checkCode);
+        if (checkCode) throw new BadRequestException('This role code is already taken.');
+        try {
+            const { code, name, menus, services } = roleDTO;
+            let role: Role = new Role();
+            role.code = code;
+            role.name = name;
+            role.menus = this.menuServices.findAllRelated(menus);
+            role.services = this.serviceServices.findAllRelated(services);
+
+            role = await this.roleRepository.save(role);
+            return role;
+        } catch (error) {
+            throw new InternalServerErrorException('Internal Server Error');
         }
     }
 
@@ -75,10 +87,14 @@ export default class RoleService {
     }
 
     async update(id: number, roleDTO: RoleDTO): Promise<Role> {
-        let role: Role = await this.roleRepository.findOne({ where: { id } });
+        const role: Role = await this.roleRepository.findOne({ where: { id } });
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
-            role = this.roleRepository.merge(role, roleDTO);
+            const { code, name, menus, services } = roleDTO;
+            role.code = code;
+            role.name = name;
+            role.menus = Promise.resolve(menus);
+            role.services = Promise.resolve(services);
             const result: Role = await this.roleRepository.save(role);
             return result;
         } catch (error) {
@@ -98,7 +114,18 @@ export default class RoleService {
     }
 
     async createBulk(data: RoleDTO[]): Promise<Role[]> {
-        const roles: Role[] = data.map((item: RoleDTO) => this.roleRepository.create(item));
+        const roles: Role[] = [];
+
+        for (const item of data) {
+            const { code, name, menus, services } = item;
+            const role: Role = new Role();
+            role.code = code;
+            role.name = name;
+            role.menus = Promise.resolve(menus);
+            role.services = Promise.resolve(services);
+
+            roles.push(role);
+        }
 
         return await this.roleRepository.save(roles);
     }

@@ -3,7 +3,7 @@ import { DegreePagedResponse, DegreeResponse, DegreeDTO } from '../models/degree
 import { Get, Controller, Param, Post, Body, Delete, Put, Logger, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse,
     ApiOperation, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
@@ -49,6 +49,24 @@ export default class DegreeController {
                 code: '200',
                 description: 'Success',
             }, data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Degree.', description: 'Search degree.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: ['name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'Search result of degree.', type: ApiResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<DegreeResponse> {
+        const { result: data = [] } = await this.degreeService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
+
+        return { data };
     }
 
     @Post()

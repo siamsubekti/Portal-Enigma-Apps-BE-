@@ -1,8 +1,8 @@
-import { Repository, DeleteResult } from 'typeorm';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Menu from '../models/menu.entity';
 import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MenuDTO } from '../models/menu.dto';
+import { MenuDTO, MenuQueryDTO, MenuQueryResult } from '../models/menu.dto';
 
 @Injectable()
 export default class MenuService {
@@ -11,9 +11,40 @@ export default class MenuService {
         private readonly menuRepository: Repository<Menu>,
     ) { }
 
-    async all(): Promise<Menu[]> {
-        const result: Menu[] = await this.menuRepository.find({ relations: ['childrenMenu'] });
-        return result;
+    async all(queryParams: MenuQueryDTO): Promise<MenuQueryResult> {
+        let query: SelectQueryBuilder<Menu> = this.menuRepository.createQueryBuilder('m').select('m');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('m.code LIKE :term', { term })
+                .orWhere('m.name LIKE :term', { term })
+                .orWhere('m.order LIKE :term', { term })
+                .orWhere('m.icon LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                code: 'm.code',
+                name: 'm.name',
+            };
+
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('m.name', 'ASC');
+
+        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.limit(queryParams.rowsPerPage);
+
+        const result: [Menu[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'MenuService@all', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
     }
 
     async add(form: MenuDTO): Promise<Menu> {

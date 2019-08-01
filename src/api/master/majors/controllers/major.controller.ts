@@ -2,11 +2,11 @@ import MajorService from '../services/major.service';
 import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiCreatedResponse,
-    ApiOkResponse, ApiInternalServerErrorResponse, ApiResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
+    ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MajorResponse, MajorDTO, MajorsPagedResponse } from '../models/major.dto';
 import { DeleteResult } from 'typeorm';
-import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import Major from '../models/major.entity';
@@ -53,6 +53,24 @@ export default class MajorController {
             }, data, paging };
     }
 
+    @Get('search')
+    @ApiOperation({ title: 'Search Major.', description: 'Search major.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: ['name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<MajorResponse> {
+        const { result: data = [] } = await this.majorService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
+
+        return { data };
+    }
+
     @Post('')
     @ApiOperation({ title: 'Create Major', description: 'Create Major' })
     @ApiCreatedResponse({ description: 'OK', type: MajorResponse })
@@ -77,7 +95,7 @@ export default class MajorController {
 
     @Put(':id')
     @ApiOperation({ title: 'Update Major', description: 'Update Major' })
-    @ApiResponse({ status: 200, description: 'OK', type: MajorResponse })
+    @ApiOkResponse({ description: 'OK', type: MajorResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Major Not Found', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)

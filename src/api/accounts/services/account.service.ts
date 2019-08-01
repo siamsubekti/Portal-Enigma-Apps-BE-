@@ -6,26 +6,29 @@ import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivileg
 import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
-import Role from '../../master/roles/models/role.entity';
 
 @Injectable()
 export default class AccountService {
-  constructor(
-    @InjectRepository(Account) private readonly account: Repository<Account>,
-  ) {}
+  constructor( @InjectRepository(Account) private readonly account: Repository<Account> ) {}
 
   repository(): Repository<Account> {
     return this.account;
   }
 
   async all(queryParams: AccountQueryDTO): Promise<AccountQueryResult> {
-    let query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
-      .leftJoinAndSelect('a.profile', 'p');
+    const orderCols: { [key: string]: string } = {
+      username: 'a.username',
+      fullname: 'p.fullname',
+      nickname: 'p.nickname',
+    };
+    const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+    const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
+      .innerJoinAndSelect('a.profile', 'p');
 
     if (queryParams.term) {
       let { term } = queryParams;
       term = `%${term}%`;
-      query = query
+      query
         .orWhere('a.username LIKE :term', { term })
         .orWhere('a.status LIKE :term', { term })
         .orWhere('p.fullname LIKE :term', { term })
@@ -33,23 +36,12 @@ export default class AccountService {
         .orWhere('p.phone LIKE :term', { term });
     }
 
-    if (queryParams.order && queryParams.sort) {
-      const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-      const orderCols: { [key: string]: string } = {
-        username: 'a.username',
-        fullname: 'p.fullname',
-        nickname: 'p.nickname',
-      };
-
-      query = query.orderBy( orderCols[ queryParams.order ], sort );
-    } else
-      query = query.orderBy( 'p.fullname', 'ASC' );
-
+    query.orderBy( queryParams.order ? orderCols[ queryParams.order ] : orderCols.fullname, sort );
     query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
     query.limit( queryParams.rowsPerPage );
 
     const result: [ Account[], number ] = await query.getManyAndCount();
-    Logger.log(queryParams, 'AccountService@all', true);
+    // Logger.log(queryParams, 'AccountService@all', true);
 
     return {
       result: result[0],
@@ -95,15 +87,21 @@ export default class AccountService {
 
   async buildAccountPrivileges(id: string): Promise<AccountPrivilege> {
     const account: Account = await this.get(id);
-    const roles: Role[] = await account.roles;
 
     if (!account) return undefined;
 
     const privileges: AccountPrivilege = {
-      roles,
+      roles: [],
       menus: [],
       services: [],
     };
+
+    for (const role of await account.roles) {
+      // role = await this.roleService.get(role.id);
+      privileges.roles.push(role);
+      privileges.menus.push( ...(await role.menus) );
+      privileges.services.push( ...(await role.services) );
+    }
 
     return privileges;
   }
@@ -123,6 +121,18 @@ export default class AccountService {
     account.updatedAt = new Date();
 
     return await this.save(account);
+  }
+
+  async cleanDelete(id: string): Promise<void> {
+    try {
+      const account: Account = await this.account.findOneOrFail(id);
+
+      await this.account.delete(account);
+    } catch (error) {
+      Logger.log(error);
+
+      throw error;
+    }
   }
 
   async save(account: Account): Promise<Account> {

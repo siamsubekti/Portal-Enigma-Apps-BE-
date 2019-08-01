@@ -9,4 +9,4 @@ import DegreeController from './controllers/degree.controller';
     providers: [DegreeService],
     controllers: [DegreeController],
 })
-export class DegreeModule {}
+export default class DegreeModule {}

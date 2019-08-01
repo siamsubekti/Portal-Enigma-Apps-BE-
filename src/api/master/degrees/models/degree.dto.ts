@@ -1,5 +1,4 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsNotEmpty } from 'class-validator';
 import Degree from './degree.entity';
@@ -15,11 +14,11 @@ export class DegreeResponseDTO {
     name: string;
 }
 
-export class DegreeResponse implements IApiResponse {
+export class DegreeResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: DegreeDTO;
+    data: Degree | Degree[];
 }
 
 export class DegreePagedResponse {

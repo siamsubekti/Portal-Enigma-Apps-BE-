@@ -1,12 +1,14 @@
 import MenuService from '../services/menu.service';
 import { MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
-import { UseInterceptors, Get, InternalServerErrorException, Controller, Post, Body, Param, Put, Logger, Delete, UseGuards } from '@nestjs/common';
+import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Logger, Delete, UseGuards, Query } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse } from '@nestjs/swagger';
-import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
 import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
+import AppConfig from 'src/config/app.config';
+import { PagingData } from 'src/libraries/responses/response.class';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Menus')
@@ -14,20 +16,56 @@ import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
 export default class MenuController {
     constructor(
         private readonly menuService: MenuService,
+        private readonly config: AppConfig,
     ) {}
 
     @Get()
-    @ApiOperation({title: 'List Menus', description: 'All Menus'})
-    @ApiOkResponse({description: 'OK', type: MenuPagedResponse})
-    @ApiInternalServerErrorResponse({description: 'Internal Server Error', type: ApiExceptionResponse})
+    @ApiOperation({ title: 'List of Menus.', description: 'Get list of menu from database.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, order, or icon)', type: ['code', 'name', 'order', 'icon'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'List of roles.', type: MenuPagedResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async allMenu(): Promise<Menu[]> {
-        try {
-            const menus: Menu[] = await this.menuService.all();
-            return menus;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
-        }
+    async allMenu(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<MenuPagedResponse> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.menuService.all({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+        page,
+        rowsPerPage,
+        totalPages: Math.ceil( totalRows / rowsPerPage ),
+        totalRows,
+        };
+        return {
+            status: {
+                code: '200',
+                description: 'Success',
+            }, data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Menu.', description: 'Search menu.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, order, or icon)', type: ['code', 'name', 'order', 'icon'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' | 'order' | 'icon' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<MenuResponse> {
+        const { result: data = [] } = await this.menuService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
+
+        return { data };
     }
 
     @Post()

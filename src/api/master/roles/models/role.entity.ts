@@ -18,7 +18,7 @@ export default class Role {
   createdAt: Date;
 
   @ManyToMany(() => Account, (account: Account) => account.roles)
-  account: Account;
+  account: Promise<Account>;
 
   @ManyToMany(() => Service, (service: Service) => service.roles, { eager: true })
   @JoinTable({
@@ -26,13 +26,13 @@ export default class Role {
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'service_id', referencedColumnName: 'id' },
   })
-  services: Service[];
+  services: Promise<Service[]>;
 
-  @ManyToMany(() => Menu, (menu: Menu) => menu.roles, { eager: true })
+  @ManyToMany(() => Menu, (menu: Menu) => menu.roles)
   @JoinTable({
     name: 'roles_has_menus',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'menu_id', referencedColumnName: 'id' },
   })
-  menus: Menu[];
+  menus: Promise<Menu[]>;
 }
