@@ -1,6 +1,5 @@
 import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, IsDefined, IsEnum } from 'class-validator';
-import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Academy from './academy.entity';
 
@@ -46,11 +45,13 @@ export class AcademyResponseDTO {
     type: string;
 }
 
-export class AcademyResponse implements IApiResponse {
+export class AcademyResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: AcademyDTO;
+    data: Academy | Academy[];
+    @ApiModelProperty()
+    paging?: PagingData;
 }
 
 export class AcademiesPagedResponse {
@@ -64,7 +65,7 @@ export class AcademiesPagedResponse {
 
 export class AcademiesQueryDTO {
     term?: string;
-    order?: 'code' | 'name' | 'phone';
+    order?: 'code' | 'name' | 'phone' | 'type';
     sort?: 'asc' | 'desc';
     page?: number;
     rowsPerPage?: number;

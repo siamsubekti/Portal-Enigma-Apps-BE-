@@ -1,6 +1,5 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import Menu from './menu.entity';
 
 export class MenuDTO {
@@ -36,18 +35,33 @@ export class MenuResponseDTO {
     menus: Menu[];
 }
 
-export class MenuResponse implements IApiResponse {
+export class MenuResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: MenuDTO;
+    data: Menu | Menu[];
+    @ApiModelProperty()
+    PagingData?: PagingData;
 }
 
-export class MenuPagedResponse implements IApiPagedResponse {
+export class MenuPagedResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: MenuDTO[];
+    data: Menu[] | Menu;
     @ApiModelProperty()
-    paging: PagingData;
+    paging?: PagingData;
 }
+
+export class MenuQueryDTO {
+    term?: string;
+    order?: 'code' | 'name' | 'order' | 'icon';
+    sort?: 'asc' | 'desc';
+    page?: number;
+    rowsPerPage?: number;
+  }
+
+export class MenuQueryResult {
+    result: Menu[] | Menu;
+    totalRows: number;
+  }

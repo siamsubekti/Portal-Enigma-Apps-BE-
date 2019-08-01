@@ -20,7 +20,8 @@ export default class AcademyService {
           query = query
             .orWhere('a.code LIKE :term', { term })
             .orWhere('a.name LIKE :term', { term })
-            .orWhere('a.phone LIKE :term', { term });
+            .orWhere('a.phone LIKE :term', { term })
+            .orWhere('a.type LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
@@ -29,6 +30,7 @@ export default class AcademyService {
             code: 'a.code',
             name: 'a.name',
             phone: 'a.phone',
+            type: 'a.type',
           };
 
           query = query.orderBy( orderCols[ queryParams.order ], sort );
@@ -46,6 +48,8 @@ export default class AcademyService {
           totalRows: result[1],
         };
     }
+
+
 
     async insert(academyDTO: AcademyDTO): Promise<Academy> {
         const checkCode: Academy = await this.academyRepository.findOne({

@@ -41,9 +41,11 @@ export class RoleIdDTO {
 
 export class RoleResponse {
   @ApiModelProperty()
-  status: ResponseStatus;
+  status?: ResponseStatus;
   @ApiModelProperty()
-  data: Role;
+  data: Role | Role[];
+  @ApiModelProperty()
+  paging?: PagingData;
 }
 
 export class RolePagedResponse {
