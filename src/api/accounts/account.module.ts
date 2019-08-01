@@ -5,8 +5,8 @@ import Profile from './models/profile.entity';
 import AccountService from './services/account.service';
 import ProfileService from './services/profile.service';
 import AccountController from './controllers/account.controller';
-import { RoleModule } from '../master/roles/role.module';
-import { MenuModule } from '../master/menus/menu.module';
+import RoleModule from '../master/roles/role.module';
+import MenuModule from '../master/menus/menu.module';
 import ServicesModule from '../master/services/services.module';
 
 @Module({
