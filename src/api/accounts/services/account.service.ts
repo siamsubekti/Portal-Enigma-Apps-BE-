@@ -16,13 +16,19 @@ export default class AccountService {
   }
 
   async all(queryParams: AccountQueryDTO): Promise<AccountQueryResult> {
-    let query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
-      .leftJoinAndSelect('a.profile', 'p');
+    const orderCols: { [key: string]: string } = {
+      username: 'a.username',
+      fullname: 'p.fullname',
+      nickname: 'p.nickname',
+    };
+    const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+    const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
+      .innerJoinAndSelect('a.profile', 'p');
 
     if (queryParams.term) {
       let { term } = queryParams;
       term = `%${term}%`;
-      query = query
+      query
         .orWhere('a.username LIKE :term', { term })
         .orWhere('a.status LIKE :term', { term })
         .orWhere('p.fullname LIKE :term', { term })
@@ -30,18 +36,7 @@ export default class AccountService {
         .orWhere('p.phone LIKE :term', { term });
     }
 
-    if (queryParams.order && queryParams.sort) {
-      const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-      const orderCols: { [key: string]: string } = {
-        username: 'a.username',
-        fullname: 'p.fullname',
-        nickname: 'p.nickname',
-      };
-
-      query = query.orderBy( orderCols[ queryParams.order ], sort );
-    } else
-      query = query.orderBy( 'p.fullname', 'ASC' );
-
+    query.orderBy( queryParams.order ? orderCols[ queryParams.order ] : orderCols.fullname, sort );
     query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
     query.limit( queryParams.rowsPerPage );
 
