@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import JobService from '../services/job.service';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { JobDTO, JobResponse, JobPageResponse } from '../models/job.dto';
+import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import { JobDTO, JobResponse, JobPageResponse, JobResponses } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
+import { PagingData } from '../../../../libraries/responses/response.class';
+import AppConfig from '../../../../config/app.config';
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
@@ -15,20 +17,50 @@ export default class JobController {
 
     constructor(
         private readonly jobService: JobService,
+        private readonly config: AppConfig,
     ) { }
 
     @Get()
-    @ApiOperation({ title: 'GET Jobs', description: 'API get list Jobs' })
-    @ApiOkResponse({ description: 'Success to get list of jobs.', type: JobPageResponse })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiOperation({ title: 'List of Jobs', description: 'API search Jobs' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'If success get list of Jobs', type: JobPageResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async get(): Promise<Job[]> {
-        const jobs: Job[] = await this.jobService.findAll();
-        return jobs;
+    async find(
+        @Query('term') term?: string,
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<JobResponses> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.jobService.find({ term, sort, page, rowsPerPage });
+        const paging: PagingData = {
+            page,
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
+        };
+
+        return { data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Job', description: 'API search job by keywords' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'If success serach Job', type: JobPageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<JobResponses> {
+        const { result: data = [] } = await this.jobService.search({ term, sort });
+
+        return { data };
     }
 
     @Get(':id')
-    @ApiOperation({ title: 'GET Job By Id', description: 'API get job by id' })
+    @ApiOperation({ title: 'Get a Job', description: 'API get job by id' })
     @ApiOkResponse({ description: 'Success to get job by id', type: JobResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
@@ -38,7 +70,7 @@ export default class JobController {
     }
 
     @Post()
-    @ApiOperation({ title: 'CREATE Job', description: 'API insert into Jobs' })
+    @ApiOperation({ title: 'Create Job', description: 'API insert into Jobs' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiCreatedResponse({ description: 'Success to create jobs.', type: JobResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -49,7 +81,7 @@ export default class JobController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'UPDATE Job', description: 'API update Job' })
+    @ApiOperation({ title: 'Update Job', description: 'API update Job' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update jobs.', type: JobResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
@@ -62,7 +94,7 @@ export default class JobController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ title: 'DELETE Job', description: 'API delete Job by ID' })
+    @ApiOperation({ title: 'Delete Job', description: 'API delete Job by ID' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: DeleteResult = await this.jobService.remove(id);

@@ -1,11 +1,13 @@
-import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpCode, Param, Body, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpCode, Param, Body, UseGuards, UseInterceptors, Query, Logger } from '@nestjs/common';
 import ParameterService from '../services/parameter.service';
-import ParameterDTO, { ParameterResponse, ParameterPageResponse } from '../models/parameter.dto';
+import ParameterDTO, { ParameterResponse, ParameterPageResponse, ParameterResponses } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { PagingData } from '../../../../libraries/responses/response.class';
+import AppConfig from '../../../../config/app.config';
 
 @Controller('parameters')
 @ApiUseTags('Parameters')
@@ -14,29 +16,64 @@ export default class ParameterController {
 
     constructor(
         private readonly parameterService: ParameterService,
+        private readonly config: AppConfig,
     ) { }
 
-    @Get(':key')
-    @ApiOperation({ title: 'GET Parameters by key', description: 'API to get value of parameter by key' })
-    @ApiOkResponse({ description: 'If keyword found Parameters', type: 'string' })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-    async get(@Param('key') key: string): Promise<string> {
-        const value: string = await this.parameterService.get(key);
-        return value;
+    @Get()
+    @ApiOperation({ title: 'List of Parameters', description: 'API get list of Parameters' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (key, value)', type: ['key', 'value'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'If success get list of Parameters', type: ParameterPageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async find(
+        @Query('term') term?: string,
+        @Query('order') order: 'key' | 'value' = 'key',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<ParameterResponses> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.parameterService.find({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+            page,
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
+        };
+
+        return { data, paging };
     }
 
-    @Get()
-    @ApiOperation({ title: 'GET Parameters', description: 'API to get list Parameters' })
-    @ApiOkResponse({ description: 'If success to get list Parameters', type: ParameterPageResponse })
+    @Get('search')
+    @ApiOperation({ title: 'Search Parameters', description: 'API search of Parameters' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (key, value)', type: ['key', 'value'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'If success search of Parameters', type: ParameterPageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'key' | 'value' = 'key',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<ParameterResponses> {
+        const { result: data = [] } = await this.parameterService.find({ term, order, sort });
+        Logger.log(`RESULT ${data}`);
+        return { data };
+    }
+
+    @Get(':id')
+    @ApiOperation({ title: 'Get a Parameter', description: 'API Get parameter by id.' })
+    @ApiOkResponse({ description: 'Success to get skill by id.', type: ParameterResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getAll(): Promise<Parameter[]> {
-        const parameters: Parameter[] = await this.parameterService.findAll();
-        return parameters;
+    async getById(@Param('id') id: number): Promise<Parameter> {
+        const parameter: Parameter = await this.parameterService.findById(id);
+        return parameter;
     }
 
     @Post()
-    @ApiOperation({ title: 'CREATE Parameter', description: 'API to create Parameter' })
+    @ApiOperation({ title: 'Create Parameter', description: 'API to create Parameter' })
     @ApiCreatedResponse({ description: 'If success insert parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -47,7 +84,7 @@ export default class ParameterController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'UPDATE Parameter', description: 'API to update Parameter' })
+    @ApiOperation({ title: 'Update Parameter', description: 'API to update Parameter' })
     @ApiOkResponse({ description: 'If success update Parameter', type: ParameterResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
@@ -60,7 +97,7 @@ export default class ParameterController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ title: 'DELETE Paramter', description: 'API to delete Parameter' })
+    @ApiOperation({ title: 'Delete Paramter', description: 'API to delete Parameter' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.parameterService.remove(id);

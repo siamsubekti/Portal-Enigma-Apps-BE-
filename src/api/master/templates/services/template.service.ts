@@ -1,7 +1,7 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import Template from '../models/template.entity';
-import { Repository, DeleteResult } from 'typeorm';
-import { TemplateDTO } from '../models/template.dto';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
+import { TemplateDTO, TemplateQueryDTO, TemplateQueryResult } from '../models/template.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -44,5 +44,71 @@ export default class TemplateService {
             data = this.templateRepository.merge(data, templateDto);
             return await this.templateRepository.save(data);
         }
+    }
+
+    async search(queryParams: TemplateQueryDTO): Promise<TemplateQueryResult> {
+        let query: SelectQueryBuilder<Template> = this.templateRepository.createQueryBuilder('t');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('t.name LIKE :term', { term })
+                .orWhere('t.type LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                name: 't.name',
+                type: 't.type',
+            };
+
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('t.name', 'ASC');
+
+        query.limit(1000);
+
+        const result: [Template[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'TemplateService@search', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
+    }
+
+    async find(queryParams: TemplateQueryDTO): Promise<TemplateQueryResult> {
+        let query: SelectQueryBuilder<Template> = this.templateRepository.createQueryBuilder('t');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('t.name LIKE :term', { term })
+                .orWhere('t.type LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                name: 't.name',
+                type: 't.type',
+            };
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('t.name', 'ASC');
+
+        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.limit(queryParams.rowsPerPage);
+
+        const result: [Template[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'TemplateService@find', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
     }
 }

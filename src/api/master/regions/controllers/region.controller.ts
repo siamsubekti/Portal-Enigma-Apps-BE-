@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import RegionService from '../services/region.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { RegionDTO, RegionResponse, RegionPageResponse } from '../models/region.dto';
+import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import { RegionDTO, RegionResponse, RegionPageResponse, RegionResponses } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
+import { PagingData } from '../../../../libraries/responses/response.class';
+import AppConfig from '../../../../config/app.config';
 
 @Controller('regions')
 @ApiUseTags('Regions')
@@ -15,20 +17,54 @@ export default class RegionController {
 
     constructor(
         private readonly regionServices: RegionService,
+        private readonly config: AppConfig,
     ) { }
 
     @Get()
-    @ApiOperation({ title: 'GET Regions', description: 'API Get list of regions' })
-    @ApiOkResponse({ description: 'Success to get list of regions.', type: RegionPageResponse })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiOperation({ title: 'List of Regions', description: 'API search Regions' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (type, name)', type: ['type', 'name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'If success get list of Regions', type: RegionPageResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async get(): Promise<Region[]> {
-        const regions: Region[] = await this.regionServices.findAll();
-        return regions;
+    async find(
+        @Query('term') term?: string,
+        @Query('order') order: 'type' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<RegionResponses> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.regionServices.find({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+            page,
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
+        };
+
+        return { data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Regions', description: 'API search Regions by keywords' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (type, name)', type: ['type', 'name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'If success serach Regions', type: RegionPageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order?: 'type' | 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<RegionResponses> {
+        const { result: data = [] } = await this.regionServices.search({ term, order, sort });
+
+        return { data };
     }
 
     @Get(':id')
-    @ApiOperation({ title: 'GET Region By Id', description: 'API Get region by Id' })
+    @ApiOperation({ title: 'Get a Region', description: 'API Get region by Id' })
     @ApiOkResponse({ description: 'Success to get region by Id.', type: RegionResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
@@ -38,7 +74,7 @@ export default class RegionController {
     }
 
     @Post()
-    @ApiOperation({ title: 'CREATE Region', description: 'API create regions' })
+    @ApiOperation({ title: 'Create Region', description: 'API create regions' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiCreatedResponse({ description: 'Success to create regions.', type: RegionResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -49,7 +85,7 @@ export default class RegionController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'UPDATE Region', description: 'API update region' })
+    @ApiOperation({ title: 'Update Region', description: 'API update region' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update region.', type: RegionResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
@@ -62,7 +98,7 @@ export default class RegionController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ title: 'DELETE Region', description: 'API delete region' })
+    @ApiOperation({ title: 'Delete Region', description: 'API delete region' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: string): Promise<any> {
         const { affected }: DeleteResult = await this.regionServices.remove(id);

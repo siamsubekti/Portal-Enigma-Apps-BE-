@@ -2,6 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsDefined, IsEnum, IsNotEmpty, MaxLength } from 'class-validator';
+import Region from './region.entity';
 
 export class RegionDTO {
 
@@ -36,5 +37,23 @@ export class RegionPageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: RegionDTO })
     data: RegionDTO[];
+}
 
+export class RegionQueryDTO {
+    term?: string;
+    order?: 'type' | 'name';
+    sort?: 'asc' | 'desc';
+    page?: number;
+    rowsPerPage?: number;
+}
+
+export class RegionQueryResult {
+    result: Region[] | Region;
+    totalRows: number;
+}
+
+export class RegionResponses {
+    status?: ResponseStatus;
+    data: Region | Region[];
+    paging?: PagingData;
 }

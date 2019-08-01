@@ -1,42 +1,88 @@
-import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import TemplateService from '../services/template.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
-import { TemplateDTO, TemplatePageResponse, TemplateResponse } from '../models/template.dto';
+import {
+    ApiUseTags,
+    ApiOperation,
+    ApiBadRequestResponse,
+    ApiOkResponse,
+    ApiNotFoundResponse,
+    ApiCreatedResponse,
+    ApiUnauthorizedResponse,
+    ApiImplicitQuery,
+} from '@nestjs/swagger';
+import { TemplateDTO, TemplatePageResponse, TemplateResponse, TemplateResponses } from '../models/template.dto';
 import Template from '../models/template.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
+import AppConfig from '../../../../config/app.config';
+import { PagingData } from '../../../../libraries/responses/response.class';
 
 @Controller('templates')
 @ApiUseTags('Templates')
 @UseGuards(CookieAuthGuard)
 export default class TemplateController {
 
-    constructor(private templateService: TemplateService) { }
+    constructor(
+        private readonly templateService: TemplateService,
+        private readonly config: AppConfig,
+    ) { }
 
     @Get()
-    @ApiOperation({ title: 'GET Templates', description: 'API get list og templates' })
-    @ApiOkResponse({ description: 'Success to get list fo templates.', type: TemplatePageResponse })
-    @ApiInternalServerErrorResponse({ description: 'If internal server error', type: ApiExceptionResponse })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiOperation({ title: 'List of Templates', description: 'API search Templates' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (name, type)', type: ['name', 'type'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+    @ApiOkResponse({ description: 'If success get list of Templates', type: TemplatePageResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async get(): Promise<Template[]> {
-        const templates: Template[] = await this.templateService.findAll();
-        return templates;
+    async find(
+        @Query('term') term?: string,
+        @Query('order') order: 'type' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+        @Query('page') page: number = 1,
+    ): Promise<TemplateResponses> {
+        const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+        const { result: data = [], totalRows } = await this.templateService.find({ term, order, sort, page, rowsPerPage });
+        const paging: PagingData = {
+            page,
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
+        };
+
+        return { data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Template', description: 'API search Template by keywords' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (type, name)', type: ['type', 'name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'If success serach Template', type: TemplatePageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'type' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<TemplateResponses> {
+        const { result: data = [] } = await this.templateService.search({ term, order, sort });
+
+        return { data };
     }
 
     @Get(':id')
-    @ApiOperation({ title: 'GET Template By Id', description: 'API Get template by id.' })
+    @ApiOperation({ title: 'Get a Template', description: 'API Get template by id.' })
     @ApiOkResponse({ description: 'Success to get template by id.', type: TemplateResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async getById(@Param('id') id : number ): Promise<Template> {
-        const template : Template = await this.templateService.findById(id);
+    async getById(@Param('id') id: number): Promise<Template> {
+        const template: Template = await this.templateService.findById(id);
         return template;
     }
 
     @Post()
-    @ApiOperation({ title: 'CREATE Template', description: 'API insert into templates' })
+    @ApiOperation({ title: 'Create Template', description: 'API insert into templates' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiCreatedResponse({ description: 'Success to create template.', type: TemplateResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -47,7 +93,7 @@ export default class TemplateController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'UPDATE Template', description: 'API Update template' })
+    @ApiOperation({ title: 'Update Template', description: 'API Update template' })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiOkResponse({ description: 'Success to update template.', type: TemplateResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
@@ -60,7 +106,7 @@ export default class TemplateController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ title: 'DELETE Template', description: 'API delete template' })
+    @ApiOperation({ title: 'Delete Template', description: 'API delete template' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: any = await this.templateService.remove(id);
