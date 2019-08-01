@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ApiController } from './api.controller';
-import { ApiService } from './api.service';
+import AppConfig from '../../config/app.config';
 
 describe('AppController', () => {
   let apiController: ApiController;
@@ -8,15 +8,15 @@ describe('AppController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [ApiController],
-      providers: [ApiService],
+      providers: [AppConfig],
     }).compile();
 
     apiController = app.get<ApiController>(ApiController);
   });
 
   describe('root', () => {
-    it('should return "Halo!"', () => {
-      expect(apiController.getHello()).toBe('Halo!');
+    it('should return "Generic Response"', () => {
+      expect(apiController.healthCheck()).toBe('Generic Response!');
     });
   });
 });

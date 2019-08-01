@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ParameterController } from './parameter.controller';
+import ParameterController from './parameter.controller';
 
 describe('Parameter Controller', () => {
   let controller: ParameterController;

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ParameterService } from './parameter.service';
+import ParameterService from './parameter.service';
 
 describe('ParameterService', () => {
   let service: ParameterService;
