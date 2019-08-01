@@ -9,4 +9,4 @@ import AcademyController from './controllers/academy.controller';
   providers: [AcademyService],
   controllers: [AcademyController],
 })
-export class AcademyModule {}
+export default class AcademyModule {}
