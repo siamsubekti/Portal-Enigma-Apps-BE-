@@ -16,14 +16,20 @@ export default class RoleService {
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
-        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r').select('r');
+        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r')
+        .leftJoinAndSelect('r.services', 's').leftJoinAndSelect('r.menus', 'm');
 
         if (queryParams.term) {
             let { term } = queryParams;
             term = `%${term}%`;
             query = query
                 .orWhere('r.code LIKE :term', { term })
-                .orWhere('r.name LIKE :term', { term });
+                .orWhere('r.name LIKE :term', { term })
+                .orWhere('s.code LIKE :term', { term })
+                .orWhere('s.name LIKE :term', { term })
+                .orWhere('m.code LIKE :term', { term })
+                .orWhere('m.name LIKE :term', { term })
+                .orWhere('m.order LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {

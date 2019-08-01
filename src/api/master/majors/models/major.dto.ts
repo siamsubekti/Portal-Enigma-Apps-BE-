@@ -1,7 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsNotEmpty } from 'class-validator';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
-import { IApiResponse } from '../../../../libraries/responses/response.interface';
 import Major from './major.entity';
 
 export class MajorDTO {
@@ -15,11 +14,11 @@ export class MajorResponseDTO {
     name: string;
 }
 
-export class MajorResponse implements IApiResponse {
+export class MajorResponse {
     @ApiModelProperty()
-    status: ResponseStatus;
+    status?: ResponseStatus;
     @ApiModelProperty()
-    data: MajorDTO;
+    data: Major | Major[];
 }
 
 export class MajorsPagedResponse {

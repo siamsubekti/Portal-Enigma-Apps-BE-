@@ -7,7 +7,7 @@ import {
 } from '@nestjs/swagger';
 import { AcademyResponse, AcademyDTO, AcademiesPagedResponse } from '../models/academy.dto';
 import { DeleteResult } from 'typeorm';
-import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
+import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { PagingData } from 'src/libraries/responses/response.class';
@@ -51,6 +51,24 @@ export default class AcademyController {
                 code: '200',
                 description: 'Success',
             }, data, paging };
+    }
+
+    @Get('search')
+    @ApiOperation({ title: 'Search Academy.', description: 'Search academy.'})
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, phone, or type)', type: ['code', 'name', 'phone', 'type'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'Search result of academy.', type: ApiResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' | 'phone' | 'type' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<AcademyResponse> {
+        const { result: data = [] } = await this.academyService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
+
+        return { data };
     }
 
     @Post()
