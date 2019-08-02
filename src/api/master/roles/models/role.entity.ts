@@ -20,7 +20,7 @@ export default class Role {
   @ManyToMany(() => Account, (account: Account) => account.roles)
   account: Promise<Account>;
 
-  @ManyToMany(() => Service, (service: Service) => service.roles, { eager: true })
+  @ManyToMany(() => Service, (service: Service) => service.roles)
   @JoinTable({
     name: 'roles_has_services',
     joinColumn: { name: 'role_id', referencedColumnName: 'id' },

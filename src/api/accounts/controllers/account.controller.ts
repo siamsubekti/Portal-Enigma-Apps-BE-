@@ -11,15 +11,16 @@ import {
   ApiBadRequestResponse,
   ApiNoContentResponse,
 } from '@nestjs/swagger';
-import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
-import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
+import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
 import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege } from '../models/account.dto';
-import AccountService from '../services/account.service';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import Account from '../models/account.entity';
+import AccountService from '../services/account.service';
+import { AccountStatus } from 'src/config/constants';
 
 @Controller('accounts')
 @ApiUseTags('Accounts')
@@ -76,6 +77,18 @@ export default class AccountController {
     return { data };
   }
 
+  @Get('privileges')
+  @ApiOperation({ title: 'Get current account privileges.', description: 'Get current account roles, available menus, and available services.' })
+  @ApiOkResponse({ description: 'Account privileges.', type: ApiResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async privileges(@Request() request: any): Promise<AccountPrivilegeResponse> {
+    const account: Account = request.user;
+    const data: AccountPrivilege = await this.accountService.buildAccountPrivileges(account.id);
+
+    return { data };
+  }
+
   @Get(':id')
   @ApiOperation({ title: 'Get an account.', description: 'Get single account data based on ID.'})
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
@@ -109,16 +122,16 @@ export default class AccountController {
     }
   }
 
-  @Put(':id/suspend')
-  @ApiOperation({ title: 'Suspend an account.', description: 'Suspend account, prevents a user from logging in using own account credential.' })
+  @Put(':id/deactivate')
+  @ApiOperation({ title: 'Deactivate an account.', description: 'Deactivate account, prevents a user from logging in using own account credential.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiNoContentResponse({ description: 'Account data has beend suspended.'})
+  @ApiNoContentResponse({ description: 'Account data has beend deactivated.'})
   @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-  async suspend(@Param('id') id: string): Promise<void> {
+  async deactivate(@Param('id') id: string): Promise<void> {
     try {
-      await this.accountService.suspend(id);
+      await this.accountService.setStatus(id, AccountStatus.ACTIVE);
     } catch (error) {
       throw error;
     }
@@ -137,17 +150,5 @@ export default class AccountController {
     } catch (error) {
       throw error;
     }
-  }
-
-  @Get('privileges/:id')
-  @ApiOperation({ title: 'Get current account privileges.', description: 'Get current account roles, available menus, and available services.' })
-  @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiOkResponse({ description: 'Account privileges.', type: ApiResponse })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-  async privileges(@Param('id') id: string): Promise<AccountPrivilegeResponse> {
-    const data: AccountPrivilege = await this.accountService.buildAccountPrivileges(id);
-
-    return { data };
   }
 }

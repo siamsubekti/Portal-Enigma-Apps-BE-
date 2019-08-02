@@ -18,6 +18,9 @@ export default class CookieStrategy extends PassportStrategy(Strategy, 'cookie')
 
     if (!account) throw new UnauthorizedException(`Session invalid.`);
 
+    // Logger.log(`cookie: ${cookie}`, `CookieStrategy`);
+    // Logger.log(`account:`, `CookieStrategy`);
+    // Logger.log(account, `CookieStrategy`);
     return done(null, account);
   }
 }

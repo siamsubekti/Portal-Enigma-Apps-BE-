@@ -6,6 +6,7 @@ import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivileg
 import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
+import Role from '../../master/roles/models/role.entity';
 
 @Injectable()
 export default class AccountService {
@@ -33,7 +34,8 @@ export default class AccountService {
         .orWhere('a.status LIKE :term', { term })
         .orWhere('p.fullname LIKE :term', { term })
         .orWhere('p.nickname LIKE :term', { term })
-        .orWhere('p.phone LIKE :term', { term });
+        .orWhere('p.phone LIKE :term', { term })
+        .where('a.status = :status', { status: AccountStatus.ACTIVE });
     }
 
     query.orderBy( queryParams.order ? orderCols[ queryParams.order ] : orderCols.fullname, sort );
@@ -97,18 +99,17 @@ export default class AccountService {
     };
 
     for (const role of await account.roles) {
-      // role = await this.roleService.get(role.id);
       privileges.roles.push(role);
-      privileges.menus.push( ...(await role.menus) );
-      privileges.services.push( ...(await role.services) );
+      privileges.menus.push( ...(await Object.create(role).menus) );
+      privileges.services.push( ...(await Object.create(role).services) );
     }
 
     return privileges;
   }
 
-  async suspend(id: string): Promise<Account> {
+  async setStatus(id: string, status: AccountStatus): Promise<Account> {
     const account: Account = await this.account.findOne(id);
-    account.status = AccountStatus.SUSPENDED;
+    account.status = status;
     account.updatedAt = new Date();
 
     return await this.save(account);

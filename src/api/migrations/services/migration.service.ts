@@ -274,6 +274,12 @@ export default class MigrationService {
         services: this.services,
         menus: this.menus,
       },
+      {
+        code: 'CANDIDATE',
+        name: 'Candidate',
+        services: [],
+        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE'].indexOf(menu.code) >= 0),
+      },
     ];
 
     Logger.log(`Creating ${data.length} roles...`);
