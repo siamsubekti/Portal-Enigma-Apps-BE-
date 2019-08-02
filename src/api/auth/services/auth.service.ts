@@ -6,13 +6,14 @@ import { RedisService } from 'nestjs-redis';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
+import { AccountPrivilege } from 'src/api/accounts/models/account.dto';
+import { AccountStatus } from 'src/config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
-import { AccountPrivilege } from 'src/api/accounts/models/account.dto';
 
 @Injectable()
 export default class AuthService {
@@ -83,7 +84,7 @@ export default class AuthService {
       const token: string = await this.hashUtil.create(`${account.id}-${account.username}-${moment().valueOf()}-${key}`);
       const jwt: string = jwtSign({ aid: account.id, token }, this.config.get('HASH_SECRET'), { expiresIn });
 
-      await this.accountService.suspend(account.id);
+      await this.accountService.setStatus(account.id, AccountStatus.SUSPENDED);
       await client.set(key, jwt);
       await client.expire(key, expiresIn); // 30 minutes in seconds
       this.sendPasswordResetEmail({ account, key, token });

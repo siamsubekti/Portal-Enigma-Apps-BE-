@@ -82,6 +82,7 @@ export default class RegisterService {
       account.password = form.password;
       account.profile = profile;
       account.status = AccountStatus.ACTIVE;
+      account.roles = Promise.resolve([]);
       account = await this.accountService.save(account);
 
       const client: IORedis.Redis = await this.redisService.getClient();

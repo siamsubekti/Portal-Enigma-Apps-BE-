@@ -1,4 +1,5 @@
 import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { AccountStatus } from 'src/config/constants';
 import Profile from './profile.entity';
 import Role from '../../../api/master/roles/models/role.entity';
 
@@ -14,8 +15,8 @@ export default class Account {
   @Column({type: 'varchar', length: 64, nullable: false, select: false })
   password: string;
 
-  @Column({type: 'varchar', length: 15, nullable: false, default: 'INACTIVE'})
-  status: 'INACTIVE' | 'ACTIVE' | 'SUSPENDED' | 'BLACKLISTED';
+  @Column({type: 'varchar', length: 15, nullable: false, default: AccountStatus.INACTIVE})
+  status: AccountStatus;
 
   @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
