@@ -13,7 +13,11 @@ export default class ServicesService {
 
     }
 
-    async findAll(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
+    async findAll(): Promise<Service[]> {
+        return await this.serviceRepository.find();
+    }
+
+    async find(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
         let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
             .leftJoinAndSelect('s.roles', 'r');
 
@@ -47,7 +51,6 @@ export default class ServicesService {
             result: result[0],
             totalRows: result[1],
         };
-        // return await this.serviceRepository.find();
     }
 
     async findById(id: number): Promise<Service> {
@@ -94,6 +97,41 @@ export default class ServicesService {
 
     async findAllRelated(services: Service[]): Promise<Service[]> {
         const serviceIds: number[] = services.map((item: Service) => item.id);
-        return this.serviceRepository.findByIds(serviceIds);
+        return await this.serviceRepository.findByIds(serviceIds);
+    }
+
+    async search(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
+        let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
+            .leftJoinAndSelect('s.roles', 'r');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('s.code LIKE :term', { term })
+                .orWhere('s.name LIKE :term', { term })
+                .orWhere('r.code LIKE :term', { term })
+                .orWhere('r.name LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                code: 's.code',
+                name: 'r.name',
+            };
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('s.code', 'ASC');
+
+        query.limit(1000);
+
+        const result: [Service[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'ServiceService@search', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
     }
 }

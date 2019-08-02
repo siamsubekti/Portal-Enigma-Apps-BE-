@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, Generated } from 'typeorm';
+import { Entity, Column, PrimaryColumn, Generated, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 
 @Entity('mst_regions')
 export default class Region {
@@ -16,4 +16,10 @@ export default class Region {
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
     createdAt: Date;
 
+    @ManyToOne(() => Region, (region: Region) => region.children)
+    @JoinColumn({name: 'parent_id'})
+    parent: Region;
+
+    @OneToMany(() => Region, (region: Region) => region.parent)
+    children: Region[];
 }

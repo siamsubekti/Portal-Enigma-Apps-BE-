@@ -7,7 +7,7 @@ import { ApiExceptionResponse } from '../../../../libraries/responses/response.t
 import Service from '../models/service.entity';
 import { PagingData } from '../../../../libraries/responses/response.class';
 import AppConfig from '../../../../config/app.config';
-import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
+import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 
 @Controller('services')
 @ApiUseTags('Services')
@@ -20,22 +20,21 @@ export default class ServicesController {
     ) { }
 
     @Get()
-    @ApiOperation({ title: 'GET Services', description: 'API Get list of services' })
+    @ApiOperation({ title: 'List of Services', description: 'API get list of services' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
-    @ApiOkResponse({ description: 'If success get list of Services', type: ServicePageResponse })
+    @ApiOkResponse({ description: 'If success search list of Services', type: ServicePageResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
-    async get(
+    async find(
         @Query('term') term?: string,
-        @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
+        @Query('order') order: 'code' | 'name' = 'name',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
         @Query('page') page: number = 1,
     ): Promise<ServiceResponses> {
-        // return await this.service.findAll();
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-        const { result: data = [], totalRows } = await this.service.findAll({ term, order, sort, page, rowsPerPage });
+        const { result: data = [], totalRows } = await this.service.find({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
             page,
             rowsPerPage,
@@ -46,8 +45,25 @@ export default class ServicesController {
         return { data, paging };
     }
 
+    @Get('search')
+    @ApiOperation({ title: 'Search of Services', description: 'API search services' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+   @ApiOkResponse({ description: 'If success search Services', type: ServicePageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<ServiceResponses> {
+        const { result: data = [] } = await this.service.search({ term, order, sort });
+
+        return { data };
+    }
+
     @Get(':id')
-    @ApiOperation({ title: 'GET Service by Id', description: 'API get services by id.' })
+    @ApiOperation({ title: 'Get a Service', description: 'API get services by id.' })
     @ApiOkResponse({ description: 'If success get service by id', type: ServiceResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async getById(@Param('id') id: number): Promise<Service> {
@@ -55,7 +71,7 @@ export default class ServicesController {
     }
 
     @Post()
-    @ApiOperation({ title: 'CREATE Service', description: 'API to create service.' })
+    @ApiOperation({ title: 'Create Service', description: 'API to create service.' })
     @ApiCreatedResponse({ description: 'If success created service', type: ServiceResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -65,7 +81,7 @@ export default class ServicesController {
     }
 
     @Put(':id')
-    @ApiOperation({ title: 'UPDATE Service', description: 'API to create service.' })
+    @ApiOperation({ title: 'Update Service', description: 'API to create service.' })
     @ApiOkResponse({ description: 'If success update service', type: ServiceResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
@@ -77,7 +93,7 @@ export default class ServicesController {
 
     @Delete(':id')
     @HttpCode(204)
-    @ApiOperation({ title: 'DELETE Service', description: 'API to delete service by id.' })
+    @ApiOperation({ title: 'Delete Service', description: 'API to delete service by id.' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.service.remove(id);

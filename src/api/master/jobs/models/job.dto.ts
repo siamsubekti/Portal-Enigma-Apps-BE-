@@ -2,6 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsDefined, MaxLength, IsOptional } from 'class-validator';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
+import Job from './job.entity';
 
 export class JobDTO {
 
@@ -34,4 +35,23 @@ export class JobPageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: JobDTO })
     data: JobDTO[];
+}
+
+export class JobQueryDTO {
+    term?: string;
+    order?: 'name';
+    sort?: 'asc' | 'desc';
+    page?: number;
+    rowsPerPage?: number;
+}
+
+export class JobQueryResult {
+    result: Job[] | Job;
+    totalRows: number;
+}
+
+export class JobResponses {
+    status?: ResponseStatus;
+    data: Job | Job[];
+    paging?: PagingData;
 }

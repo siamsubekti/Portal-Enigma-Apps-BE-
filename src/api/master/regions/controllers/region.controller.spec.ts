@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { RegionController } from './region.controller';
+import RegionController from './region.controller';
 
 describe('Region Controller', () => {
   let controller: RegionController;

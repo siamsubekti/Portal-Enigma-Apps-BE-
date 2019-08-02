@@ -104,6 +104,6 @@ export default class MenuService {
 
     async findAllRelated(menu: Menu[]): Promise<Menu[]> {
         const menuIds: number[] = menu.map((item: Menu) => item.id);
-        return this.menuRepository.findByIds(menuIds);
+        return await this.menuRepository.findByIds(menuIds);
     }
 }

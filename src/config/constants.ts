@@ -1,29 +1,29 @@
 export enum AccountStatus {
-  INACTIVE    = 'INACTIVE',
-  ACTIVE      = 'ACTIVE',
-  SUSPENDED   = 'SUSPENDED',
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE',
+  SUSPENDED = 'SUSPENDED',
   BLACKLISTED = 'BLACKLISTED',
 }
 
 export enum ProfileGender {
-  MALE   = 'MALE',
+  MALE = 'MALE',
   FEMALE = 'FEMALE',
 }
 
 export enum ProfileReligion {
-  BUDDHA      = 'BUDDHA',
-  HINDU       = 'HINDU',
-  ISLAM       = 'ISLAM',
+  BUDDHA = 'BUDDHA',
+  HINDU = 'HINDU',
+  ISLAM = 'ISLAM',
   KONG_HU_CHU = 'KONG HU CHU',
-  CHRISTIAN   = 'CHRISTIAN',
-  CATHOLIC    = 'CATHOLIC',
+  CHRISTIAN = 'CHRISTIAN',
+  CATHOLIC = 'CATHOLIC',
 }
 
 export enum ProfileMaritalStatus {
-  SINGLE          = 'SINGLE',
+  SINGLE = 'SINGLE',
   IN_RELATIONSHIP = 'IN RELATIONSHIP',
-  MARRIED         = 'MARRIED',
-  DIVORCED        = 'DIVORCED',
+  MARRIED = 'MARRIED',
+  DIVORCED = 'DIVORCED',
 }
 
 export enum TypeAcademy {
@@ -101,3 +101,16 @@ const HttpStatusMessage: any = {
 };
 
 export default HttpStatusMessage;
+
+export enum RegionType {
+  PROVINCE = 'PROVINSI',
+  REGENCY = 'KABUPATEN',
+  KOTA = 'KOTA',
+  DISTRICT = 'KECAMATAN',
+  VILLAGE = 'KELURAHAN',
+}
+
+export enum TemplateType {
+  MAIL = 'MAIL',
+  SMS = 'SMS',
+}

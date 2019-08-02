@@ -53,7 +53,7 @@ export class ServicePageResponse implements IApiPagedResponse {
 
 export class ServiceQueryDTO {
   term?: string;
-  order?: 'username' | 'fullname' | 'nickname';
+  order?: 'code' | 'name';
   sort?: 'asc' | 'desc';
   page?: number;
   rowsPerPage?: number;

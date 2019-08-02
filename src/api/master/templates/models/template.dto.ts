@@ -2,6 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsDefined, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
+import Template from './template.entity';
 
 export class TemplateDTO {
 
@@ -46,4 +47,23 @@ export class TemplatePageResponse implements IApiPagedResponse {
 
     @ApiModelProperty({ type: TemplateDTO })
     data: TemplateDTO[];
+}
+
+export class TemplateQueryDTO {
+    term?: string;
+    order?: 'type' | 'name';
+    sort?: 'asc' | 'desc';
+    page?: number;
+    rowsPerPage?: number;
+}
+
+export class TemplateQueryResult {
+    result: Template[] | Template;
+    totalRows: number;
+}
+
+export class TemplateResponses {
+    status?: ResponseStatus;
+    data: Template | Template[];
+    paging?: PagingData;
 }

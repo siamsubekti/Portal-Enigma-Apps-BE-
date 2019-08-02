@@ -1,8 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Region from '../models/region.entity';
-import { Repository, DeleteResult } from 'typeorm';
-import { RegionDTO } from '../models/region.dto';
+import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
+import { RegionDTO, RegionQueryDTO, RegionQueryResult } from '../models/region.dto';
 
 @Injectable()
 export default class RegionService {
@@ -14,13 +14,24 @@ export default class RegionService {
     }
 
     async findById(id: string): Promise<Region> {
-        return await this.regionRepository.findOne(id);
+        return await this.regionRepository.findOne({ where: { id } });
+    }
+
+    async findChild(id: string): Promise<Region> {
+        return await this.regionRepository.findOne({ where: { id }, relations: ['children'] });
     }
 
     async create(regionDto: RegionDTO): Promise<Region> {
         const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
         if (exist) throw new BadRequestException('Data ini telah ada.');
-        return await this.regionRepository.save(regionDto);
+
+        const region: Region = new Region();
+        region.name = regionDto.name;
+        region.type = regionDto.type;
+        const parent: Region = await this.findParent(regionDto.parent);
+        region.parent = parent;
+
+        return await this.regionRepository.save(region);
     }
 
     async remove(id: string): Promise<DeleteResult> {
@@ -37,9 +48,89 @@ export default class RegionService {
         if (!data) throw new NotFoundException(`Region with id: ${id} not found`);
         else {
             const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
-            if (exist && regionDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && (regionDto.name !== data.name)) throw new BadRequestException('Data ini telah ada.');
             data = this.regionRepository.merge(data, regionDto);
             return await this.regionRepository.save(data);
         }
+    }
+
+    async search(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
+        let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('region.type LIKE :term', { term })
+                .orWhere('region.name LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                type: 'region.type',
+                name: 'region.name',
+            };
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('region.name', 'ASC');
+
+        query.limit(100);
+
+        const result: [Region[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'RegionService@search', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
+    }
+
+    async find(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
+        let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
+
+        if (queryParams.term) {
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('region.type LIKE :term', { term })
+                .orWhere('region.name LIKE :term', { term });
+        }
+
+        if (queryParams.order && queryParams.sort) {
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                name: 'region.name',
+                type: 'region.type',
+            };
+            query = query.orderBy(orderCols[queryParams.order], sort);
+        } else
+            query = query.orderBy('region.name', 'ASC');
+
+        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.limit(queryParams.rowsPerPage);
+
+        const result: [Region[], number] = await query.getManyAndCount();
+        Logger.log(queryParams, 'RegionService@find', true);
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
+    }
+
+    async findByType(queryParams: RegionQueryDTO): Promise<Region[]> {
+        return await this.regionRepository.find({
+            where: {
+                type: queryParams.term,
+            },
+            order: {
+                name: queryParams.sort.toUpperCase() as 'ASC' | 'DESC',
+            },
+        });
+    }
+
+    async findParent(region: Region): Promise<Region> {
+        return await this.regionRepository.findOne({ where: { id: region.id } });
     }
 }
