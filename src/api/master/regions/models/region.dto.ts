@@ -3,15 +3,16 @@ import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsDefined, IsEnum, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 import Region from './region.entity';
+import { RegionType } from 'src/config/constants';
 
 export class RegionDTO {
 
-    @ApiModelProperty({ enum: ['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'], maxLength: 32, required: true })
+    @ApiModelProperty({ enum: RegionType, maxLength: 32, required: true })
     @IsDefined()
-    @IsEnum(['KELURAHAN', 'KECAMATAN', 'KABUPATEN', 'KOTA', 'PROVINSI'])
+    @IsEnum(RegionType)
     @IsNotEmpty()
     @MaxLength(32)
-    type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
+    type: RegionType;
 
     @ApiModelProperty({ type: 'string', uniqueItems: true, maxLength: 255, required: true })
     @IsDefined()

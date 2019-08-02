@@ -15,7 +15,7 @@ import Profile from '../../accounts/models/profile.entity';
 import { ServiceDTO } from '../../master/services/models/service.dto';
 import { MenuDTO } from '../../master/menus/models/menu.dto';
 import { RoleDTO } from '../../master/roles/models/role.dto';
-import { ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountStatus } from 'src/config/constants';
+import { ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountStatus, HttpMethod } from '../../../config/constants';
 
 @Injectable()
 export default class MigrationService {
@@ -45,127 +45,127 @@ export default class MigrationService {
         code: 'MST_SERVICE_CREATE',
         name: 'Create Service',
         endpointUrl: '/services',
-        method: 'POST',
+        method: HttpMethod.POST,
       },
       {
         code: 'MST_SERVICE_UPDATE',
         name: 'Update Service',
         endpointUrl: '/services',
-        method: 'PUT',
+        method: HttpMethod.PUT,
       },
       {
         code: 'MST_SERVICE_DELETE',
         name: 'Delete Service',
         endpointUrl: '/services',
-        method: 'DELETE',
+        method: HttpMethod.DELETE,
       },
       {
         code: 'MST_SERVICE_LIST',
         name: 'List All Services',
         endpointUrl: '/services',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_SERVICE_GET',
         name: 'Get Single Service',
         endpointUrl: '/services',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_MENU_CREATE',
         name: 'Create Menu',
         endpointUrl: '/menus',
-        method: 'POST',
+        method: HttpMethod.POST,
       },
       {
         code: 'MST_MENU_UPDATE',
         name: 'Update Menu',
         endpointUrl: '/menus',
-        method: 'PUT',
+        method: HttpMethod.PUT,
       },
       {
         code: 'MST_MENU_DELETE',
         name: 'Delete Menu',
         endpointUrl: '/menus',
-        method: 'DELETE',
+        method: HttpMethod.DELETE,
       },
       {
         code: 'MST_MENU_LIST',
         name: 'List All Menus',
         endpointUrl: '/menus',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_MENU_GET',
         name: 'Get Single Menu',
         endpointUrl: '/menus',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_ROLE_CREATE',
         name: 'Create Role',
         endpointUrl: '/roles',
-        method: 'POST',
+        method: HttpMethod.POST,
       },
       {
         code: 'MST_ROLE_UPDATE',
         name: 'Update Role',
         endpointUrl: '/roles',
-        method: 'PUT',
+        method: HttpMethod.PUT,
       },
       {
         code: 'MST_ROLE_DELETE',
         name: 'Delete Role',
         endpointUrl: '/roles',
-        method: 'DELETE',
+        method: HttpMethod.DELETE,
       },
       {
         code: 'MST_ROLE_LIST',
         name: 'List All Roles',
         endpointUrl: '/roles',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_ROLE_GET',
         name: 'Get Single Role',
         endpointUrl: '/roles',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_ACCOUNT_CREATE',
         name: 'Create Account',
         endpointUrl: '/accounts',
-        method: 'POST',
+        method: HttpMethod.POST,
       },
       {
         code: 'MST_ACCOUNT_UPDATE',
         name: 'Update Account',
         endpointUrl: '/accounts',
-        method: 'PUT',
+        method: HttpMethod.PUT,
       },
       {
         code: 'MST_ACCOUNT_DELETE',
         name: 'Delete Account',
         endpointUrl: '/accounts',
-        method: 'DELETE',
+        method: HttpMethod.DELETE,
       },
       {
         code: 'MST_ACCOUNT_LIST',
         name: 'List All Accounts',
         endpointUrl: '/accounts',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_ACCOUNT_GET',
         name: 'Get Account',
         endpointUrl: '/accounts',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
       {
         code: 'MST_ACCOUNT_PRIVILEGES',
         name: 'Get Account Privileges',
         endpointUrl: '/accounts',
-        method: 'GET',
+        method: HttpMethod.GET,
       },
     ];
 

@@ -106,3 +106,10 @@ export enum TemplateType {
   MAIL = 'MAIL',
   SMS = 'SMS',
 }
+
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+}

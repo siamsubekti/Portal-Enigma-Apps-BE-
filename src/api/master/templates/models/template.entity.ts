@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { TemplateType } from 'src/config/constants';
 
 @Entity('mst_templates')
 export default class Template {
@@ -9,8 +10,8 @@ export default class Template {
     @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
     name: string;
 
-    @Column({ type: 'varchar', length: 50, nullable: false })
-    type: string;
+    @Column({ enum: TemplateType, length: 50, nullable: false })
+    type: TemplateType;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
     subject: string;
