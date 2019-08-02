@@ -1,10 +1,11 @@
-import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail, IsEnum } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
 import Account from './account.entity';
 import Role from '../../master/roles/models/role.entity';
 import Menu from '../../master/menus/models/menu.entity';
 import Service from '../../master/services/models/service.entity';
+import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus } from '../../../config/constants';
 
 export class AccountResponse {
   status?: ResponseStatus;
@@ -16,13 +17,13 @@ export class AccountDTO {
   username: string;
   password: string;
   confirmPassword: string;
-  status: 'INACTIVE' | 'ACTIVE' | 'SUSPENDED' | 'BLACKLISTED';
+  status: AccountStatus;
   createdAt: Date;
   updatedAt: Date;
 }
 
 export class AccountProfileDTO {
-  @ApiModelProperty({ description: 'Account username, usually email address.', type: 'string', required: true })
+  @ApiModelProperty({ description: 'Account username, usually email address.', type: 'string', required: true, uniqueItems: true })
   @IsDefined()
   @IsNotEmpty()
   @MinLength(5)
@@ -35,12 +36,12 @@ export class AccountProfileDTO {
   @IsNotEmpty()
   fullname: string;
 
-  @ApiModelProperty({ description: 'Account nickname.', type: 'string', required: true })
+  @ApiModelProperty({ description: 'Account nickname.', type: 'string', required: true, uniqueItems: true })
   @IsDefined()
   @IsNotEmpty()
   nickname: string;
 
-  @ApiModelProperty({ description: 'Account email.', type: 'string', required: true })
+  @ApiModelProperty({ description: 'Account email.', type: 'string', required: true, uniqueItems: true })
   @IsDefined()
   @IsNotEmpty()
   email: string;
@@ -55,20 +56,27 @@ export class AccountProfileDTO {
   @IsNotEmpty()
   birthdate: string;
 
-  @ApiModelProperty({ description: 'Account gender.', type: 'string', enum: ['MALE', 'FEMALE'], required: true })
+  @ApiModelProperty({ description: 'Account gender.', type: 'string', enum: ProfileGender, required: true })
   @IsDefined()
   @IsNotEmpty()
-  gender: 'MALE' | 'FEMALE';
+  @IsEnum(ProfileGender)
+  gender: ProfileGender;
 
-  @ApiModelProperty({ description: 'Account religion.', type: 'string', enum: ['BUDDHA', 'HINDU', 'ISLAM', 'KONG HU CHU', 'CHRISTIAN', 'CATHOLIC'], required: true })
+  @ApiModelProperty({ description: 'Account religion.', type: 'string', enum: ProfileReligion, required: true })
   @IsDefined()
   @IsNotEmpty()
-  religion: 'BUDDHA' | 'HINDU' | 'ISLAM' | 'KONG HU CHU' | 'CHRISTIAN' | 'CATHOLIC';
+  @IsEnum(ProfileReligion)
+  religion: ProfileReligion;
 
-  @ApiModelProperty({ description: 'Account marital status.', type: 'string', enum: ['SINGLE', 'IN RELATIONSHIP', 'MARRIED', 'DIVORCED'], required: true })
+  @ApiModelProperty({ description: 'Account marital status.', type: 'string', enum: ProfileMaritalStatus, required: true })
   @IsDefined()
   @IsNotEmpty()
-  maritalStatus: 'SINGLE' | 'IN RELATIONSHIP' | 'MARRIED' | 'DIVORCED';
+  @IsEnum(ProfileMaritalStatus)
+  maritalStatus: ProfileMaritalStatus;
+
+  @ApiModelProperty({ type: Role, required: false})
+  @IsDefined()
+  roles: Role[];
 }
 
 export class AccountQueryDTO {

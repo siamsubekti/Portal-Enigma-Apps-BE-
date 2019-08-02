@@ -10,8 +10,9 @@ import {
   ApiImplicitBody,
   ApiBadRequestResponse,
   ApiNoContentResponse,
+  ApiCreatedResponse,
 } from '@nestjs/swagger';
-import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request } from '@nestjs/common';
+import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request, Post } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
@@ -30,10 +31,10 @@ export default class AccountController {
   constructor(
     private readonly accountService: AccountService,
     private readonly config: AppConfig,
-  ) {}
+  ) { }
 
   @Get()
-  @ApiOperation({ title: 'List of Accounts.', description: 'Get list of registered accounts.'})
+  @ApiOperation({ title: 'List of Accounts.', description: 'Get list of registered accounts.' })
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -52,7 +53,7 @@ export default class AccountController {
     const paging: PagingData = {
       page,
       rowsPerPage,
-      totalPages: Math.ceil( totalRows / rowsPerPage ),
+      totalPages: Math.ceil(totalRows / rowsPerPage),
       totalRows,
     };
 
@@ -60,7 +61,7 @@ export default class AccountController {
   }
 
   @Get('search')
-  @ApiOperation({ title: 'Search Accounts.', description: 'Search registered accounts.'})
+  @ApiOperation({ title: 'Search Accounts.', description: 'Search registered accounts.' })
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -90,7 +91,7 @@ export default class AccountController {
   }
 
   @Get(':id')
-  @ApiOperation({ title: 'Get an account.', description: 'Get single account data based on ID.'})
+  @ApiOperation({ title: 'Get an account.', description: 'Get single account data based on ID.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
   @ApiOkResponse({ description: 'Account data.', type: ApiResponse })
   @ApiNotFoundResponse({ description: 'Account data not found.', type: ApiExceptionResponse })
@@ -99,17 +100,26 @@ export default class AccountController {
   async get(@Param('id') id: string): Promise<AccountResponse> {
     const data: Account = await this.accountService.get(id);
 
-    if (!data) throw new HttpException({ status: HttpStatus.NOT_FOUND, error: `Account not found.`}, HttpStatus.NOT_FOUND);
+    if (!data) throw new HttpException({ status: HttpStatus.NOT_FOUND, error: `Account not found.` }, HttpStatus.NOT_FOUND);
 
     return { data };
+  }
+
+  @Post()
+  @ApiOperation({ title: 'Create Account.', description: 'API to Create Account.' })
+  @ApiCreatedResponse({ description: 'Account successfuly created.', type : AccountResponse })
+  @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
+  @ApiImplicitBody({ name: 'AccountProfileDTO', description: 'Account form data.', type: AccountProfileDTO })
+  async insert(@Body() accountDto: AccountProfileDTO): Promise<Account> {
+    return await this.accountService.create(accountDto);
   }
 
   @Put(':id/update')
   @ApiOperation({ title: 'Update an account.', description: 'Renew account and profile data based on ID.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiImplicitBody({ name: 'AccountProfileDTO', description: 'Account Profile form data', type: AccountProfileDTO, required: true})
+  @ApiImplicitBody({ name: 'AccountProfileDTO', description: 'Account Profile form data', type: AccountProfileDTO, required: true })
   @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
-  @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
+  @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async edit(@Param('id') id: string, @Body() form: AccountProfileDTO): Promise<AccountResponse> {
@@ -125,8 +135,8 @@ export default class AccountController {
   @Put(':id/deactivate')
   @ApiOperation({ title: 'Deactivate an account.', description: 'Deactivate account, prevents a user from logging in using own account credential.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiNoContentResponse({ description: 'Account data has beend deactivated.'})
-  @ApiBadRequestResponse({description: 'Form data validation failed.', type: ApiExceptionResponse})
+  @ApiNoContentResponse({ description: 'Account data has beend deactivated.' })
+  @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async deactivate(@Param('id') id: string): Promise<void> {
@@ -140,7 +150,7 @@ export default class AccountController {
   @Delete(':id')
   @ApiOperation({ title: 'Delete an account', description: 'Delete account and all of its related content.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiNoContentResponse({ description: 'Account data has beend deleted.'})
+  @ApiNoContentResponse({ description: 'Account data has beend deleted.' })
   @ApiNotFoundResponse({ description: 'Account data not found.', type: ApiExceptionResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })

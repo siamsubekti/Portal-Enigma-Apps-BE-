@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, Generated, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
+import { RegionType } from 'src/config/constants';
 
 @Entity('mst_regions')
 export default class Region {
@@ -7,8 +8,8 @@ export default class Region {
     @Generated('uuid')
     id: string;
 
-    @Column({ type: 'varchar', length: 32, nullable: false })
-    type: 'KELURAHAN' | 'KECAMATAN' | 'KABUPATEN' | 'KOTA' | 'PROVINSI';
+    @Column({ enum: RegionType, length: 32, nullable: false })
+    type: RegionType;
 
     @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
     name: string;

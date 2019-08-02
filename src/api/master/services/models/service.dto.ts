@@ -2,7 +2,8 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Service from './service.entity';
-import { IsNotEmpty, IsDefined, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsDefined, MaxLength, IsEnum } from 'class-validator';
+import { HttpMethod } from '../../../../config/constants';
 
 export class ServiceDTO {
 
@@ -24,11 +25,12 @@ export class ServiceDTO {
   @MaxLength(128)
   endpointUrl: string;
 
-  @ApiModelProperty({ enum: ['GET', 'POST', 'PUT', 'DELETE'], required: true, maxLength: 6 })
+  @ApiModelProperty({ enum: HttpMethod, required: true, maxLength: 6 })
   @IsDefined()
   @IsNotEmpty()
+  @IsEnum(HttpMethod)
   @MaxLength(6)
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: HttpMethod;
 }
 
 export class ServiceResponse implements IApiResponse {
