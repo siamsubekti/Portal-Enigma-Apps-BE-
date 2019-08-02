@@ -20,6 +20,7 @@ import {
   ProfileReligion,
   ProfileMaritalStatus,
   AccountStatus,
+  HttpMethod,
 } from '../../../config/constants';
 
 @Injectable()

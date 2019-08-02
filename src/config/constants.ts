@@ -34,6 +34,27 @@ export enum TypeAcademy {
   S2  = 'S2',
 }
 
+export enum RegionType {
+  PROVINCE = 'PROVINSI',
+  REGENCY = 'KABUPATEN',
+  KOTA = 'KOTA',
+  DISTRICT = 'KECAMATAN',
+  VILLAGE = 'KELURAHAN',
+}
+
+export enum TemplateType {
+  MAIL = 'MAIL',
+  SMS = 'SMS',
+}
+
+export enum HttpMethod {
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+}
+
+
 const HttpStatusMessage: any = {
   100: 'Continue',
   101: 'Switching Protocols',
@@ -100,24 +121,4 @@ const HttpStatusMessage: any = {
   599: 'Network Connect Timeout Error',
 };
 
-export default HttpStatusMessage;
-
-export enum RegionType {
-  PROVINCE = 'PROVINSI',
-  REGENCY = 'KABUPATEN',
-  KOTA = 'KOTA',
-  DISTRICT = 'KECAMATAN',
-  VILLAGE = 'KELURAHAN',
-}
-
-export enum TemplateType {
-  MAIL = 'MAIL',
-  SMS = 'SMS',
-}
-
-export enum HttpMethod {
-  GET = 'GET',
-  POST = 'POST',
-  PUT = 'PUT',
-  DELETE = 'DELETE',
-}
+export { HttpStatusMessage };

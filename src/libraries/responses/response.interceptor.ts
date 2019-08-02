@@ -3,7 +3,7 @@ import { Injectable, NestInterceptor, ExecutionContext, CallHandler } from '@nes
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ResponseStatus, PagingData } from './response.class';
-import HttpStatusMessage from '../../config/constants';
+import { HttpStatusMessage } from '../../config/constants';
 
 export interface Response<T> {
   status: ResponseStatus;
