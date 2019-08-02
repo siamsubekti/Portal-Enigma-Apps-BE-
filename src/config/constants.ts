@@ -26,6 +26,14 @@ export enum ProfileMaritalStatus {
   DIVORCED        = 'DIVORCED',
 }
 
+export enum TypeAcademy {
+  SMA = 'SMA',
+  SMK = 'SMK',
+  D3  = 'D3',
+  S1  = 'S1',
+  S2  = 'S2',
+}
+
 const HttpStatusMessage: any = {
   100: 'Continue',
   101: 'Switching Protocols',
