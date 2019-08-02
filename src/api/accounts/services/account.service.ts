@@ -1,5 +1,5 @@
 import * as moment from 'moment-timezone';
-import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivilege } from '../models/account.dto';
@@ -7,10 +7,17 @@ import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
 import Role from '../../master/roles/models/role.entity';
+import RoleService from 'src/api/master/roles/services/role.service';
+import ProfileService from './profile.service';
 
 @Injectable()
 export default class AccountService {
-  constructor( @InjectRepository(Account) private readonly account: Repository<Account> ) {}
+  constructor(
+    @InjectRepository(Account)
+    private readonly account: Repository<Account>,
+    private readonly roleServices: RoleService,
+    private readonly profilService: ProfileService,
+  ) { }
 
   repository(): Repository<Account> {
     return this.account;
@@ -38,11 +45,11 @@ export default class AccountService {
         .where('a.status = :status', { status: AccountStatus.ACTIVE });
     }
 
-    query.orderBy( queryParams.order ? orderCols[ queryParams.order ] : orderCols.fullname, sort );
-    query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
-    query.limit( queryParams.rowsPerPage );
+    query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
+    query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+    query.limit(queryParams.rowsPerPage);
 
-    const result: [ Account[], number ] = await query.getManyAndCount();
+    const result: [Account[], number] = await query.getManyAndCount();
     // Logger.log(queryParams, 'AccountService@all', true);
 
     return {
@@ -72,7 +79,10 @@ export default class AccountService {
     account.username = data.username;
     account.profile = profile;
 
-    return account;
+    const roles: Role[] = await this.roleServices.findAllRelated(data.roles);
+    account.roles = Promise.resolve(roles);
+
+    return await this.account.save(account);
   }
 
   async countByUsername(username: string): Promise<number> {
@@ -80,11 +90,11 @@ export default class AccountService {
   }
 
   async findByUsername(username: string): Promise<Account> {
-    return this.account.findOne({ select: [ 'id', 'username', 'password', 'status' ], where: { username, status: AccountStatus.ACTIVE }, relations: [ 'profile' ] });
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
 
   async get(id: string): Promise<Account> {
-    return this.account.findOne(id, { where: { status: AccountStatus.ACTIVE }, relations: [ 'profile' ] });
+    return this.account.findOne(id, { where: { status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
 
   async buildAccountPrivileges(id: string): Promise<AccountPrivilege> {
@@ -100,8 +110,8 @@ export default class AccountService {
 
     for (const role of await account.roles) {
       privileges.roles.push(role);
-      privileges.menus.push( ...(await Object.create(role).menus) );
-      privileges.services.push( ...(await Object.create(role).services) );
+      privileges.menus.push(...(await Object.create(role).menus));
+      privileges.services.push(...(await Object.create(role).services));
     }
 
     return privileges;
@@ -138,5 +148,39 @@ export default class AccountService {
 
   async save(account: Account): Promise<Account> {
     return this.account.save(account);
+  }
+
+  // email
+  // if (status = SUSPEN && lastlogin = null)
+  // return code 422 message = 'please reset password';
+
+  async create(accountDto: AccountProfileDTO): Promise<Account> {
+
+    const usernameExist: boolean = await this.account.count({ where: { username: accountDto.username } }) > 0;
+    const nickName: Profile = await this.profilService.findNickname(accountDto.nickname);
+    const email: Profile = await this.profilService.findMail(accountDto.email);
+
+    if (usernameExist) throw new BadRequestException('Username has exist.');
+    else if (nickName) throw new BadRequestException('Nickname has exist.');
+    else if (email) throw new BadRequestException('Email has exist.');
+
+    let profile: Profile = new Profile();
+    profile.fullname = accountDto.fullname;
+    profile.nickname = accountDto.nickname || accountDto.fullname.substring(0, accountDto.fullname.indexOf(' '));
+    profile.email = accountDto.email;
+    profile.phone = accountDto.phone;
+
+    profile = await this.profilService.save(profile);
+
+    const account: Account = new Account();
+    account.username = accountDto.username;
+    account.password = process.env.DEFAULT_PASSWORD;
+    account.profile = profile;
+    account.status = AccountStatus.SUSPENDED;
+
+    const roles: Role[] = await this.roleServices.findAllRelated(accountDto.roles);
+    account.roles = Promise.resolve(roles);
+
+    return await this.account.save(account);
   }
 }

@@ -129,4 +129,9 @@ export default class RoleService {
 
         return await this.roleRepository.save(roles);
     }
+
+    async findAllRelated(roles: Role[]): Promise<Role[]> {
+        const roleIds: number[] = roles.map((item: Role) => item.id);
+        return await this.roleRepository.findByIds(roleIds);
+    }
 }

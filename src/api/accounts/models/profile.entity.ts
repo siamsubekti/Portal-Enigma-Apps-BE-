@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Generated, Column, OneToOne } from 'typeorm';
 import Account from './account.entity';
+import { ProfileGender, ProfileReligion, ProfileMaritalStatus } from '../../../config/constants';
 
 @Entity('profiles')
 export default class Profile {
@@ -22,14 +23,14 @@ export default class Profile {
   @Column({type: 'date', nullable: true})
   birthdate: Date;
 
-  @Column({type: 'varchar', length: 10, nullable: true})
-  gender: 'MALE' | 'FEMALE';
+  @Column({enum: ProfileGender, length: 10, nullable: true})
+  gender: ProfileGender;
 
-  @Column({type: 'varchar', length: 50, nullable: true})
-  religion: 'BUDDHA' | 'HINDU' | 'ISLAM' | 'KONG HU CHU' | 'CHRISTIAN' | 'CATHOLIC';
+  @Column({enum: ProfileReligion, length: 50, nullable: true})
+  religion: ProfileReligion;
 
-  @Column({type: 'varchar', length: 20, nullable: true, name: 'marital_status'})
-  maritalStatus: 'SINGLE' | 'IN RELATIONSHIP' | 'MARRIED' | 'DIVORCED';
+  @Column({enum: ProfileMaritalStatus, length: 20, nullable: true, name: 'marital_status'})
+  maritalStatus: ProfileMaritalStatus;
 
   @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
   createdAt: Date;
