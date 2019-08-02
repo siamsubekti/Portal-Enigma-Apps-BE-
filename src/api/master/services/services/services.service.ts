@@ -97,7 +97,7 @@ export default class ServicesService {
 
     async findAllRelated(services: Service[]): Promise<Service[]> {
         const serviceIds: number[] = services.map((item: Service) => item.id);
-        return this.serviceRepository.findByIds(serviceIds);
+        return await this.serviceRepository.findByIds(serviceIds);
     }
 
     async search(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
