@@ -22,8 +22,6 @@ export default class MenuController {
     @Get()
     @ApiOperation({ title: 'List of Menus.', description: 'Get list of menu from database.'})
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
-    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, order, or icon)', type: ['code', 'name', 'order', 'icon'], required: false })
-    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
     @ApiOkResponse({ description: 'List of roles.', type: MenuPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -31,12 +29,10 @@ export default class MenuController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async allMenu(
         @Query('term') term?: string,
-        @Query('order') order: 'code' | 'name' = 'name',
-        @Query('sort') sort: 'asc' | 'desc' = 'asc',
         @Query('page') page: number = 1,
     ): Promise<MenuPagedResponse> {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-        const { result: data = [], totalRows } = await this.menuService.all({ term, order, sort, page, rowsPerPage });
+        const { result: data = [], totalRows } = await this.menuService.all({ term, page, rowsPerPage });
         const paging: PagingData = {
         page,
         rowsPerPage,
@@ -48,6 +44,17 @@ export default class MenuController {
                 code: '200',
                 description: 'Success',
             }, data, paging };
+    }
+
+    @Get(':id/subs')
+    @ApiOperation({ title: 'List of Sub Menus.', description: 'Get list of sub menu from database.'})
+    @ApiOkResponse({ description: 'List of sub menu.', type: ApiResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async allSubMenu(): Promise<MenuPagedResponse> {
+        const { result: data = [] } = await this.menuService.allSub();
+        return { data };
     }
 
     @Get('search')

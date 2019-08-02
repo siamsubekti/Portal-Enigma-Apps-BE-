@@ -24,17 +24,6 @@ export default class MenuService {
                 .orWhere('m.icon LIKE :term', { term });
         }
 
-        if (queryParams.order && queryParams.sort) {
-            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            const orderCols: { [key: string]: string } = {
-                code: 'm.code',
-                name: 'm.name',
-            };
-
-            query = query.orderBy(orderCols[queryParams.order], sort);
-        } else
-            query = query.orderBy('m.name', 'ASC');
-
         query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
         query.limit(queryParams.rowsPerPage);
 
@@ -47,11 +36,22 @@ export default class MenuService {
         };
     }
 
+    async allSub(): Promise<MenuQueryResult> {
+        const query: SelectQueryBuilder<Menu> = this.menuRepository.createQueryBuilder('m').select('m')
+        .where('m.parentMenu');
+
+        const result: [Menu[], number] = await query.getManyAndCount();
+
+        return {
+            result: result[0],
+            totalRows: result[1],
+        };
+    }
+
     async add(form: MenuDTO): Promise<Menu> {
         const checkCode: Menu = await this.menuRepository.findOne({ where: { code: form.code } });
         if (checkCode) throw new BadRequestException('Code has been use');
-        const parent: Menu = await this.menuRepository.findOne(form.parentId);
-        Logger.log(parent);
+        const parent: Menu = await this.menuRepository.findOne(form.parentMenu);
         const menu: Menu = new Menu();
         menu.code = form.code;
         menu.name = form.name;
@@ -64,7 +64,7 @@ export default class MenuService {
     }
 
     async get(id: number): Promise<Menu> {
-        const result: Menu = await this.menuRepository.findOne(id, { relations: ['childrenMenu'] });
+        const result: Menu = await this.menuRepository.findOne(id);
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             return result;
