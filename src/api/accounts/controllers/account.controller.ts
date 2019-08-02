@@ -20,7 +20,7 @@ import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import Account from '../models/account.entity';
 import AccountService from '../services/account.service';
-import { AccountStatus } from 'src/config/constants';
+import { AccountStatus } from '../../../config/constants';
 
 @Controller('accounts')
 @ApiUseTags('Accounts')

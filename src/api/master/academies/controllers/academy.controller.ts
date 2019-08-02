@@ -10,7 +10,7 @@ import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
-import { PagingData } from 'src/libraries/responses/response.class';
+import { PagingData } from '../../../../libraries/responses/response.class';
 import AppConfig from '../../../../config/app.config';
 import Academy from '../models/academy.entity';
 

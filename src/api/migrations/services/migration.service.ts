@@ -15,7 +15,12 @@ import Profile from '../../accounts/models/profile.entity';
 import { ServiceDTO } from '../../master/services/models/service.dto';
 import { MenuDTO } from '../../master/menus/models/menu.dto';
 import { RoleDTO } from '../../master/roles/models/role.dto';
-import { ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountStatus } from 'src/config/constants';
+import {
+  ProfileGender,
+  ProfileReligion,
+  ProfileMaritalStatus,
+  AccountStatus,
+} from '../../../config/constants';
 
 @Injectable()
 export default class MigrationService {

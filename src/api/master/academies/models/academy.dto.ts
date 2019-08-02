@@ -2,7 +2,7 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, IsDefined, IsEnum } from 'class-validator';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Academy from './academy.entity';
-import { TypeAcademy } from 'src/config/constants';
+import { TypeAcademy } from '../../../../config/constants';
 
 export class AcademyDTO {
     @ApiModelProperty()

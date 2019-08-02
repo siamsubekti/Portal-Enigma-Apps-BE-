@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Generated, Column, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
-import { AccountStatus } from 'src/config/constants';
+import { AccountStatus } from '../../../config/constants';
 import Profile from './profile.entity';
 import Role from '../../../api/master/roles/models/role.entity';
 

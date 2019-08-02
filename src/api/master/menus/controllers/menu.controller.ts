@@ -6,9 +6,9 @@ import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
-import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
-import AppConfig from 'src/config/app.config';
-import { PagingData } from 'src/libraries/responses/response.class';
+import CookieAuthGuard from '../../../auth/guards/cookie.guard';
+import AppConfig from '../../../../config/app.config';
+import { PagingData } from '../../../../libraries/responses/response.class';
 
 @UseGuards(CookieAuthGuard)
 @ApiUseTags('Menus')

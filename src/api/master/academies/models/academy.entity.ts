@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { TypeAcademy } from '../../../../config/constants';
 
 @Entity('mst_academies')
 export default class Academy {
@@ -18,7 +19,7 @@ export default class Academy {
     address: string;
 
     @Column({ type: 'varchar', length: 20, nullable: false})
-    type: string;
+    type: TypeAcademy;
 
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
