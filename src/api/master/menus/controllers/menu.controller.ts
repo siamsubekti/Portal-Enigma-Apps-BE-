@@ -23,7 +23,7 @@ export default class MenuController {
     @ApiOperation({ title: 'List of Menus.', description: 'Get list of menu from database.'})
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
-    @ApiOkResponse({ description: 'List of roles.', type: MenuPagedResponse })
+    @ApiOkResponse({ description: 'List of menus.', type: MenuPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
