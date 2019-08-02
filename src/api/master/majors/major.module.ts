@@ -9,4 +9,4 @@ import MajorController from './controllers/major.controller';
   providers: [MajorService],
   controllers: [MajorController],
 })
-export class MajorModule {}
+export default class MajorModule {}

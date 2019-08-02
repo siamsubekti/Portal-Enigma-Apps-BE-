@@ -14,4 +14,4 @@ import MenuModule from '../menus/menu.module';
     exports: [RoleService],
     controllers: [RoleController],
 })
-export class RoleModule { }
+export default class RoleModule { }
