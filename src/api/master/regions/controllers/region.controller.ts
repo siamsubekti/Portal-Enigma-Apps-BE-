@@ -46,6 +46,20 @@ export default class RegionController {
         return { data, paging };
     }
 
+    @Get('type')
+    @ApiOperation({ title: 'List of Regions based Type', description: 'API search Regions' })
+    @ApiImplicitQuery({ name: 'type', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'If success get list of Regions', type: RegionPageResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async findByType(
+        @Query('type') term: 'PROVINSI' | 'KABUPATEN' | 'KECAMATAN' | 'KELURAHAN' = 'PROVINSI',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<Region[]> {
+        return await this.regionServices.findByType({ term, sort });
+
+    }
+
     @Get('search')
     @ApiOperation({ title: 'Search Regions', description: 'API search Regions by keywords' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
@@ -61,6 +75,16 @@ export default class RegionController {
         const { result: data = [] } = await this.regionServices.search({ term, order, sort });
 
         return { data };
+    }
+
+    @Get(':id/subs')
+    @ApiOperation({ title: 'Get a Region include their childrens.', description: 'API Get region by Id include their childrens.' })
+    @ApiOkResponse({ description: 'Success to get region.', type: RegionResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async getRegionChild(@Param('id') id: string): Promise<Region> {
+        const region: Region = await this.regionServices.findChild(id);
+        return region;
     }
 
     @Get(':id')

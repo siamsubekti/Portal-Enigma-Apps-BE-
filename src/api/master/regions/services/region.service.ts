@@ -14,13 +14,24 @@ export default class RegionService {
     }
 
     async findById(id: string): Promise<Region> {
-        return await this.regionRepository.findOne(id);
+        return await this.regionRepository.findOne({ where: { id } });
+    }
+
+    async findChild(id: string): Promise<Region> {
+        return await this.regionRepository.findOne({ where: { id }, relations: ['children'] });
     }
 
     async create(regionDto: RegionDTO): Promise<Region> {
         const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
         if (exist) throw new BadRequestException('Data ini telah ada.');
-        return await this.regionRepository.save(regionDto);
+
+        const region: Region = new Region();
+        region.name = regionDto.name;
+        region.type = regionDto.type;
+        const parent: Region = await this.findParent(regionDto.parent);
+        region.parent = parent;
+
+        return await this.regionRepository.save(region);
     }
 
     async remove(id: string): Promise<DeleteResult> {
@@ -37,7 +48,7 @@ export default class RegionService {
         if (!data) throw new NotFoundException(`Region with id: ${id} not found`);
         else {
             const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
-            if (exist && regionDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && (regionDto.name !== data.name)) throw new BadRequestException('Data ini telah ada.');
             data = this.regionRepository.merge(data, regionDto);
             return await this.regionRepository.save(data);
         }
@@ -106,5 +117,20 @@ export default class RegionService {
             result: result[0],
             totalRows: result[1],
         };
+    }
+
+    async findByType(queryParams: RegionQueryDTO): Promise<Region[]> {
+        return await this.regionRepository.find({
+            where: {
+                type: queryParams.term,
+            },
+            order: {
+                name: queryParams.sort.toUpperCase() as 'ASC' | 'DESC',
+            },
+        });
+    }
+
+    async findParent(region: Region): Promise<Region> {
+        return await this.regionRepository.findOne({ where: { id: region.id } });
     }
 }
