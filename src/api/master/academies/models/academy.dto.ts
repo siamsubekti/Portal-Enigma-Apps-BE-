@@ -2,6 +2,7 @@ import { ApiModelProperty, ApiModelPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, MaxLength, IsDefined, IsEnum } from 'class-validator';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Academy from './academy.entity';
+import { TypeAcademy } from 'src/config/constants';
 
 export class AcademyDTO {
     @ApiModelProperty()
@@ -19,11 +20,12 @@ export class AcademyDTO {
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty({enum: [ 'SMA', 'SMK', 'D3', 'S1', 'S2']})
-    @IsEnum([ 'SMA', 'SMK', 'D3', 'S1', 'S2'])
+    @ApiModelProperty({ enum: TypeAcademy, required: true, maxLength: 5 })
     @IsDefined()
     @IsNotEmpty()
-    type: string;
+    @IsEnum(TypeAcademy)
+    @MaxLength(5)
+    type: TypeAcademy;
 }
 
 export class AcademyResponseDTO {
@@ -40,9 +42,8 @@ export class AcademyResponseDTO {
     @ApiModelPropertyOptional()
     address?: string;
 
-    @ApiModelProperty({enum: [ 'SMA', 'SMK', 'D3', 'S1', 'S2']})
-    @IsEnum([ 'SMA', 'SMK', 'D3', 'S1', 'S2'])
-    type: string;
+    @ApiModelProperty()
+    type: TypeAcademy;
 }
 
 export class AcademyResponse {

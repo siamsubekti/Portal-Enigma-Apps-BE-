@@ -16,9 +16,6 @@ export class MenuDTO {
     icon: string;
 
     @ApiModelProperty()
-    parentId?: number;
-
-    @ApiModelProperty()
     parentMenu?: Menu;
 }
 

@@ -22,7 +22,7 @@ export default class RoleController {
     private readonly config: AppConfig) { }
 
   @Get()
-  @ApiOperation({ title: 'List of Roles.', description: 'Get list of role from database.'})
+  @ApiOperation({ title: 'List of Roles.', description: 'Get list of roles from database.'})
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, or name)', type: ['code', 'name'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })

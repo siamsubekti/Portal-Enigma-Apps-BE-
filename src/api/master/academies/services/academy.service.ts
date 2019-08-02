@@ -41,15 +41,12 @@ export default class AcademyService {
         query.limit( queryParams.rowsPerPage );
 
         const result: [ Academy[], number ] = await query.getManyAndCount();
-        Logger.log(queryParams, 'AcademiesService@all', true);
 
         return {
           result: result[0],
           totalRows: result[1],
         };
     }
-
-
 
     async insert(academyDTO: AcademyDTO): Promise<Academy> {
         const checkCode: Academy = await this.academyRepository.findOne({
