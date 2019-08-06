@@ -24,6 +24,9 @@ export default class Account {
   @Column({name: 'updated_at', type: 'timestamp', nullable: true})
   updatedAt: Date;
 
+  // @Column({name: 'last_login', type: 'timestamp', nullable: true})
+  // lastlogin: Date;
+
   @OneToOne(() => Profile, (profile: Profile) => profile.account, { cascade: true })
   @JoinColumn({name: 'profile_id'})
   profile: Profile;

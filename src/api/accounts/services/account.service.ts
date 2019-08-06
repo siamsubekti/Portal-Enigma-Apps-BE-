@@ -7,8 +7,9 @@ import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
 import Role from '../../master/roles/models/role.entity';
-import RoleService from 'src/api/master/roles/services/role.service';
+import RoleService from '../../../api/master/roles/services/role.service';
 import ProfileService from './profile.service';
+import HashUtil from '../../../libraries/utilities/hash.util';
 
 @Injectable()
 export default class AccountService {
@@ -17,6 +18,7 @@ export default class AccountService {
     private readonly account: Repository<Account>,
     private readonly roleServices: RoleService,
     private readonly profilService: ProfileService,
+    private readonly hashUtil: HashUtil,
   ) { }
 
   repository(): Repository<Account> {
@@ -93,6 +95,10 @@ export default class AccountService {
     return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
 
+  async findSuspendedAccount(username: string): Promise<Account> {
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.SUSPENDED }, relations: ['profile'] });
+  }
+
   async get(id: string): Promise<Account> {
     return this.account.findOne(id, { where: { status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
@@ -150,10 +156,6 @@ export default class AccountService {
     return this.account.save(account);
   }
 
-  // email
-  // if (status = SUSPEN && lastlogin = null)
-  // return code 422 message = 'please reset password';
-
   async create(accountDto: AccountProfileDTO): Promise<Account> {
 
     const usernameExist: boolean = await this.account.count({ where: { username: accountDto.username } }) > 0;
@@ -174,7 +176,7 @@ export default class AccountService {
 
     const account: Account = new Account();
     account.username = accountDto.username;
-    account.password = process.env.DEFAULT_PASSWORD;
+    account.password = await this.hashUtil.create(process.env.DEFAULT_PASSWORD);
     account.profile = profile;
     account.status = AccountStatus.SUSPENDED;
 
