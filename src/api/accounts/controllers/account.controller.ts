@@ -16,7 +16,7 @@ import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterce
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
-import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege } from '../models/account.dto';
+import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege, AccountPagedResponse } from '../models/account.dto';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import Account from '../models/account.entity';
@@ -47,7 +47,7 @@ export default class AccountController {
     @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
     @Query('page') page: number = 1,
-  ): Promise<AccountResponse> {
+  ): Promise<AccountPagedResponse> {
     const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
     const { result: data = [], totalRows } = await this.accountService.all({ term, order, sort, page, rowsPerPage });
     const paging: PagingData = {
@@ -65,14 +65,14 @@ export default class AccountController {
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-  @ApiOkResponse({ description: 'Search result of user accounts.', type: ApiResponse })
+  @ApiOkResponse({ description: 'Search result of user accounts.', type: ApiPagedResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async search(
     @Query('term') term?: string,
     @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
-  ): Promise<AccountResponse> {
+  ): Promise<AccountPagedResponse> {
     const { result: data = [] } = await this.accountService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
 
     return { data };

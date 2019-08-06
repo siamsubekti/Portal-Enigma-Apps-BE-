@@ -170,7 +170,7 @@ export default class MigrationService {
       {
         code: 'MST_ACCOUNT_PRIVILEGES',
         name: 'Get Account Privileges',
-        endpointUrl: '/accounts',
+        endpointUrl: '/accounts/privileges',
         method: HttpMethod.GET,
       },
     ];

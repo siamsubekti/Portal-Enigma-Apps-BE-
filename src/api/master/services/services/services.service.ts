@@ -57,6 +57,10 @@ export default class ServicesService {
         return await this.serviceRepository.findOne({ where: { id }, relations: ['roles'] });
     }
 
+    async findByCode(code: string): Promise<Service> {
+        return await this.serviceRepository.findOne({ where: { code } });
+    }
+
     async create(serviceDto: ServiceDTO): Promise<Service> {
         const service: Service = await this.serviceRepository.findOne({ where: { code: serviceDto.code } });
         if (service) throw new BadRequestException('Data ini telah ada.');
