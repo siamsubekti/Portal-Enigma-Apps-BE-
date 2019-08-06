@@ -48,6 +48,7 @@ export default class AuthService {
           loginResponse = {
             accountId: suspendedAccount.id,
             sessionId: null,
+            redirectTo: null,
           };
         return loginResponse;
       } else if (account && await this.hashUtil.compare(credential.password, account.password))
