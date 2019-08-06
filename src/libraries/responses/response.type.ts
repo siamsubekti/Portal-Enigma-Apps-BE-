@@ -22,6 +22,6 @@ export class ApiPagedResponse implements IApiPagedResponse {
   @ApiModelProperty({ type: Array })
   data: any[];
 
-  @ApiModelProperty({ type: PagingData })
-  paging: PagingData;
+  @ApiModelProperty({ type: PagingData, required: false })
+  paging?: PagingData;
 }

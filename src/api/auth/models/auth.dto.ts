@@ -2,6 +2,7 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty, IsEmail } from 'class-validator';
 import { IApiResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
+import Service from '../../master/services/models/service.entity';
 
 export class LoginCredentialDTO {
   @IsDefined()
@@ -22,6 +23,9 @@ export class LoginResponseDTO {
 
   @ApiModelProperty({type: 'string', description: 'Session ID for the logged-in user.'})
   sessionId: string;
+
+  @ApiModelProperty({type: Service, description: 'Service endpoint to get privileges.'})
+  redirectTo: Service;
 }
 
 export class LoginResponse implements IApiResponse {

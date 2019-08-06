@@ -7,11 +7,13 @@ import ConfigModule from '../../config/config.module';
 import AuthController from './controllers/auth.controller';
 import CookieStrategy from './strategies/cookie.strategy';
 import RegisterService from './services/register.service';
+import ServicesModule from '../master/services/services.module';
 
 @Module({
   imports: [
     ConfigModule,
     AccountModule,
+    ServicesModule,
     PassportModule.register({defaultStrategy: 'cookie', property: 'account', session: false}),
   ],
   exports: [ AuthService, RegisterService, CookieStrategy ],

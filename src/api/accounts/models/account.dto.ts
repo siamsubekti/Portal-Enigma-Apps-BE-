@@ -8,8 +8,21 @@ import Service from '../../master/services/models/service.entity';
 import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus } from '../../../config/constants';
 
 export class AccountResponse {
+  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
   status?: ResponseStatus;
-  data: Account | Account[];
+
+  @ApiModelProperty({ description: 'Account data', type: Account, required: true })
+  data: Account;
+}
+
+export class AccountPagedResponse {
+  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
+  status?: ResponseStatus;
+
+  @ApiModelProperty({ description: 'List of accounts', type: [ Account ], required: true })
+  data: Account[];
+
+  @ApiModelProperty({ description: 'Paging data', type: PagingData, required: false })
   paging?: PagingData;
 }
 
@@ -87,12 +100,13 @@ export class AccountQueryDTO {
   rowsPerPage?: number;
 }
 
-export class AccountQueryResult {
-  result: Account[] | Account;
+export class AccountQueryResult<T> {
+  result: T;
   totalRows: number;
 }
 
 export class AccountPrivilege {
+  account: Account;
   roles: Role[];
   menus: Menu[];
   services: Service[];

@@ -14,10 +14,12 @@ import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
+import ServicesService from 'src/api/master/services/services/services.service';
 
 @Injectable()
 export default class AuthService {
   constructor(
+    private readonly service: ServicesService,
     private readonly accountService: AccountService,
     private readonly hashUtil: HashUtil,
     private readonly mailUtil: MailerUtil,
@@ -44,6 +46,7 @@ export default class AuthService {
         loginResponse = {
           accountId: account.id,
           sessionId: await this.createSession(account),
+          redirectTo: await this.service.findByCode('MST_ACCOUNT_PRIVILEGES'),
         };
 
       return loginResponse;

@@ -3,7 +3,7 @@ import { ResponseStatus, PagingData } from './response.class';
 export interface IApiPagedResponse {
   status: ResponseStatus;
   data: any[];
-  paging: PagingData;
+  paging?: PagingData;
 }
 
 export interface IApiResponse {

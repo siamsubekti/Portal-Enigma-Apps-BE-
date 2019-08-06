@@ -23,7 +23,7 @@ export default class AccountService {
     return this.account;
   }
 
-  async all(queryParams: AccountQueryDTO): Promise<AccountQueryResult> {
+  async all(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
     const orderCols: { [key: string]: string } = {
       username: 'a.username',
       fullname: 'p.fullname',
@@ -103,12 +103,13 @@ export default class AccountService {
     if (!account) return undefined;
 
     const privileges: AccountPrivilege = {
+      account,
       roles: [],
       menus: [],
       services: [],
     };
 
-    for (const role of await account.roles) {
+    for (const role of await (Object.create(account).roles)) {
       privileges.roles.push(role);
       privileges.menus.push(...(await Object.create(role).menus));
       privileges.services.push(...(await Object.create(role).services));
