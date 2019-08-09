@@ -6,13 +6,13 @@ import Parameter from './parameter.entity';
 
 export default class ParameterDTO {
 
-  @ApiModelProperty({ type: 'string', uniqueItems: true, maxLength: 255, required: true })
+  @ApiModelProperty({ description: 'Key of a parameter.', type: 'string', uniqueItems: true, maxLength: 255, required: true })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(255)
   key: string;
 
-  @ApiModelProperty({ type: 'string', maxLength: 255, required: true })
+  @ApiModelProperty({ description: 'Value of a parameter.', type: 'string', maxLength: 255, required: true })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(255)
@@ -20,23 +20,23 @@ export default class ParameterDTO {
 }
 
 export class ParameterResponse implements IApiResponse {
-  @ApiModelProperty({ type: ResponseStatus })
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
   status: ResponseStatus;
 
-  @ApiModelProperty({ type: ParameterDTO })
+  @ApiModelProperty({ description: 'Parameter data.', type: ParameterDTO })
   data: ParameterDTO;
 }
 
 export class ParameterPageResponse implements IApiPagedResponse {
 
-  @ApiModelProperty({ type: PagingData })
-  paging: PagingData;
-
-  @ApiModelProperty({ type: ResponseStatus })
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
   status: ResponseStatus;
 
-  @ApiModelProperty({ type: ParameterDTO })
+  @ApiModelProperty({ description: 'List of Parameters.', type: [ ParameterDTO ] })
   data: ParameterDTO[];
+
+  @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+  paging: PagingData;
 }
 
 export class ParameterQueryDTO {

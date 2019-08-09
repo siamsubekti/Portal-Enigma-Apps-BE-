@@ -7,25 +7,25 @@ import { HttpMethod } from '../../../../config/constants';
 
 export class ServiceDTO {
 
-  @ApiModelProperty({ type: 'string', uniqueItems: true, required: true, maxLength: 50 })
+  @ApiModelProperty({ description: 'Code of a service.', type: 'string', uniqueItems: true, required: true, maxLength: 50 })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(50)
   code: string;
 
-  @ApiModelProperty({ type: 'string', required: true, maxLength: 255 })
+  @ApiModelProperty({ description: 'Name a service.', type: 'string', required: true, maxLength: 255 })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
 
-  @ApiModelProperty({ type: 'string', required: true, maxLength: 128 })
+  @ApiModelProperty({ description: 'End point URL of service.', type: 'string', required: true, maxLength: 128 })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(128)
   endpointUrl: string;
 
-  @ApiModelProperty({ enum: HttpMethod, required: true, maxLength: 6 })
+  @ApiModelProperty({ description: 'HTTP method of service.', enum: HttpMethod, required: true, maxLength: 6 })
   @IsDefined()
   @IsNotEmpty()
   @IsEnum(HttpMethod)
@@ -34,22 +34,23 @@ export class ServiceDTO {
 }
 
 export class ServiceResponse implements IApiResponse {
-  @ApiModelProperty({ type: ResponseStatus })
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
   status: ResponseStatus;
 
-  @ApiModelProperty({ type: ServiceDTO })
+  @ApiModelProperty({ description: 'Service data.', type: ServiceDTO })
   data: ServiceDTO;
 }
 
 export class ServicePageResponse implements IApiPagedResponse {
-  @ApiModelProperty({ type: PagingData })
-  paging: PagingData;
 
-  @ApiModelProperty({ type: ResponseStatus })
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
   status: ResponseStatus;
 
-  @ApiModelProperty({ type: ServiceDTO })
+  @ApiModelProperty({ description: 'List of services.', type: [ ServiceDTO ] })
   data: ServiceDTO[];
+
+  @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+  paging: PagingData;
 
 }
 

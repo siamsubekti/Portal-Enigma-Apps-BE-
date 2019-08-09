@@ -7,48 +7,49 @@ import { TemplateType } from 'src/config/constants';
 
 export class TemplateDTO {
 
-    @ApiModelProperty({ type: 'string', uniqueItems: true, required: true, maxLength: 255 })
+    @ApiModelProperty({ description: 'Name of template.', type: 'string', uniqueItems: true, required: true, maxLength: 255 })
     @IsDefined()
     @IsNotEmpty()
     @MaxLength(255)
     name: string;
 
-    @ApiModelProperty({ enum: TemplateType, required: true, maxLength: 50 })
+    @ApiModelProperty({ description: 'Type of template.', enum: TemplateType, required: true, maxLength: 50 })
     @IsDefined()
     @IsNotEmpty()
     @IsEnum(TemplateType)
     @MaxLength(50)
     type: TemplateType;
 
-    @ApiModelProperty({ type: 'string', required: false, maxLength: 255 })
+    @ApiModelProperty({ description: 'Subject of template.', type: 'string', required: false, maxLength: 255 })
     @IsOptional()
     @IsDefined()
     @MaxLength(255)
     subject: string;
 
-    @ApiModelProperty({ type: 'string', required: true })
+    @ApiModelProperty({ description: 'Content body.', type: 'string', required: true })
     @IsDefined()
     @IsNotEmpty()
     body: string;
 }
 
 export class TemplateResponse implements IApiResponse {
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: TemplateDTO })
+    @ApiModelProperty({ description: 'Template data.', type: TemplateDTO })
     data: TemplateDTO;
 }
 
 export class TemplatePageResponse implements IApiPagedResponse {
-    @ApiModelProperty({ type: PagingData })
-    paging: PagingData;
 
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: TemplateDTO })
+    @ApiModelProperty({ description: 'List of templates.', type: [ TemplateDTO ] })
     data: TemplateDTO[];
+
+    @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+    paging: PagingData;
 }
 
 export class TemplateQueryDTO {
