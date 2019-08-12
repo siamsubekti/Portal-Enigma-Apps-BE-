@@ -21,7 +21,7 @@ export default class DatabaseConnectionConfig implements TypeOrmOptionsFactory {
         `${__dirname}/../**/*.model{.ts,.js}`,
       ],
       synchronize: (this.config.get('DB_SYNC') === 'true'),
-      logging: (this.config.get('NODE_ENV') === 'local'),
+      logging: (this.config.get('DB_LOG') === 'true'),
     };
 
     return options;

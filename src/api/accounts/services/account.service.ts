@@ -9,6 +9,7 @@ import Profile from '../models/profile.entity';
 import Role from '../../master/roles/models/role.entity';
 import RoleService from 'src/api/master/roles/services/role.service';
 import ProfileService from './profile.service';
+import MenuService from 'src/api/master/menus/services/menu.service';
 
 @Injectable()
 export default class AccountService {
@@ -17,6 +18,7 @@ export default class AccountService {
     private readonly account: Repository<Account>,
     private readonly roleServices: RoleService,
     private readonly profilService: ProfileService,
+    private readonly menuService: MenuService,
   ) { }
 
   repository(): Repository<Account> {
@@ -111,8 +113,12 @@ export default class AccountService {
 
     for (const role of await (Object.create(account).roles)) {
       privileges.roles.push(role);
-      privileges.menus.push(...(await Object.create(role).menus));
       privileges.services.push(...(await Object.create(role).services));
+
+      for (let menu of (await Object.create(role).menus)) {
+        menu = await this.menuService.getWithParent(menu.id);
+        privileges.menus.push(menu);
+      }
     }
 
     return privileges;

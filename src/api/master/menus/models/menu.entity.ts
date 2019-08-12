@@ -6,19 +6,22 @@ export default class Menu {
     @PrimaryGeneratedColumn({type: 'int', unsigned: true})
     id: number;
 
-    @Column({type: 'varchar', length: 50, nullable: false, unique: true})
+    @Column({type: 'varchar', length: 50, unique: true})
     code: string;
 
-    @Column({type: 'varchar', length: 255, nullable: false})
+    @Column({type: 'varchar', length: 255})
     name: string;
 
     @Column({type: 'smallint'})
     order: number;
 
-    @Column({type: 'varchar', length: 50})
+    @Column({type: 'varchar', length: 50, nullable: true})
     icon: string;
 
-    @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
+    @Column({type: 'varchar', length: 50})
+    path: string;
+
+    @Column({name: 'created_at', type: 'timestamp', default: (): string => 'CURRENT_TIMESTAMP'})
     createdAt: Date;
 
     @ManyToOne(() => Menu, (menu: Menu) => menu.childrenMenu)
@@ -26,8 +29,8 @@ export default class Menu {
     parentMenu: Menu;
 
     @OneToMany(() => Menu, (menu: Menu) => menu.parentMenu)
-    childrenMenu: Menu[];
+    childrenMenu: Promise<Menu[]>;
 
     @ManyToMany(() => Role, (role: Role) => role.menus)
-    roles: Role[];
+    roles: Promise<Role[]>;
 }

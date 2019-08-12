@@ -187,30 +187,35 @@ export default class MigrationService {
       {
          code: 'HOME',
          name: 'Home',
+         path: '/home',
          icon: 'fa-home',
          order: 0,
       },
       {
         code: 'CANDIDATE',
         name: 'Candidate Menu',
+        path: '/candidate',
         icon: 'fa-user',
         order: 1,
       },
       {
         code: 'HC',
         name: 'Human Capital Menu',
+        path: '/human-capital',
         icon: 'fa-user',
         order: 2,
       },
       {
         code: 'STAFF',
         name: 'Staff Menu',
+        path: '/staff',
         icon: 'fa-user',
         order: 3,
       },
       {
         code: 'MASTER',
         name: 'Master Data',
+        path: '/master',
         icon: 'fa-database',
         order: 4,
       },
@@ -230,6 +235,7 @@ export default class MigrationService {
       {
         code: 'MST_ACCOUNTS',
         name: 'Accounts Management',
+        path: '/master/accounts',
         icon: 'fa-groups',
         order: 0,
         parentMenu: parents[ 'MASTER' ],
@@ -237,6 +243,7 @@ export default class MigrationService {
       {
         code: 'MST_ROLES',
         name: 'Roles Management',
+        path: '/master/roles',
         icon: 'fa-empty',
         order: 1,
         parentMenu: parents['MASTER'],
@@ -244,6 +251,7 @@ export default class MigrationService {
       {
         code: 'MST_MENUS',
         name: 'Menus Management',
+        path: '/master/menus',
         icon: 'fa-empty',
         order: 2,
         parentMenu: parents['MASTER'],
@@ -251,6 +259,7 @@ export default class MigrationService {
       {
         code: 'MST_SERVICES',
         name: 'Services Management',
+        path: '/master/services',
         icon: 'fa-empty',
         order: 3,
         parentMenu: parents['MASTER'],
