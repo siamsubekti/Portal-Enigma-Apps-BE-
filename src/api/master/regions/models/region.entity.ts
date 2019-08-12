@@ -8,7 +8,7 @@ export default class Region {
     @Generated('uuid')
     id: string;
 
-    @Column({ enum: RegionType, length: 32, nullable: false })
+    @Column({ type: 'varchar', length: 32, nullable: false })
     type: RegionType;
 
     @Column({ type: 'varchar', length: 255, nullable: false, unique: true })

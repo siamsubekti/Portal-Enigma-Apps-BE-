@@ -10,7 +10,7 @@ export default class Template {
     @Column({ type: 'varchar', length: 255, nullable: false, unique: true })
     name: string;
 
-    @Column({ enum: TemplateType, length: 50, nullable: false })
+    @Column({ type: 'varchar', length: 50, nullable: false })
     type: TemplateType;
 
     @Column({ type: 'varchar', length: 255, nullable: true })
