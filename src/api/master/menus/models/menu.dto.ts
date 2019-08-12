@@ -1,21 +1,39 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Menu from './menu.entity';
+import { IsDefined, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
 
 export class MenuDTO {
-    @ApiModelProperty()
+    @ApiModelProperty({description: 'Menu code', type: 'string', required: true})
+    @IsDefined()
+    @IsNotEmpty()
     code: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({description: 'Menu name', type: 'string', required: true})
+    @IsDefined()
+    @IsNotEmpty()
     name: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({description: 'Menu order', type: 'number', required: true})
+    @IsDefined()
+    @IsNotEmpty()
+    @IsNumber()
     order: number;
 
-    @ApiModelProperty()
-    icon: string;
+    @ApiModelProperty({description: 'Menu icon', type: 'string', required: true})
+    @IsDefined()
+    @IsNotEmpty()
+    icon?: string;
 
-    @ApiModelProperty()
+    @ApiModelProperty({description: 'Menu path', type: 'string', required: true})
+    @IsDefined()
+    @IsNotEmpty()
+    path: string;
+
+    @ApiModelProperty({description: 'Menu parent', type: 'string', required: false})
+    @IsOptional()
+    @IsDefined()
+    @IsNotEmpty()
     parentMenu?: Menu;
 }
 

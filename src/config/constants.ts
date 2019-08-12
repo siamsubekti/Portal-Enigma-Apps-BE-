@@ -5,6 +5,12 @@ export enum AccountStatus {
   BLACKLISTED = 'BLACKLISTED',
 }
 
+export enum AccountType {
+  ADMINISTRATOR = 'ADMINISTRATOR',
+  STAFF = 'STAFF',
+  CANDIDATE = 'CANDIDATE',
+}
+
 export enum ProfileGender {
   MALE = 'MALE',
   FEMALE = 'FEMALE',

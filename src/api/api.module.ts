@@ -18,6 +18,7 @@ import LibraryModule from '../libraries/library.module';
 import AccountModule from './accounts/account.module';
 import AuthModule from './auth/auth.module';
 import MigrationModule from './migrations/migration.module';
+import CandidateModule from './candidates/candidate.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import MigrationModule from './migrations/migration.module';
     ParameterModule,
     ServicesModule,
     MigrationModule,
+    CandidateModule,
   ],
   controllers: [ ApiController],
 })

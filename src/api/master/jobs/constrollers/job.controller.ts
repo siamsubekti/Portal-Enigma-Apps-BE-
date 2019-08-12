@@ -9,10 +9,12 @@ import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { PagingData } from '../../../../libraries/responses/response.class';
 import AppConfig from '../../../../config/app.config';
+import { RolesGuard } from 'src/api/auth/guards/roles.guard';
+import { Roles } from 'src/api/auth/guards/roles.decorator';
 
 @Controller('jobs')
 @ApiUseTags('Jobs')
-@UseGuards(CookieAuthGuard)
+@UseGuards(CookieAuthGuard, RolesGuard)
 export default class JobController {
 
     constructor(
@@ -27,6 +29,7 @@ export default class JobController {
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
     @ApiOkResponse({ description: 'If success get list of Jobs', type: JobPageResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
+    @Roles('admin')
     async find(
         @Query('term') term?: string,
         @Query('sort') sort: 'asc' | 'desc' = 'asc',

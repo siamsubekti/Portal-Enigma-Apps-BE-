@@ -73,6 +73,16 @@ export default class MenuService {
         }
     }
 
+    async getWithParent(id: number): Promise<Menu> {
+        const result: Menu = await this.menuRepository.findOne({where: { id }, relations: ['parentMenu']});
+        if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
+        try {
+            return result;
+        } catch (error) {
+            throw new InternalServerErrorException('Internal Server Error');
+        }
+    }
+
     async update(id: number, form: MenuDTO): Promise<Menu> {
         const result: Menu = await this.menuRepository.findOne({ where: { id } });
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
