@@ -36,5 +36,5 @@ export class LoginResponse implements IApiResponse {
 }
 
 export interface JwtPayload {
-  accountId: string;
+  aid: string;
 }
