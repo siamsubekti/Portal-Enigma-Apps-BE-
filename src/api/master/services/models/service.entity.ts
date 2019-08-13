@@ -17,7 +17,7 @@ export default class Service {
     @Column({ name: 'endpoint_url', type: 'varchar', length: 128, nullable: false })
     endpointUrl: string;
 
-    @Column({ enum: HttpMethod, length: 6, nullable: false })
+    @Column({ type: 'varchar', length: 6, nullable: false })
     method: HttpMethod;
 
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })

@@ -15,10 +15,10 @@ export default class Account {
   @Column({ type: 'varchar', length: 64, nullable: false, select: false })
   password: string;
 
-  @Column({ enum: AccountStatus, length: 15, nullable: false, default: AccountStatus.INACTIVE })
+  @Column({type: 'varchar', length: 15, nullable: false, default: AccountStatus.INACTIVE})
   status: AccountStatus;
 
-  @Column({ name: 'account_type', enum: AccountType, length: 15, nullable: true })
+  @Column({ name: 'account_type', type: 'varchar', length: 15, nullable: true })
   accountType: AccountType;
 
   @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
