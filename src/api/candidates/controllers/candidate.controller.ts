@@ -1,13 +1,15 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ApiUseTags, ApiOperation, ApiImplicitQuery, ApiOkResponse, ApiUnauthorizedResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
 import CandidateService from '../services/candidate.service';
 import { ApiPagedResponse, ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import { AccountPagedResponse } from '../../../api/accounts/models/account.dto';
 import { PagingData } from '../../../libraries/responses/response.class';
 import AppConfig from '../../../config/app.config';
+import CookieAuthGuard from '../../../api/auth/guards/cookie.guard';
 
 @Controller('candidates')
 @ApiUseTags('Candidates')
+@UseGuards(CookieAuthGuard)
 export default class CandidateController {
     constructor(
         private readonly candidateServices: CandidateService,
@@ -15,12 +17,12 @@ export default class CandidateController {
     ) { }
 
     @Get()
-    @ApiOperation({ title: 'List of Candidates.', description: 'Get list of candidates.' })
+    @ApiOperation({ title: 'List of registered Candidates.', description: 'Get list of registered candidates.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
-    @ApiOkResponse({ description: 'List of candidates.', type: ApiPagedResponse })
+    @ApiOkResponse({ description: 'List of registered candidates.', type: ApiPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
     async get(
