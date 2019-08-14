@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import JobService from '../services/job.service';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
-import { JobDTO, JobResponse, JobPageResponse, JobResponses } from '../models/job.dto';
+import { JobDTO, JobResponse, JobPageResponse, JobResponses, JobSearchResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
@@ -48,7 +48,7 @@ export default class JobController {
     @ApiOperation({ title: 'Search Job', description: 'API search job by keywords' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'If success serach Job', type: JobPageResponse })
+    @ApiOkResponse({ description: 'If success serach Job', type: JobSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,

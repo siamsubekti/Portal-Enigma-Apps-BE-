@@ -72,3 +72,11 @@ export class ServiceResponses {
   data: Service | Service[];
   paging?: PagingData;
 }
+
+export class ServiceSearchResponse implements IApiResponse {
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+  status: ResponseStatus;
+
+  @ApiModelProperty({ description: 'Service data.', type: [ ServiceDTO ] })
+  data: ServiceDTO[];
+}

@@ -57,3 +57,11 @@ export class ParameterResponses {
   data: Parameter | Parameter[];
   paging?: PagingData;
 }
+
+export class ParameterSearchResponse implements IApiResponse {
+  @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+  status: ResponseStatus;
+
+  @ApiModelProperty({ description: 'Parameter data.', type: [ ParameterDTO ] })
+  data: ParameterDTO[];
+}

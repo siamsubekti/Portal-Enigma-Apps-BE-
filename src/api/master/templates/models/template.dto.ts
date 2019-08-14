@@ -70,3 +70,11 @@ export class TemplateResponses {
     data: Template | Template[];
     paging?: PagingData;
 }
+
+export class TemplateSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Template data.', type: [ TemplateDTO ] })
+    data: TemplateDTO[];
+}

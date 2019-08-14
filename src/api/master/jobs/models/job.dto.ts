@@ -56,3 +56,11 @@ export class JobResponses {
     data: Job | Job[];
     paging?: PagingData;
 }
+
+export class JobSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response Status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Job data.', type: [ JobDTO ] })
+    data: JobDTO[];
+}

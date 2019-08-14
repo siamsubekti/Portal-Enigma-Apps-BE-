@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import RegionService from '../services/region.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
-import { RegionDTO, RegionResponse, RegionPageResponse, RegionResponses } from '../models/region.dto';
+import { RegionDTO, RegionResponse, RegionPageResponse, RegionResponses, RegionSearchResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -65,7 +65,7 @@ export default class RegionController {
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (type, name)', type: ['type', 'name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'If success serach Regions', type: RegionPageResponse })
+    @ApiOkResponse({ description: 'If success serach Regions', type: RegionSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,

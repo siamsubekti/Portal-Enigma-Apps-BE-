@@ -56,3 +56,11 @@ export class SkillResponses {
     data: Skill | Skill[];
     paging?: PagingData;
 }
+
+export class SkillSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Skill data.', type: [ SkillDTO ] })
+    data: SkillDTO[];
+}

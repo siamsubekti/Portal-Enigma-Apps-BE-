@@ -64,3 +64,11 @@ export class RegionResponses {
     data: Region | Region[];
     paging?: PagingData;
 }
+
+export class RegionSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Region data.', type: [ RegionDTO ] })
+    data: RegionDTO[];
+}

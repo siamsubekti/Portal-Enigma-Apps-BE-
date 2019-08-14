@@ -116,3 +116,11 @@ export class AccountPrivilegeResponse {
   status?: ResponseStatus;
   data: AccountPrivilege;
 }
+
+export class AccountSearchResponse {
+  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
+  status?: ResponseStatus;
+
+  @ApiModelProperty({ description: 'Account data', type: [ Account ], required: true })
+  data: Account[];
+}
