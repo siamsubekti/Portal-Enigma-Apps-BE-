@@ -47,7 +47,6 @@ export default class RoleService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Role[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RoleService@all', true);
 
         return {
             result: result[0],

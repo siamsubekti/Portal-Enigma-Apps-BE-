@@ -59,6 +59,7 @@ export default class DegreeController {
     @ApiOkResponse({ description: 'Search result of degree.', type: ApiResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,
         @Query('order') order: 'name' = 'name',

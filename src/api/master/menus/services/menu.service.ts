@@ -28,7 +28,6 @@ export default class MenuService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Menu[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'MenuService@all', true);
 
         return {
             result: result[0],
