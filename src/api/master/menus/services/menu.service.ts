@@ -1,6 +1,6 @@
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Menu from '../models/menu.entity';
-import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO, MenuQueryDTO, MenuQueryResult } from '../models/menu.dto';
 

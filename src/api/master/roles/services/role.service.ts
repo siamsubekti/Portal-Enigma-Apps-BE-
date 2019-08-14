@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
