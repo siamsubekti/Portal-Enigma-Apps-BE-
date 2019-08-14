@@ -72,6 +72,12 @@ export default class MigrationService {
         method: HttpMethod.GET,
       },
       {
+        code: 'MST_SERVICE_SEARCH',
+        name: 'Search Services',
+        endpointUrl: '/services/search',
+        method: HttpMethod.GET,
+      },
+      {
         code: 'MST_SERVICE_GET',
         name: 'Get Single Service',
         endpointUrl: '/services',
@@ -99,6 +105,12 @@ export default class MigrationService {
         code: 'MST_MENU_LIST',
         name: 'List All Menus',
         endpointUrl: '/menus',
+        method: HttpMethod.GET,
+      },
+      {
+        code: 'MST_MENU_SEARCH',
+        name: 'Search Menus',
+        endpointUrl: '/menus/search',
         method: HttpMethod.GET,
       },
       {
@@ -132,6 +144,12 @@ export default class MigrationService {
         method: HttpMethod.GET,
       },
       {
+        code: 'MST_ROLE_SEARCH',
+        name: 'Search Roles',
+        endpointUrl: '/roles/search',
+        method: HttpMethod.GET,
+      },
+      {
         code: 'MST_ROLE_GET',
         name: 'Get Single Role',
         endpointUrl: '/roles',
@@ -159,6 +177,12 @@ export default class MigrationService {
         code: 'MST_ACCOUNT_LIST',
         name: 'List All Accounts',
         endpointUrl: '/accounts',
+        method: HttpMethod.GET,
+      },
+      {
+        code: 'MST_ACCOUNT_SEARCH',
+        name: 'Search Accounts',
+        endpointUrl: '/accounts/search',
         method: HttpMethod.GET,
       },
       {
