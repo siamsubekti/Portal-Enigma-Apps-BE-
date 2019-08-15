@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import SkillService from '../services/skill.service';
 import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
-import { SkillDTO, SkillPageResponse, SkillResponse, SkillResponses } from '../models/skill.dto';
+import { SkillDTO, SkillPageResponse, SkillResponse, SkillResponses, SkillSearchResponse } from '../models/skill.dto';
 import Skill from '../models/skill.entity';
 import { DeleteResult } from 'typeorm';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -48,7 +48,7 @@ export default class SkillsController {
     @ApiOperation({ title: 'Search Skills', description: 'API search Skills by keywords' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'If success serach Skills', type: SkillPageResponse })
+    @ApiOkResponse({ description: 'If success serach Skills', type: SkillSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,

@@ -10,7 +10,7 @@ import {
     ApiUnauthorizedResponse,
     ApiImplicitQuery,
 } from '@nestjs/swagger';
-import { TemplateDTO, TemplatePageResponse, TemplateResponse, TemplateResponses } from '../models/template.dto';
+import { TemplateDTO, TemplatePageResponse, TemplateResponse, TemplateResponses, TemplateSearchResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
@@ -59,7 +59,7 @@ export default class TemplateController {
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (type, name)', type: ['type', 'name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'If success serach Template', type: TemplatePageResponse })
+    @ApiOkResponse({ description: 'If success serach Template', type: TemplateSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,
