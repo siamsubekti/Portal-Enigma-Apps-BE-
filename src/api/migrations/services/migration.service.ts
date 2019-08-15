@@ -42,7 +42,7 @@ export default class MigrationService {
     await this.createDefaultServices();
     await this.createDefaultMenus();
     await this.createRoles();
-    await this.createAccount();
+    await this.createAccounts();
   }
 
   private async createDefaultServices(): Promise<void> {
@@ -69,6 +69,12 @@ export default class MigrationService {
         code: 'MST_SERVICE_LIST',
         name: 'List All Services',
         endpointUrl: '/services',
+        method: HttpMethod.GET,
+      },
+      {
+        code: 'MST_SERVICE_SEARCH',
+        name: 'Search Services',
+        endpointUrl: '/services/search',
         method: HttpMethod.GET,
       },
       {
@@ -102,6 +108,12 @@ export default class MigrationService {
         method: HttpMethod.GET,
       },
       {
+        code: 'MST_MENU_SEARCH',
+        name: 'Search Menus',
+        endpointUrl: '/menus/search',
+        method: HttpMethod.GET,
+      },
+      {
         code: 'MST_MENU_GET',
         name: 'Get Single Menu',
         endpointUrl: '/menus',
@@ -129,6 +141,12 @@ export default class MigrationService {
         code: 'MST_ROLE_LIST',
         name: 'List All Roles',
         endpointUrl: '/roles',
+        method: HttpMethod.GET,
+      },
+      {
+        code: 'MST_ROLE_SEARCH',
+        name: 'Search Roles',
+        endpointUrl: '/roles/search',
         method: HttpMethod.GET,
       },
       {
@@ -162,6 +180,12 @@ export default class MigrationService {
         method: HttpMethod.GET,
       },
       {
+        code: 'MST_ACCOUNT_SEARCH',
+        name: 'Search Accounts',
+        endpointUrl: '/accounts/search',
+        method: HttpMethod.GET,
+      },
+      {
         code: 'MST_ACCOUNT_GET',
         name: 'Get Account',
         endpointUrl: '/accounts',
@@ -188,36 +212,15 @@ export default class MigrationService {
          code: 'HOME',
          name: 'Home',
          path: '/home',
-         icon: 'fa-home',
+         icon: 'home',
          order: 0,
-      },
-      {
-        code: 'CANDIDATE',
-        name: 'Candidate Menu',
-        path: '/candidate',
-        icon: 'fa-user',
-        order: 1,
-      },
-      {
-        code: 'HC',
-        name: 'Human Capital Menu',
-        path: '/human-capital',
-        icon: 'fa-user',
-        order: 2,
-      },
-      {
-        code: 'STAFF',
-        name: 'Staff Menu',
-        path: '/staff',
-        icon: 'fa-user',
-        order: 3,
       },
       {
         code: 'MASTER',
         name: 'Master Data',
         path: '/master',
-        icon: 'fa-database',
-        order: 4,
+        icon: 'settings',
+        order: 1,
       },
     ];
 
@@ -236,7 +239,6 @@ export default class MigrationService {
         code: 'MST_ACCOUNTS',
         name: 'Accounts Management',
         path: '/master/accounts',
-        icon: 'fa-groups',
         order: 0,
         parentMenu: parents[ 'MASTER' ],
       },
@@ -244,7 +246,6 @@ export default class MigrationService {
         code: 'MST_ROLES',
         name: 'Roles Management',
         path: '/master/roles',
-        icon: 'fa-empty',
         order: 1,
         parentMenu: parents['MASTER'],
       },
@@ -252,7 +253,6 @@ export default class MigrationService {
         code: 'MST_MENUS',
         name: 'Menus Management',
         path: '/master/menus',
-        icon: 'fa-empty',
         order: 2,
         parentMenu: parents['MASTER'],
       },
@@ -260,7 +260,6 @@ export default class MigrationService {
         code: 'MST_SERVICES',
         name: 'Services Management',
         path: '/master/services',
-        icon: 'fa-empty',
         order: 3,
         parentMenu: parents['MASTER'],
       },
@@ -278,22 +277,16 @@ export default class MigrationService {
   private async createRoles(): Promise<void> {
     const data: RoleDTO[] = [
       {
-        code: 'SUDO',
-        name: 'Superuser',
-        services: this.services,
-        menus: this.menus,
-      },
-      {
         code: 'ADMIN',
         name: 'Administrator',
         services: this.services,
         menus: this.menus,
       },
       {
-        code: 'CANDIDATE',
-        name: 'Candidate',
+        code: 'STAFF',
+        name: 'Staff',
         services: [],
-        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE'].indexOf(menu.code) >= 0),
+        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
       },
     ];
 
@@ -306,29 +299,54 @@ export default class MigrationService {
     });
   }
 
-  private async createAccount(): Promise<void> {
+  private async createAccounts(): Promise<void> {
     Logger.log(`Creating new account..`);
 
-    const profile: Profile = this.profile.repository().create({
-      fullname: 'Adisthya Rahmadyan',
-      nickname: 'Adis',
-      email: 'adisthya.rahmadyan@sqrtechno.com',
-      phone: '087887202505',
+    let profile: Profile = this.profile.repository().create({
+      fullname: 'Administrator',
+      nickname: 'Mimin',
+      email: 'administrator@enigmacamp.com',
+      phone: '-',
       gender: ProfileGender.MALE,
       religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.MARRIED,
-      birthdate: new Date(1986, 3, 16, 0, 0, 0, 0),
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2000, 1, 1, 0, 0, 0, 0),
     });
 
     let account: Account = this.account.repository().create({
-      username: profile.email,
+      username: 'admin',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
       profile,
     });
 
     account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['SUDO'] ]);
+    account.roles = Promise.resolve([ this.roles['ADMIN'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
+
+    profile = this.profile.repository().create({
+      fullname: 'Staff Backoffice',
+      nickname: 'Staff 1',
+      email: 'staff1@enigmacamp.com',
+      phone: '-',
+      gender: ProfileGender.FEMALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2000, 1, 1, 0, 0, 0, 0),
+    });
+
+    account = this.account.repository().create({
+      username: 'staff1',
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['STAFF'] ]);
 
     await this.account.save(account);
 

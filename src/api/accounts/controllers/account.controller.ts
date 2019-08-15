@@ -87,6 +87,7 @@ export default class AccountController {
     const account: Account = request.user;
     const data: AccountPrivilege = await this.accountService.buildAccountPrivileges(account.id);
 
+    // Logger.log({ account, data }, 'AccountController@privileges', true);
     return { data };
   }
 

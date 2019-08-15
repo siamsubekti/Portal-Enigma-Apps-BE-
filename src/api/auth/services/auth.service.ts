@@ -58,6 +58,8 @@ export default class AuthService {
           redirectTo: await this.service.findByCode('MST_ACCOUNT_PRIVILEGES'),
         };
 
+      // Logger.log({ account }, 'AuthService@login', true);
+
       return loginResponse;
     } catch (error) {
       Logger.error(error);
@@ -150,8 +152,10 @@ export default class AuthService {
       const client: IORedis.Redis = await this.redisService.getClient();
       const token: string = await client.get(cookie);
       const payload: JwtPayload = jwtVerify(token, this.config.get('HASH_SECRET')) as JwtPayload;
+      const account: Account = await this.accountService.get(payload.aid);
 
-      return await this.accountService.get(payload.accountId);
+      // Logger.log({account, payload, token}, 'AuthService@validateSession', true);
+      return account;
 
     } catch (error) {
       Logger.error(error, undefined, 'AuthService');
@@ -163,8 +167,10 @@ export default class AuthService {
     const expiresIn: number = Number(this.config.get('SESSION_EXPIRES')) / 1000; // 1 day in seconds
     const client: IORedis.Redis = await this.redisService.getClient();
     const sessionId: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}-session`);
-    const token: string = jwtSign({ aid: account.id }, this.config.get('HASH_SECRET'), { expiresIn });
+    const payload: JwtPayload = { aid: account.id };
+    const token: string = jwtSign(payload, this.config.get('HASH_SECRET'), { expiresIn });
 
+    // Logger.log({account, sessionId, token}, 'AuthService@createSession', true);
     await client.set(sessionId, token);
     await client.expire(sessionId, expiresIn);
     return sessionId;
