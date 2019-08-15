@@ -22,7 +22,7 @@ export default class RoleController {
     private readonly config: AppConfig) { }
 
   @Get()
-  @ApiOperation({ title: 'List of Roles.', description: 'Get list of roles from database.'})
+  @ApiOperation({ title: 'List of Roles.', description: 'Get list of roles from database.' })
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, or name)', type: ['code', 'name'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -32,42 +32,39 @@ export default class RoleController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
   async allRole(
-      @Query('term') term?: string,
-      @Query('order') order: 'code' | 'name' = 'name',
-      @Query('sort') sort: 'asc' | 'desc' = 'asc',
-      @Query('page') page: number = 1,
+    @Query('term') term?: string,
+    @Query('order') order: 'code' | 'name' = 'name',
+    @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    @Query('page') page: number = 1,
   ): Promise<RolePagedResponse> {
-      const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-      const { result: data = [], totalRows } = await this.roleService.all({ term, order, sort, page, rowsPerPage });
-      const paging: PagingData = {
+    const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
+    const { result: data = [], totalRows } = await this.roleService.all({ term, order, sort, page, rowsPerPage });
+    const paging: PagingData = {
       page,
       rowsPerPage,
-      totalPages: Math.ceil( totalRows / rowsPerPage ),
+      totalPages: Math.ceil(totalRows / rowsPerPage),
       totalRows,
-      };
-      return {
-          status: {
-              code: '200',
-              description: 'Success',
-          }, data, paging };
+    };
+
+    return { data, paging };
   }
 
   @Get('search')
-    @ApiOperation({ title: 'Search Role.', description: 'Search role.'})
-    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
-    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
-    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-    async search(
-        @Query('term') term?: string,
-        @Query('order') order: 'code' | 'name' = 'name',
-        @Query('sort') sort: 'asc' | 'desc' = 'asc',
-    ): Promise<RoleResponse> {
-        const { result: data = [] } = await this.roleService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
+  @ApiOperation({ title: 'Search Role.', description: 'Search role.' })
+  @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+  @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
+  @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+  @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async search(
+    @Query('term') term?: string,
+    @Query('order') order: 'code' | 'name' = 'name',
+    @Query('sort') sort: 'asc' | 'desc' = 'asc',
+  ): Promise<RoleResponse> {
+    const { result: data = [] } = await this.roleService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
 
-        return { data };
+    return { data };
   }
 
   @Post()
