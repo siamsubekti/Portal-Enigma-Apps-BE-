@@ -10,6 +10,7 @@ import Role from '../../master/roles/models/role.entity';
 import RoleService from 'src/api/master/roles/services/role.service';
 import ProfileService from './profile.service';
 import MenuService from 'src/api/master/menus/services/menu.service';
+import HashUtil from 'src/libraries/utilities/hash.util';
 
 @Injectable()
 export default class AccountService {
@@ -19,6 +20,7 @@ export default class AccountService {
     private readonly roleServices: RoleService,
     private readonly profilService: ProfileService,
     private readonly menuService: MenuService,
+    private readonly hashUtil: HashUtil,
   ) { }
 
   repository(): Repository<Account> {
@@ -73,7 +75,7 @@ export default class AccountService {
     profile.nickname = data.nickname || data.fullname.substring(0, data.fullname.indexOf(' '));
     profile.email = data.email;
     profile.phone = data.phone;
-    profile.birthdate = moment(`${data.birthdate} 00:00:00`, 'DD-MM-YYYY HH:mm:ss').toDate();
+    profile.birthdate = moment(data.birthdate, 'DD-MM-YYYY').toDate();
     profile.gender = data.gender;
     profile.religion = data.religion;
     profile.maritalStatus = data.maritalStatus;
@@ -162,31 +164,36 @@ export default class AccountService {
   // return code 422 message = 'please reset password';
 
   async create(accountDto: AccountProfileDTO): Promise<Account> {
-
     const usernameExist: boolean = await this.account.count({ where: { username: accountDto.username } }) > 0;
     const nickName: Profile = await this.profilService.findNickname(accountDto.nickname);
     const email: Profile = await this.profilService.findMail(accountDto.email);
 
-    if (usernameExist) throw new BadRequestException('Username has exist.');
-    else if (nickName) throw new BadRequestException('Nickname has exist.');
-    else if (email) throw new BadRequestException('Email has exist.');
+    if (usernameExist) throw new BadRequestException('Username has already been taken.');
+    if (nickName) throw new BadRequestException('Nickname has already been taken.');
+    if (email) throw new BadRequestException('Email has already been taken.');
 
     let profile: Profile = new Profile();
     profile.fullname = accountDto.fullname;
     profile.nickname = accountDto.nickname || accountDto.fullname.substring(0, accountDto.fullname.indexOf(' '));
     profile.email = accountDto.email;
     profile.phone = accountDto.phone;
+    profile.birthdate = moment(accountDto.birthdate, 'DD-MM-YYYY').toDate();
+    profile.gender = accountDto.gender;
+    profile.religion = accountDto.religion;
+    profile.maritalStatus = accountDto.maritalStatus;
 
     profile = await this.profilService.save(profile);
 
     const account: Account = new Account();
     account.username = accountDto.username;
-    account.password = process.env.DEFAULT_PASSWORD;
+    account.password = await this.hashUtil.create(process.env.DEFAULT_PASSWORD);
     account.profile = profile;
     account.status = AccountStatus.SUSPENDED;
 
-    const roles: Role[] = await this.roleServices.findAllRelated(accountDto.roles);
-    account.roles = Promise.resolve(roles);
+    if (accountDto.roles) {
+      const roles: Role[] = await this.roleServices.findAllRelated(accountDto.roles);
+      account.roles = Promise.resolve(roles);
+    }
 
     return await this.account.save(account);
   }

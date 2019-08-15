@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import * as moment from 'moment-timezone';
 import * as cookieParser from 'cookie-parser';
 import * as limiter from 'express-rate-limit';
 import * as compression from 'compression';
@@ -31,6 +32,7 @@ async function bootstrap(): Promise<void> {
   // app.setBaseViewsDir(join(__dirname, 'views'));
   // app.setViewEngine('hbs');
 
+  moment.tz.setDefault(process.env.TZ);
   await app.listen(process.env.API_PORT, '0.0.0.0');
 }
 
