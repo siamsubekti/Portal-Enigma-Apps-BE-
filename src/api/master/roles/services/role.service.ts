@@ -57,14 +57,13 @@ export default class RoleService {
         if (checkCode) throw new BadRequestException('This role code is already taken.');
         try {
             const { code, name, menus, services } = roleDTO;
-            let role: Role = new Role();
+            const role: Role = new Role();
             role.code = code;
             role.name = name;
             role.menus = this.menuServices.findAllRelated(menus);
             role.services = this.serviceServices.findAllRelated(services);
 
-            role = await this.roleRepository.save(role);
-            return role;
+            return await this.roleRepository.save(role);
         } catch (error) {
             throw new InternalServerErrorException('Internal Server Error');
         }
