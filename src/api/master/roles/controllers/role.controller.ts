@@ -84,10 +84,14 @@ export default class RoleController {
   @ApiOkResponse({ description: 'Detail Role', type: RoleResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   @UseInterceptors(ResponseRebuildInterceptor)
-  async getRole(@Param('id') id: number): Promise<Role> {
+  async getRole(@Param('id') id: number): Promise<any> {
     const role: Role = await this.roleService.get(id);
-    Logger.log(role);
-    return role;
+
+    return {
+      ...role,
+      menus: await (Object.create(role).menus),
+      services: await (Object.create(role).services),
+    };
   }
 
   @Put(':id')

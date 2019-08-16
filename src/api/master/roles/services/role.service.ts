@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, BadRequestException, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -41,7 +41,6 @@ export default class RoleService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Role[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RoleService@all', true);
 
         return {
             result: result[0],
@@ -70,7 +69,7 @@ export default class RoleService {
     }
 
     async get(id: number): Promise<Role> {
-        const role: Role = await this.roleRepository.findOne({ where: { id }, relations: ['menus', 'services'] });
+        const role: Role = await this.roleRepository.findOne(id);
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             return role;
@@ -80,7 +79,7 @@ export default class RoleService {
     }
 
     async update(id: number, roleDTO: RoleDTO): Promise<Role> {
-        const role: Role = await this.roleRepository.findOne({ where: { id } });
+        const role: Role = await this.roleRepository.findOne(id);
         if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
         try {
             const { code, name, menus, services } = roleDTO;

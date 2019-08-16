@@ -35,7 +35,6 @@ export default class MajorService {
         query.limit( queryParams.rowsPerPage );
 
         const result: [ Major[], number ] = await query.getManyAndCount();
-        Logger.log(queryParams, 'MajorsService@all', true);
 
         return {
           result: result[0],

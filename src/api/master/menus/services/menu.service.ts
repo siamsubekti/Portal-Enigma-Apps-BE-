@@ -1,6 +1,6 @@
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Menu from '../models/menu.entity';
-import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO, MenuQueryDTO, MenuQueryResult } from '../models/menu.dto';
 
@@ -28,7 +28,6 @@ export default class MenuService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Menu[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'MenuService@all', true);
 
         return {
             result: result[0],

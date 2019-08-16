@@ -35,7 +35,6 @@ export default class DegreeService {
         query.limit( queryParams.rowsPerPage );
 
         const result: [ Degree[], number ] = await query.getManyAndCount();
-        Logger.log(queryParams, 'DegreesService@all', true);
 
         return {
           result: result[0],

@@ -46,11 +46,7 @@ export default class MajorController {
         totalPages: Math.ceil( totalRows / rowsPerPage ),
         totalRows,
         };
-        return {
-            status: {
-                code: '200',
-                description: 'Success',
-            }, data, paging };
+        return { data, paging };
     }
 
     @Get('search')
@@ -61,6 +57,7 @@ export default class MajorController {
     @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,
         @Query('order') order: 'name' = 'name',
