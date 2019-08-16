@@ -7,42 +7,43 @@ import { RegionType } from 'src/config/constants';
 
 export class RegionDTO {
 
-    @ApiModelProperty({ enum: RegionType, maxLength: 32, required: true })
+    @ApiModelProperty({ description: 'Type of a region (VILLAGE, CITY, and more).', enum: RegionType, maxLength: 32, required: true })
     @IsDefined()
     @IsEnum(RegionType)
     @IsNotEmpty()
     @MaxLength(32)
     type: RegionType;
 
-    @ApiModelProperty({ type: 'string', uniqueItems: true, maxLength: 255, required: true })
+    @ApiModelProperty({ description: 'Name of a region.', type: 'string', uniqueItems: true, maxLength: 255, required: true })
     @IsDefined()
     @IsNotEmpty()
     @MaxLength(255)
     name: string;
 
-    @ApiModelProperty({ type: Region, required: false })
+    @ApiModelProperty({ description: 'Description about the region.', type: Region, required: false })
     @IsOptional()
     @IsDefined()
     parent?: Region;
 }
 
 export class RegionResponse implements IApiResponse {
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: RegionDTO })
+    @ApiModelProperty({ description: 'Region data.', type: RegionDTO })
     data: RegionDTO;
 }
 
 export class RegionPageResponse implements IApiPagedResponse {
-    @ApiModelProperty({ type: PagingData })
-    paging: PagingData;
 
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: RegionDTO })
+    @ApiModelProperty({ description: 'List of regions.', type: [ RegionDTO ] })
     data: RegionDTO[];
+
+    @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+    paging: PagingData;
 }
 
 export class RegionQueryDTO {
@@ -62,4 +63,12 @@ export class RegionResponses {
     status?: ResponseStatus;
     data: Region | Region[];
     paging?: PagingData;
+}
+
+export class RegionSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Region data.', type: [ RegionDTO ] })
+    data: RegionDTO[];
 }

@@ -6,35 +6,36 @@ import Skill from './skill.entity';
 
 export class SkillDTO {
 
-    @ApiModelProperty({ type: 'string', maxLength: 255, required: true, uniqueItems: true })
+    @ApiModelProperty({ description: 'Name of skill.', type: 'string', maxLength: 255, required: true, uniqueItems: true })
     @IsDefined()
     @IsNotEmpty()
     @MaxLength(255)
     name: string;
 
-    @ApiModelProperty({ type: 'string', required: false })
+    @ApiModelProperty({ description: 'Description about the skill.', type: 'string', required: false })
     @IsOptional()
     @IsDefined()
     description: string;
 }
 
 export class SkillResponse implements IApiResponse {
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: SkillDTO })
+    @ApiModelProperty({ description: 'Skill data.', type: SkillDTO })
     data: SkillDTO;
 }
 
 export class SkillPageResponse implements IApiPagedResponse {
-    @ApiModelProperty({ type: PagingData })
-    paging: PagingData;
 
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: SkillDTO })
+    @ApiModelProperty({ description: 'List of skills.', type: [ SkillDTO ] })
     data: SkillDTO[];
+
+    @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+    paging: PagingData;
 }
 
 export class SkillQueryDTO {
@@ -54,4 +55,12 @@ export class SkillResponses {
     status?: ResponseStatus;
     data: Skill | Skill[];
     paging?: PagingData;
+}
+
+export class SkillSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Skill data.', type: [ SkillDTO ] })
+    data: SkillDTO[];
 }

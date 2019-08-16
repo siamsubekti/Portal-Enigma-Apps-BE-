@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiController } from './main/api.controller';
+import { DocumentModule } from './resumes/document/document.module';
 import JobModule from './master/jobs/job.module';
 import RegionsModule from './master/regions/regions.module';
 import SkillsModule from './master/skills/skills.module';
@@ -18,6 +19,7 @@ import LibraryModule from '../libraries/library.module';
 import AccountModule from './accounts/account.module';
 import AuthModule from './auth/auth.module';
 import MigrationModule from './migrations/migration.module';
+import CandidateModule from './candidates/candidate.module';
 
 @Module({
   imports: [
@@ -33,7 +35,7 @@ import MigrationModule from './migrations/migration.module';
     RoleModule,
     MenuModule,
     TypeOrmModule.forRootAsync({
-      imports: [ ConfigModule ],
+      imports: [ConfigModule],
       useClass: DatabaseConnectionConfig,
     }),
     AccountModule,
@@ -41,7 +43,9 @@ import MigrationModule from './migrations/migration.module';
     ParameterModule,
     ServicesModule,
     MigrationModule,
+    CandidateModule,
+    DocumentModule,
   ],
-  controllers: [ ApiController],
+  controllers: [ApiController],
 })
-export default class ApiModule {}
+export default class ApiModule { }
