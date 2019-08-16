@@ -9,8 +9,8 @@ import Profile from '../models/profile.entity';
 import Role from '../../master/roles/models/role.entity';
 import RoleService from '../../../api/master/roles/services/role.service';
 import ProfileService from './profile.service';
-import MenuService from 'src/api/master/menus/services/menu.service';
-import HashUtil from 'src/libraries/utilities/hash.util';
+import HashUtil from '../../../libraries/utilities/hash.util';
+import MenuService from '../../../api/master/menus/services/menu.service';
 
 @Injectable()
 export default class AccountService {
@@ -19,8 +19,8 @@ export default class AccountService {
     private readonly account: Repository<Account>,
     private readonly roleServices: RoleService,
     private readonly profilService: ProfileService,
-    private readonly hashUtil: HashUtil,
     private readonly menuService: MenuService,
+    private readonly hashUtil: HashUtil,
   ) { }
 
   repository(): Repository<Account> {

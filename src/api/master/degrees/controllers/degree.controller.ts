@@ -44,11 +44,7 @@ export default class DegreeController {
         totalPages: Math.ceil( totalRows / rowsPerPage ),
         totalRows,
         };
-        return {
-            status: {
-                code: '200',
-                description: 'Success',
-            }, data, paging };
+        return { data, paging };
     }
 
     @Get('search')
