@@ -16,7 +16,7 @@ export default class RoleService {
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
-        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r').select('r');
+        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r');
 
         if (queryParams.term) {
             let { term } = queryParams;
