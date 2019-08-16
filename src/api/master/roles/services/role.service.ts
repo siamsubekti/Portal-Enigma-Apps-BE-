@@ -5,6 +5,8 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
 import ServicesService from '../../services/services/services.service';
 import MenuService from '../../menus/services/menu.service';
+import Menu from '../../menus/models/menu.entity';
+import Service from '../../services/models/service.entity';
 
 @Injectable()
 export default class RoleService {
@@ -57,10 +59,13 @@ export default class RoleService {
         try {
             const { code, name, menus, services } = roleDTO;
             const role: Role = new Role();
+            const menu: Menu[] = await this.menuServices.findAllRelated(menus);
+            const service: Service[] = await this.serviceServices.findAllRelated(services);
+
             role.code = code;
             role.name = name;
-            role.menus = this.menuServices.findAllRelated(menus);
-            role.services = this.serviceServices.findAllRelated(services);
+            role.menus = Promise.resolve(menu);
+            role.services = Promise.resolve(service);
 
             return await this.roleRepository.save(role);
         } catch (error) {
