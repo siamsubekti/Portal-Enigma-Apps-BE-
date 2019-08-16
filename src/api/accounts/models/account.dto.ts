@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail, IsEnum } from 'class-validator';
+import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail, IsEnum, IsOptional } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
 import Account from './account.entity';
@@ -41,7 +41,6 @@ export class AccountProfileDTO {
   @IsNotEmpty()
   @MinLength(5)
   @MaxLength(255)
-  @IsEmail()
   username: string;
 
   @ApiModelProperty({ description: 'Account fullname.', type: 'string', required: true })
@@ -57,6 +56,7 @@ export class AccountProfileDTO {
   @ApiModelProperty({ description: 'Account email.', type: 'string', required: true, uniqueItems: true })
   @IsDefined()
   @IsNotEmpty()
+  @IsEmail()
   email: string;
 
   @ApiModelProperty({ description: 'Account phone.', type: 'string', required: true })
@@ -64,7 +64,7 @@ export class AccountProfileDTO {
   @IsNotEmpty()
   phone: string;
 
-  @ApiModelProperty({ description: 'Account birthdate.', type: 'string', required: true })
+  @ApiModelProperty({ description: 'Account birthdate.', type: 'string', required: true, example: '31-12-1991' })
   @IsDefined()
   @IsNotEmpty()
   birthdate: string;
@@ -87,9 +87,29 @@ export class AccountProfileDTO {
   @IsEnum(ProfileMaritalStatus)
   maritalStatus: ProfileMaritalStatus;
 
-  @ApiModelProperty({ type: Role, required: false})
+  @ApiModelProperty({ type: [Role], required: false})
+  @IsOptional()
   @IsDefined()
-  roles: Role[];
+  @IsNotEmpty()
+  roles?: Role[];
+
+  @ApiModelProperty({ type: 'string', required: false})
+  @IsOptional()
+  @IsDefined()
+  @IsNotEmpty()
+  newPassword?: string;
+
+  @ApiModelProperty({ type: 'string', required: false})
+  @IsOptional()
+  @IsDefined()
+  @IsNotEmpty()
+  confirmPassword?: string;
+
+  @ApiModelProperty({ type: 'string', required: false})
+  @IsOptional()
+  @IsDefined()
+  @IsNotEmpty()
+  currentPassword?: string;
 }
 
 export class AccountQueryDTO {
