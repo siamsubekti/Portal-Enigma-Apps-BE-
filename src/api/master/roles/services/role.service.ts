@@ -5,6 +5,8 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { RoleDTO, RoleQueryDTO, RoleQueryResult } from '../models/role.dto';
 import ServicesService from '../../services/services/services.service';
 import MenuService from '../../menus/services/menu.service';
+import Menu from '../../menus/models/menu.entity';
+import Service from '../../services/models/service.entity';
 
 @Injectable()
 export default class RoleService {
@@ -56,14 +58,16 @@ export default class RoleService {
         if (checkCode) throw new BadRequestException('This role code is already taken.');
         try {
             const { code, name, menus, services } = roleDTO;
-            let role: Role = new Role();
+            const role: Role = new Role();
+            const menu: Menu[] = await this.menuServices.findAllRelated(menus);
+            const service: Service[] = await this.serviceServices.findAllRelated(services);
+
             role.code = code;
             role.name = name;
-            role.menus = this.menuServices.findAllRelated(menus);
-            role.services = this.serviceServices.findAllRelated(services);
+            role.menus = Promise.resolve(menu);
+            role.services = Promise.resolve(service);
 
-            role = await this.roleRepository.save(role);
-            return role;
+            return await this.roleRepository.save(role);
         } catch (error) {
             throw new InternalServerErrorException('Internal Server Error');
         }
