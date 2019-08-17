@@ -6,35 +6,36 @@ import Job from './job.entity';
 
 export class JobDTO {
 
-    @ApiModelProperty({ type: 'string', uniqueItems: true, required: true, maxLength: 255 })
+    @ApiModelProperty({ description: 'Name of job.', type: 'string', uniqueItems: true, required: true, maxLength: 255 })
     @IsDefined()
     @IsNotEmpty()
     @MaxLength(255)
     name: string;
 
-    @ApiModelProperty({ type: 'string', required: false })
+    @ApiModelProperty({ description: 'Descriptions about the job.', type: 'string', required: false })
     @IsOptional()
     @IsDefined()
     description: string;
 }
 
 export class JobResponse implements IApiResponse {
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response Status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: JobDTO })
+    @ApiModelProperty({ description: 'Job data.', type: JobDTO })
     data: JobDTO;
 }
 
 export class JobPageResponse implements IApiPagedResponse {
-    @ApiModelProperty({ type: PagingData })
-    paging: PagingData;
 
-    @ApiModelProperty({ type: ResponseStatus })
+    @ApiModelProperty({ description: 'Response Status.', type: ResponseStatus })
     status: ResponseStatus;
 
-    @ApiModelProperty({ type: JobDTO })
+    @ApiModelProperty({ description: 'List of jobs.', type: [ JobDTO ] })
     data: JobDTO[];
+
+    @ApiModelProperty({ description: 'Paging data.', type: PagingData })
+    paging: PagingData;
 }
 
 export class JobQueryDTO {
@@ -54,4 +55,12 @@ export class JobResponses {
     status?: ResponseStatus;
     data: Job | Job[];
     paging?: PagingData;
+}
+
+export class JobSearchResponse implements IApiResponse {
+    @ApiModelProperty({ description: 'Response Status.', type: ResponseStatus })
+    status: ResponseStatus;
+
+    @ApiModelProperty({ description: 'Job data.', type: [ JobDTO ] })
+    data: JobDTO[];
 }

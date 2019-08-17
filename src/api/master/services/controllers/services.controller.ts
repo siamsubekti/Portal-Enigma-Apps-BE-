@@ -2,7 +2,7 @@ import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, 
 import ServicesService from '../services/services.service';
 import { ApiOkResponse, ApiOperation, ApiUseTags, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiBadRequestResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses } from '../models/service.dto';
+import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses, ServiceSearchResponse } from '../models/service.dto';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
 import Service from '../models/service.entity';
 import { PagingData } from '../../../../libraries/responses/response.class';
@@ -50,7 +50,7 @@ export default class ServicesController {
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-   @ApiOkResponse({ description: 'If success search Services', type: ServicePageResponse })
+   @ApiOkResponse({ description: 'If success search Services', type: ServiceSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,

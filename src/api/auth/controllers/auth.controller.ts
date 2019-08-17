@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, Put, Param, UseInterceptors } from '@nestjs/common';
+import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, Put, Param, UseInterceptors, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
 import {
   ApiUseTags,
@@ -21,6 +21,7 @@ import AuthService from '../services/auth.service';
 import CookieAuthGuard from '../guards/cookie.guard';
 import AppConfig from '../../../config/app.config';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
+import { ResponseStatus } from 'src/libraries/responses/response.class';
 
 @ApiUseTags('Authentication')
 @Controller('auth')
@@ -40,7 +41,7 @@ export default class AuthController {
   async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
     const credential: LoginResponseDTO = await this.authService.login(form);
 
-    if (credential) {
+    if (credential && credential.sessionId !== null) {
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential);
       response.cookie('EPSESSION', credential.sessionId, {
         maxAge: Number(this.config.get('SESSION_EXPIRES')),
@@ -49,8 +50,15 @@ export default class AuthController {
       });
 
       response.json(body);
-    } else
-      throw new ForbiddenException('Invalid account credential.');
+    } else if (credential && credential.sessionId === null) {
+      const resStatus: ResponseStatus = {
+        code: HttpStatus.UNPROCESSABLE_ENTITY.toString(),
+        description: 'Please reset your password !',
+      };
+      const body: LoginResponse = this.responseUtil.rebuildResponse(credential, resStatus);
+
+      response.json(body);
+    } else throw new ForbiddenException('Invalid account credential.');
   }
 
   @Delete('logout')

@@ -26,7 +26,7 @@ export default class AuthService {
     private readonly templateUtil: TemplateUtil,
     private readonly redisService: RedisService,
     private readonly config: AppConfig,
-  ) {}
+  ) { }
 
   async getAccountPrivileges(accountId: string): Promise<AccountPrivilege> {
     try {
@@ -42,7 +42,16 @@ export default class AuthService {
     const account: Account = await this.accountService.findByUsername(credential.username);
 
     try {
-      if ( account && await this.hashUtil.compare(credential.password, account.password) )
+      if (!account) {
+        const suspendedAccount: Account = await this.accountService.findSuspendedAccount(credential.username);
+        if (suspendedAccount && await this.hashUtil.compare(credential.password, suspendedAccount.password))
+          loginResponse = {
+            accountId: suspendedAccount.id,
+            sessionId: null,
+            redirectTo: null,
+          };
+        return loginResponse;
+      } else if (account && await this.hashUtil.compare(credential.password, account.password))
         loginResponse = {
           accountId: account.id,
           sessionId: await this.createSession(account),
@@ -66,7 +75,7 @@ export default class AuthService {
       else {
         await client.unlink(sessionId);
 
-        return !( await client.exists(sessionId) );
+        return !(await client.exists(sessionId));
       }
     } catch (error) {
       Logger.error(error, undefined, 'AuthService');
@@ -181,7 +190,7 @@ export default class AuthService {
         html,
       });
 
-      return ( response ? true : false );
+      return (response ? true : false);
     } catch (exception) {
       Logger.error(exception, exception, 'AuthService @sendPasswordResetEmail');
 
