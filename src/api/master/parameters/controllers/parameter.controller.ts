@@ -1,4 +1,4 @@
-import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpCode, Param, Body, UseGuards, UseInterceptors, Query, Logger } from '@nestjs/common';
+import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpCode, Param, Body, UseGuards, UseInterceptors, Query } from '@nestjs/common';
 import ParameterService from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse, ParameterResponses } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
@@ -58,7 +58,7 @@ export default class ParameterController {
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<ParameterResponses> {
         const { result: data = [] } = await this.parameterService.find({ term, order, sort });
-        Logger.log(`RESULT ${data}`);
+        // Logger.log(`RESULT ${data}`);
         return { data };
     }
 

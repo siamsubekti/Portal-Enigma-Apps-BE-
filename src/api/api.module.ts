@@ -2,6 +2,14 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiController } from './main/api.controller';
 import { DocumentModule } from './resumes/document/document.module';
+import ConfigModule from '../config/config.module';
+import DatabaseConnectionConfig from '../config/database.config';
+import LibraryModule from '../libraries/library.module';
+import MigrationModule from './migrations/migration.module';
+
+import AuthModule from './auth/auth.module';
+import AccountModule from './accounts/account.module';
+import CandidateModule from './candidates/candidate.module';
 import JobModule from './master/jobs/job.module';
 import RegionsModule from './master/regions/regions.module';
 import SkillsModule from './master/skills/skills.module';
@@ -13,18 +21,17 @@ import DegreeModule from './master/degrees/degree.module';
 import RoleModule from './master/roles/role.module';
 import ServicesModule from './master/services/services.module';
 import MenuModule from './master/menus/menu.module';
-import DatabaseConnectionConfig from '../config/database.config';
-import ConfigModule from '../config/config.module';
-import LibraryModule from '../libraries/library.module';
-import AccountModule from './accounts/account.module';
-import AuthModule from './auth/auth.module';
-import MigrationModule from './migrations/migration.module';
-import CandidateModule from './candidates/candidate.module';
 
 @Module({
   imports: [
     ConfigModule,
     LibraryModule,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useClass: DatabaseConnectionConfig,
+    }),
+    MigrationModule,
+    AuthModule,
     JobModule,
     RegionsModule,
     SkillsModule,
@@ -34,15 +41,9 @@ import CandidateModule from './candidates/candidate.module';
     DegreeModule,
     RoleModule,
     MenuModule,
-    TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useClass: DatabaseConnectionConfig,
-    }),
     AccountModule,
-    AuthModule,
     ParameterModule,
     ServicesModule,
-    MigrationModule,
     CandidateModule,
     DocumentModule,
   ],

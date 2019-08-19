@@ -1,6 +1,6 @@
 import DegreeService from '../services/degree.service';
 import { DegreePagedResponse, DegreeResponse, DegreeDTO } from '../models/degree.dto';
-import { Get, Controller, Param, Post, Body, Delete, Put, Logger, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Get, Controller, Param, Post, Body, Delete, Put, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import { ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse,
     ApiOperation, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
@@ -73,7 +73,7 @@ export default class DegreeController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async add(@Body() form: DegreeDTO): Promise<Degree> {
         const degree: Degree = await this.degreeService.insert(form);
-        Logger.log(degree);
+        // Logger.log(degree);
         return degree;
     }
 
@@ -85,7 +85,7 @@ export default class DegreeController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async get(@Param('id') params: number): Promise<Degree> {
         const degree: Degree = await this.degreeService.get(params);
-        Logger.log(degree);
+        // Logger.log(degree);
         return degree;
     }
 
@@ -97,7 +97,7 @@ export default class DegreeController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async edit(@Param('id') params: number, @Body() form: DegreeDTO): Promise<Degree> {
         const degree: Degree = await this.degreeService.update(params, form);
-        Logger.log(degree);
+        // Logger.log(degree);
         return degree;
     }
 
@@ -107,7 +107,7 @@ export default class DegreeController {
     @ApiNotFoundResponse({ description: 'Degree Not Found', type: ApiExceptionResponse })
     async remove(@Param('id') params: number): Promise<DeleteResult> {
         const { affected }: DeleteResult = await this.degreeService.delete(params);
-        Logger.log({ affected });
+        // Logger.log({ affected });
         if (affected === 1) return null;
     }
 }

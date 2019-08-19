@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Job from '../models/job.entity';
@@ -67,7 +67,7 @@ export default class JobService {
         query.limit(100);
 
         const result: [Job[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'JobService@search', true);
+        // Logger.log(queryParams, 'JobService@search', true);
 
         return {
             result: result[0],
@@ -99,7 +99,7 @@ export default class JobService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Job[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'ServiceService@find', true);
+        // Logger.log(queryParams, 'ServiceService@find', true);
 
         return {
             result: result[0],

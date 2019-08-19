@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Degree from '../models/degree.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -44,7 +44,7 @@ export default class DegreeService {
 
     async get(id: number): Promise<Degree> {
         const degree: Degree = await this.degreeRepository.findOne(id);
-        Logger.log(degree);
+        // Logger.log(degree);
         if (!degree) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         try {
             return degree;
