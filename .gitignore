@@ -36,3 +36,7 @@ lerna-debug.log*
 .env
 *.rdb
 *.pdf
+*.docx
+*.doc
+*.jpg
+*.jpeg
