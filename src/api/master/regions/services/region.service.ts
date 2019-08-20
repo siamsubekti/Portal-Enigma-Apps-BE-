@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Region from '../models/region.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -78,7 +78,7 @@ export default class RegionService {
         query.limit(100);
 
         const result: [Region[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RegionService@search', true);
+        // Logger.log(queryParams, 'RegionService@search', true);
 
         return {
             result: result[0],
@@ -111,7 +111,7 @@ export default class RegionService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Region[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RegionService@find', true);
+        // Logger.log(queryParams, 'RegionService@find', true);
 
         return {
             result: result[0],

@@ -74,7 +74,7 @@ export default class ParameterService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Parameter[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'ParameterService@find', true);
+        // Logger.log(queryParams, 'ParameterService@find', true);
 
         return {
             result: result[0],
@@ -107,7 +107,7 @@ export default class ParameterService {
             query.limit(1000);
 
             const result: [Parameter[], number] = await query.getManyAndCount();
-            Logger.log(queryParams, 'ParameterService@search', true);
+            // Logger.log(queryParams, 'ParameterService@search', true);
             return {
                 result: result[0],
                 totalRows: result[1],

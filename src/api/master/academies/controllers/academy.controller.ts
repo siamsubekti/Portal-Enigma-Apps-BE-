@@ -1,5 +1,5 @@
 import AcademyService from '../services/academy.service';
-import { Controller, Get, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Body, Post, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiImplicitParam,
     ApiCreatedResponse, ApiBadRequestResponse, ApiInternalServerErrorResponse,
@@ -77,7 +77,7 @@ export default class AcademyController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async add(@Body() form: AcademyDTO): Promise<Academy> {
         const academy: Academy = await this.academyService.insert(form);
-        Logger.log(academy);
+        // Logger.log(academy);
         return academy;
     }
 
@@ -90,7 +90,7 @@ export default class AcademyController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async get(@Param('id') id: number): Promise<Academy> {
         const academy: Academy = await this.academyService.get(id);
-        Logger.log(academy);
+        // Logger.log(academy);
         return academy;
     }
 
@@ -102,7 +102,7 @@ export default class AcademyController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async edit(@Param('id') id: number, @Body() form: AcademyDTO): Promise<Academy> {
         const academy: Academy = await this.academyService.update(id, form);
-        Logger.log(academy);
+        // Logger.log(academy);
         return academy;
     }
 
@@ -112,7 +112,7 @@ export default class AcademyController {
     @ApiNotFoundResponse({ description: `Academy Not Found`, type: ApiExceptionResponse })
     async remove(@Param('id') id: number): Promise<DeleteResult> {
         const { affected }: DeleteResult = await this.academyService.delete(id);
-        Logger.log(affected);
+        // Logger.log(affected);
         if (affected === 1) return null;
     }
 }

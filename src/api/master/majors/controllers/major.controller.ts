@@ -1,5 +1,5 @@
 import MajorService from '../services/major.service';
-import { Controller, Get, Logger, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
     ApiUseTags, ApiOperation, ApiCreatedResponse,
     ApiOkResponse, ApiInternalServerErrorResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
@@ -86,7 +86,7 @@ export default class MajorController {
     @UseInterceptors(ResponseRebuildInterceptor)
     async getAcademyById(@Param('id') params: number): Promise<Major> {
         const major: Major = await this.majorService.getDetailMajor(params);
-        Logger.log(major);
+        // Logger.log(major);
         return major;
     }
 
@@ -107,7 +107,7 @@ export default class MajorController {
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     async DeleteAcademy(@Param('id') id: number): Promise<DeleteResult> {
         const { affected }: DeleteResult = await this.majorService.delete(id);
-        Logger.log(affected);
+        // Logger.log(affected);
         if (affected === 1) return null;
     }
 }

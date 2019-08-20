@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import Service from '../models/service.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,24 +18,21 @@ export default class ServicesService {
     }
 
     async find(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
-        let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s')
-            .leftJoinAndSelect('s.roles', 'r');
+        let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s');
 
         if (queryParams.term) {
             let { term } = queryParams;
             term = `%${term}%`;
             query = query
                 .orWhere('s.code LIKE :term', { term })
-                .orWhere('s.name LIKE :term', { term })
-                .orWhere('r.code LIKE :term', { term })
-                .orWhere('r.name LIKE :term', { term });
+                .orWhere('s.name LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
             const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
             const orderCols: { [key: string]: string } = {
                 code: 's.code',
-                name: 'r.name',
+                name: 's.name',
             };
             query = query.orderBy(orderCols[queryParams.order], sort);
         } else
@@ -45,7 +42,7 @@ export default class ServicesService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Service[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'ServiceService@findAll', true);
+        // Logger.log(queryParams, 'ServiceService@findAll', true);
 
         return {
             result: result[0],
@@ -63,7 +60,7 @@ export default class ServicesService {
 
     async create(serviceDto: ServiceDTO): Promise<Service> {
         const service: Service = await this.serviceRepository.findOne({ where: { code: serviceDto.code } });
-        if (service) throw new BadRequestException('Data ini telah ada.');
+        if (service) throw new BadRequestException('Data ini telah ada (PAKEK BAHASA INGGERIS BIAR KEKINIAN OY!).');
         else return await this.serviceRepository.save(serviceDto);
     }
 
@@ -131,7 +128,7 @@ export default class ServicesService {
         query.limit(1000);
 
         const result: [Service[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'ServiceService@search', true);
+        // Logger.log(queryParams, 'ServiceService@search', true);
 
         return {
             result: result[0],
