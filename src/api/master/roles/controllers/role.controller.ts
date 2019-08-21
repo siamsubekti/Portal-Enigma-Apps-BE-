@@ -1,6 +1,6 @@
 import RoleService from '../services/role.service';
 import { RoleResponse, RolePagedResponse, RoleDTO } from '../models/role.dto';
-import { Get, Controller, Body, Post, Logger, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Get, Controller, Body, Post, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import {
   ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
   ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
@@ -75,7 +75,7 @@ export default class RoleController {
   @ApiBadRequestResponse({ description: 'Code has been use' })
   async addRole(@Body() form: RoleDTO): Promise<Role> {
     const role: Role = await this.roleService.insert(form);
-    Logger.log(role);
+    // Logger.log(role);
     return role;
   }
 
@@ -101,7 +101,7 @@ export default class RoleController {
   @UseInterceptors(ResponseRebuildInterceptor)
   async editRole(@Param('id') id: number, @Body() form: RoleDTO): Promise<Role> {
     const role: Role = await this.roleService.update(id, form);
-    Logger.log(role);
+    // Logger.log(role);
     return role;
   }
 

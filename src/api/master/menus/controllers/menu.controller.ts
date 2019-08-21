@@ -1,6 +1,6 @@
 import MenuService from '../services/menu.service';
 import { MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
-import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Logger, Delete, UseGuards, Query } from '@nestjs/common';
+import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Delete, UseGuards, Query } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
@@ -84,7 +84,7 @@ export default class MenuController {
     async addMenu(@Body() form: MenuDTO): Promise<Menu> {
         try {
             const menu: Menu = await this.menuService.add(form);
-            Logger.log(menu);
+            // Logger.log(menu);
             return menu;
         } catch (error) {
             throw error;
@@ -127,7 +127,7 @@ export default class MenuController {
     @ApiNotFoundResponse({description: `Menu Not Found`, type: ApiExceptionResponse})
     async deleteMenu(@Param('id') id: number): Promise<DeleteResult> {
         const {affected}: DeleteResult = await this.menuService.delete(id);
-        Logger.log(affected);
+        // Logger.log(affected);
         if (affected === 1) return null;
     }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Skill from '../models/skill.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -67,7 +67,7 @@ export default class SkillService {
         query.limit(100);
 
         const result: [Skill[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'SkillsService@search', true);
+        // Logger.log(queryParams, 'SkillsService@search', true);
 
         return {
             result: result[0],
@@ -100,7 +100,7 @@ export default class SkillService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Skill[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'SkillService@find', true);
+        // Logger.log(queryParams, 'SkillService@find', true);
 
         return {
             result: result[0],

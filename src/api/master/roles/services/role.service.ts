@@ -54,7 +54,7 @@ export default class RoleService {
         const checkCode: Role = await this.roleRepository.findOne({
             where: { code: roleDTO.code },
         });
-        // Logger.log(checkCode);
+        // // Logger.log(checkCode);
         if (checkCode) throw new BadRequestException('This role code is already taken.');
         try {
             const { code, name, menus, services } = roleDTO;

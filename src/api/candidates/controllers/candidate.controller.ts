@@ -17,7 +17,7 @@ import {
 } from '@nestjs/swagger';
 import CandidateService from '../services/candidate.service';
 import { ApiPagedResponse, ApiExceptionResponse } from '../../../libraries/responses/response.type';
-import { AccountPagedResponse, AccountSearchResponse } from '../../../api/accounts/models/account.dto';
+import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO } from '../../../api/accounts/models/account.dto';
 import { PagingData } from '../../../libraries/responses/response.class';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../../api/auth/guards/cookie.guard';
@@ -55,13 +55,20 @@ export default class CandidateController {
         @Query('page') page: number = 1,
     ): Promise<AccountPagedResponse> {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-        const { result: data = [], totalRows } = await this.candidateServices.getCandidates({ term, order, sort, page, rowsPerPage });
+        const { result = [], totalRows } = await this.candidateServices.getCandidates({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
             page,
             rowsPerPage,
             totalPages: Math.ceil(totalRows / rowsPerPage),
             totalRows,
         };
+        const data: AccountResponseDTO[] = [];
+
+        for ( const account of result )
+          data.push({
+            ...account,
+            roles: undefined,
+          });
 
         return { data, paging };
     }
@@ -79,7 +86,14 @@ export default class CandidateController {
         @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<AccountPagedResponse> {
-        const { result: data = [] } = await this.candidateServices.searchCandidates({ term, order, sort, rowsPerPage: 1000 });
+        const { result } = await this.candidateServices.searchCandidates({ term, order, sort, rowsPerPage: 1000 });
+        const data: AccountResponseDTO[] = [];
+
+        for ( const account of result )
+          data.push({
+            ...account,
+            roles: undefined,
+          });
 
         return { data };
     }

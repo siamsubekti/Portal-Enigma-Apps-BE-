@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import Template from '../models/template.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { TemplateDTO, TemplateQueryDTO, TemplateQueryResult } from '../models/template.dto';
@@ -71,7 +71,7 @@ export default class TemplateService {
         query.limit(1000);
 
         const result: [Template[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'TemplateService@search', true);
+        // Logger.log(queryParams, 'TemplateService@search', true);
 
         return {
             result: result[0],
@@ -104,7 +104,7 @@ export default class TemplateService {
         query.limit(queryParams.rowsPerPage);
 
         const result: [Template[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'TemplateService@find', true);
+        // Logger.log(queryParams, 'TemplateService@find', true);
 
         return {
             result: result[0],
