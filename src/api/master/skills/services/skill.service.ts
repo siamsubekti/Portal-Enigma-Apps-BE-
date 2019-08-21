@@ -76,6 +76,7 @@ export default class SkillService {
     }
 
     async find(queryParams: SkillQueryDTO): Promise<SkillQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Skill> = this.skillRepository.createQueryBuilder('skill');
 
         if (queryParams.term) {
@@ -96,7 +97,7 @@ export default class SkillService {
         } else
             query = query.orderBy('skill.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Skill[], number] = await query.getManyAndCount();

@@ -18,6 +18,7 @@ export default class RoleService {
     ) { }
 
     async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r');
 
         if (queryParams.term) {
@@ -39,7 +40,7 @@ export default class RoleService {
         } else
             query = query.orderBy('r.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Role[], number] = await query.getManyAndCount();

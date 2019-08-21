@@ -35,7 +35,7 @@ export default class SkillsController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result: data = [], totalRows } = await this.skillService.search({ term, sort, page, rowsPerPage });
         const paging: PagingData = {
-            page,
+            page: Number(page),
             rowsPerPage,
             totalPages: Math.ceil(totalRows / rowsPerPage),
             totalRows,

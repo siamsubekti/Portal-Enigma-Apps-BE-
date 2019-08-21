@@ -87,6 +87,7 @@ export default class RegionService {
     }
 
     async find(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
 
         if (queryParams.term) {
@@ -107,7 +108,7 @@ export default class RegionService {
         } else
             query = query.orderBy('region.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Region[], number] = await query.getManyAndCount();

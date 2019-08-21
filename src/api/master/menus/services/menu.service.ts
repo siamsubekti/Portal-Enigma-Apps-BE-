@@ -12,6 +12,7 @@ export default class MenuService {
     ) { }
 
     async all(queryParams: MenuQueryDTO): Promise<MenuQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Menu> = this.menuRepository.createQueryBuilder('m').select('m');
 
         if (queryParams.term) {
@@ -24,7 +25,7 @@ export default class MenuService {
                 .orWhere('m.icon LIKE :term', { term });
         }
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Menu[], number] = await query.getManyAndCount();
@@ -37,7 +38,7 @@ export default class MenuService {
 
     async allSub(): Promise<MenuQueryResult> {
         const query: SelectQueryBuilder<Menu> = this.menuRepository.createQueryBuilder('m').select('m')
-        .where('m.parentMenu');
+            .where('m.parentMenu');
 
         const result: [Menu[], number] = await query.getManyAndCount();
 
@@ -73,7 +74,7 @@ export default class MenuService {
     }
 
     async getWithParent(id: number): Promise<Menu> {
-        const result: Menu = await this.menuRepository.findOne({where: { id }, relations: ['parentMenu']});
+        const result: Menu = await this.menuRepository.findOne({ where: { id }, relations: ['parentMenu'] });
         if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
         try {
             return result;

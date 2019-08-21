@@ -76,6 +76,7 @@ export default class JobService {
     }
 
     async find(queryParams: JobQueryDTO): Promise<JobQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Job> = this.jobRepository.createQueryBuilder('job');
 
         if (queryParams.term) {
@@ -95,7 +96,7 @@ export default class JobService {
         } else
             query = query.orderBy('job.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Job[], number] = await query.getManyAndCount();

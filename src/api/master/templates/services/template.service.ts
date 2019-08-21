@@ -80,6 +80,7 @@ export default class TemplateService {
     }
 
     async find(queryParams: TemplateQueryDTO): Promise<TemplateQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Template> = this.templateRepository.createQueryBuilder('t');
 
         if (queryParams.term) {
@@ -100,7 +101,7 @@ export default class TemplateService {
         } else
             query = query.orderBy('t.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Template[], number] = await query.getManyAndCount();
