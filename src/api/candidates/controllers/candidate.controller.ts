@@ -124,6 +124,7 @@ export default class CandidateController {
     @Header('Content-type', 'application/pdf')
     @ApiProduces('application/pdf')
     @ApiNotFoundResponse({ description: 'If path not found.', type: ApiExceptionResponse })
+    @ApiOkResponse({ description: 'Success get file to download.'})
     async download(@Param('path') path: string, @Res() res: Response): Promise<any> {
 
         const downloadPath: Document = await this.docService.getFilenameByPath(path);
