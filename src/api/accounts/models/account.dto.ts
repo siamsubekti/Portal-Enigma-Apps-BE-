@@ -5,26 +5,7 @@ import Account from './account.entity';
 import Role from '../../master/roles/models/role.entity';
 import Menu from '../../master/menus/models/menu.entity';
 import Service from '../../master/services/models/service.entity';
-import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus } from '../../../config/constants';
-
-export class AccountResponse {
-  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
-  status?: ResponseStatus;
-
-  @ApiModelProperty({ description: 'Account data', type: Account, required: true })
-  data: Account;
-}
-
-export class AccountPagedResponse {
-  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
-  status?: ResponseStatus;
-
-  @ApiModelProperty({ description: 'List of accounts', type: [ Account ], required: true })
-  data: Account[];
-
-  @ApiModelProperty({ description: 'Paging data', type: PagingData, required: false })
-  paging?: PagingData;
-}
+import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountType } from '../../../config/constants';
 
 export class AccountDTO {
   username: string;
@@ -33,6 +14,52 @@ export class AccountDTO {
   status: AccountStatus;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export class ProfileResponseDTO {
+  @ApiModelProperty({ description: 'Account profile ID', type: 'string'})
+  id: string;
+  @ApiModelProperty({ description: 'Account profile fullname', type: 'string'})
+  fullname: string;
+  @ApiModelProperty({ description: 'Account profile nickname', type: 'string'})
+  nickname: string;
+  @ApiModelProperty({ description: 'Account profile email address', type: 'string'})
+  email: string;
+  @ApiModelProperty({ description: 'Account profile phone number', type: 'string'})
+  phone: string;
+  @ApiModelProperty({ description: 'Account profile birthdate', type: 'string'})
+  birthdate: Date;
+  @ApiModelProperty({ description: 'Account profile gender', enum: ProfileGender})
+  gender: ProfileGender;
+  @ApiModelProperty({ description: 'Account profile gender', enum: ProfileReligion})
+  religion: ProfileReligion;
+  @ApiModelProperty({ description: 'Account profile gender', enum: ProfileMaritalStatus})
+  maritalStatus: ProfileMaritalStatus;
+  @ApiModelProperty({ description: 'Account profile creation date', type: 'string'})
+  createdAt: Date;
+  @ApiModelProperty({ description: 'Account profile update date', type: 'string'})
+  updatedAt: Date;
+}
+
+export class AccountResponseDTO {
+  @ApiModelProperty({ description: 'Account ID', type: 'string'})
+  id: string;
+  @ApiModelProperty({ description: 'Account username', type: 'string'})
+  username: string;
+  @ApiModelProperty({ description: 'Account status', enum: AccountStatus })
+  status: AccountStatus;
+  @ApiModelProperty({ description: 'Account type', type: AccountType})
+  accountType: AccountType;
+  @ApiModelProperty({ description: 'Account creation date', type: 'string'})
+  createdAt: Date;
+  @ApiModelProperty({ description: 'Account update date', type: 'string'})
+  updatedAt: Date;
+  @ApiModelProperty({ description: 'Account last login date', type: 'string'})
+  lastlogin: Date;
+  @ApiModelProperty({ description: 'Account profile data', type: ProfileResponseDTO})
+  profile: ProfileResponseDTO;
+  @ApiModelProperty({ description: 'Account profile data', type: [Role]})
+  roles: Role[];
 }
 
 export class AccountProfileDTO {
@@ -143,4 +170,23 @@ export class AccountSearchResponse {
 
   @ApiModelProperty({ description: 'Account data', type: [ Account ], required: true })
   data: Account[];
+}
+
+export class AccountResponse {
+  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
+  status?: ResponseStatus;
+
+  @ApiModelProperty({ description: 'Account data', type: Account, required: true })
+  data: AccountResponseDTO;
+}
+
+export class AccountPagedResponse {
+  @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
+  status?: ResponseStatus;
+
+  @ApiModelProperty({ description: 'List of accounts', type: [ Account ], required: true })
+  data: AccountResponseDTO[];
+
+  @ApiModelProperty({ description: 'Paging data', type: PagingData, required: false })
+  paging?: PagingData;
 }

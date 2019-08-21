@@ -12,6 +12,7 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiImplicitParam,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { LoginCredentialDTO, LoginResponse, LoginResponseDTO } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetDTO } from '../models/password-reset.dto';
@@ -37,6 +38,7 @@ export default class AuthController {
   @ApiCreatedResponse({ description: 'User successfuly logged-in.', type: LoginResponse })
   @ApiForbiddenResponse({ description: 'Invalid user account credential.', type: ApiExceptionResponse })
   @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
+  @ApiUnprocessableEntityResponse({ description: 'Account not active yet.', type: ApiExceptionResponse })
   @ApiImplicitBody({ name: 'LoginCredentialDTO', description: 'User account form data.', type: LoginCredentialDTO })
   async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
     const credential: LoginResponseDTO = await this.authService.login(form);
@@ -57,7 +59,7 @@ export default class AuthController {
       };
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential, resStatus);
 
-      response.json(body);
+      response.status(HttpStatus.UNPROCESSABLE_ENTITY).json(body);
     } else throw new ForbiddenException('Invalid account credential.');
   }
 

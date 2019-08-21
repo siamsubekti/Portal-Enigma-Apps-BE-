@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Region from '../models/region.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -23,7 +23,7 @@ export default class RegionService {
 
     async create(regionDto: RegionDTO): Promise<Region> {
         const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
-        if (exist) throw new BadRequestException('Data ini telah ada.');
+        if (exist) throw new BadRequestException('Data already exists.');
 
         const region: Region = new Region();
         region.name = regionDto.name;
@@ -48,7 +48,7 @@ export default class RegionService {
         if (!data) throw new NotFoundException(`Region with id: ${id} not found`);
         else {
             const exist: boolean = await this.regionRepository.count({ where: { name: regionDto.name } }) === 1;
-            if (exist && (regionDto.name !== data.name)) throw new BadRequestException('Data ini telah ada.');
+            if (exist && (regionDto.name !== data.name)) throw new BadRequestException('Region name already exists.');
             data = this.regionRepository.merge(data, regionDto);
             return await this.regionRepository.save(data);
         }
@@ -78,7 +78,7 @@ export default class RegionService {
         query.limit(100);
 
         const result: [Region[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RegionService@search', true);
+        // Logger.log(queryParams, 'RegionService@search', true);
 
         return {
             result: result[0],
@@ -87,6 +87,7 @@ export default class RegionService {
     }
 
     async find(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
 
         if (queryParams.term) {
@@ -107,11 +108,11 @@ export default class RegionService {
         } else
             query = query.orderBy('region.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Region[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'RegionService@find', true);
+        // Logger.log(queryParams, 'RegionService@find', true);
 
         return {
             result: result[0],

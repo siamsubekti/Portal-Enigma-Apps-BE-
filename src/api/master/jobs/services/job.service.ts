@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Job from '../models/job.entity';
@@ -19,7 +19,7 @@ export default class JobService {
 
     async create(jobDto: JobDTO): Promise<Job> {
         const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
-        if (exist) throw new BadRequestException('Data ini telah ada.');
+        if (exist) throw new BadRequestException('Data already exists.');
         return await this.jobRepository.save(jobDto);
     }
 
@@ -38,7 +38,7 @@ export default class JobService {
         if (!data) throw new NotFoundException(`Job with id: ${id} not found`);
         else {
             const exist: boolean = await this.jobRepository.count({ where: { name: jobDto.name } }) === 1;
-            if (exist && jobDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && jobDto.name !== data.name) throw new BadRequestException('Job name already exists.');
             data = this.jobRepository.merge(data, jobDto);
             return await this.jobRepository.save(data);
         }
@@ -67,7 +67,7 @@ export default class JobService {
         query.limit(100);
 
         const result: [Job[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'JobService@search', true);
+        // Logger.log(queryParams, 'JobService@search', true);
 
         return {
             result: result[0],
@@ -76,6 +76,7 @@ export default class JobService {
     }
 
     async find(queryParams: JobQueryDTO): Promise<JobQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Job> = this.jobRepository.createQueryBuilder('job');
 
         if (queryParams.term) {
@@ -95,11 +96,11 @@ export default class JobService {
         } else
             query = query.orderBy('job.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Job[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'ServiceService@find', true);
+        // Logger.log(queryParams, 'ServiceService@find', true);
 
         return {
             result: result[0],

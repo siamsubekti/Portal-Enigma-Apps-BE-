@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import Template from '../models/template.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { TemplateDTO, TemplateQueryDTO, TemplateQueryResult } from '../models/template.dto';
@@ -22,7 +22,7 @@ export default class TemplateService {
             where: { name: templateDto.name },
         });
 
-        if (template) throw new BadRequestException('Data ini telah ada');
+        if (template) throw new BadRequestException('Data already exists.');
         else return await this.templateRepository.save(templateDto);
     }
 
@@ -40,7 +40,7 @@ export default class TemplateService {
         if (!data) throw new NotFoundException(`Template with id: ${id} not found`);
         else {
             const exist: boolean = await this.templateRepository.count({ where: { name: templateDto.name } }) === 1;
-            if (exist && templateDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && templateDto.name !== data.name) throw new BadRequestException('Name already exists.');
             data = this.templateRepository.merge(data, templateDto);
             return await this.templateRepository.save(data);
         }
@@ -71,7 +71,7 @@ export default class TemplateService {
         query.limit(1000);
 
         const result: [Template[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'TemplateService@search', true);
+        // Logger.log(queryParams, 'TemplateService@search', true);
 
         return {
             result: result[0],
@@ -80,6 +80,7 @@ export default class TemplateService {
     }
 
     async find(queryParams: TemplateQueryDTO): Promise<TemplateQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Template> = this.templateRepository.createQueryBuilder('t');
 
         if (queryParams.term) {
@@ -100,11 +101,11 @@ export default class TemplateService {
         } else
             query = query.orderBy('t.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Template[], number] = await query.getManyAndCount();
-        Logger.log(queryParams, 'TemplateService@find', true);
+        // Logger.log(queryParams, 'TemplateService@find', true);
 
         return {
             result: result[0],

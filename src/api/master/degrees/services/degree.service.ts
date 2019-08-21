@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Degree from '../models/degree.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -9,42 +9,43 @@ export default class DegreeService {
     constructor(
         @InjectRepository(Degree)
         private readonly degreeRepository: Repository<Degree>,
-    ) {}
+    ) { }
 
     async all(queryParams: DegreesQueryDTO): Promise<DegreesQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Degree> = this.degreeRepository.createQueryBuilder('d').select('d');
 
         if (queryParams.term) {
-          let { term } = queryParams;
-          term = `%${term}%`;
-          query = query
-            .orWhere('d.name LIKE :term', { term });
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('d.name LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
-          const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-          const orderCols: { [key: string]: string } = {
-            name: 'd.name',
-          };
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                name: 'd.name',
+            };
 
-          query = query.orderBy( orderCols[ queryParams.order ], sort );
+            query = query.orderBy(orderCols[queryParams.order], sort);
         } else
-          query = query.orderBy( 'd.name', 'ASC' );
+            query = query.orderBy('d.name', 'ASC');
 
-        query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
-        query.limit( queryParams.rowsPerPage );
+        query.offset(offset);
+        query.limit(queryParams.rowsPerPage);
 
-        const result: [ Degree[], number ] = await query.getManyAndCount();
+        const result: [Degree[], number] = await query.getManyAndCount();
 
         return {
-          result: result[0],
-          totalRows: result[1],
+            result: result[0],
+            totalRows: result[1],
         };
     }
 
     async get(id: number): Promise<Degree> {
         const degree: Degree = await this.degreeRepository.findOne(id);
-        Logger.log(degree);
+        // Logger.log(degree);
         if (!degree) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         try {
             return degree;
@@ -63,7 +64,7 @@ export default class DegreeService {
     }
 
     async update(id: number, degreeDTO: DegreeDTO): Promise<Degree> {
-        let degree: Degree = await this.degreeRepository.findOne({where: {id}});
+        let degree: Degree = await this.degreeRepository.findOne({ where: { id } });
         if (!degree) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         try {
             degree = this.degreeRepository.merge(degree, degreeDTO);
@@ -75,7 +76,7 @@ export default class DegreeService {
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        const countId: boolean = await this.degreeRepository.count({id}) > 0;
+        const countId: boolean = await this.degreeRepository.count({ id }) > 0;
         if (!countId) throw new NotFoundException(`Degree with id: ${id} Not Found`);
         const result: DeleteResult = await this.degreeRepository.delete(id);
         try {
