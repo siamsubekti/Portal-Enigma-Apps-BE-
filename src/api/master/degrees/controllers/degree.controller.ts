@@ -1,8 +1,10 @@
 import DegreeService from '../services/degree.service';
 import { DegreePagedResponse, DegreeResponse, DegreeDTO } from '../models/degree.dto';
 import { Get, Controller, Param, Post, Body, Delete, Put, UseInterceptors, UseGuards, Query } from '@nestjs/common';
-import { ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse,
-    ApiOperation, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+    ApiUseTags, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse,
+    ApiOperation, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
@@ -21,7 +23,7 @@ export default class DegreeController {
     ) { }
 
     @Get()
-    @ApiOperation({ title: 'List of Degrees.', description: 'Get list of degrees from database.'})
+    @ApiOperation({ title: 'List of Degrees.', description: 'Get list of degrees from database.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: 'name', required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -39,16 +41,16 @@ export default class DegreeController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result: data = [], totalRows } = await this.degreeService.all({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
-        page,
-        rowsPerPage,
-        totalPages: Math.ceil( totalRows / rowsPerPage ),
-        totalRows,
+            page: Number(page),
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
         };
         return { data, paging };
     }
 
     @Get('search')
-    @ApiOperation({ title: 'Search Degree.', description: 'Search degree.'})
+    @ApiOperation({ title: 'Search Degree.', description: 'Search degree.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: ['name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })

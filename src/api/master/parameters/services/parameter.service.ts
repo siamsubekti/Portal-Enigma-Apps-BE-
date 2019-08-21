@@ -50,6 +50,7 @@ export default class ParameterService {
     }
 
     async find(queryParams: ParameterQueryDTO): Promise<ParameterQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Parameter> = this.parameterRepository.createQueryBuilder('p');
 
         if (queryParams.term) {
@@ -70,7 +71,7 @@ export default class ParameterService {
         } else
             query = query.orderBy('p.key', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Parameter[], number] = await query.getManyAndCount();

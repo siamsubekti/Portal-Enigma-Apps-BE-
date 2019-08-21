@@ -76,11 +76,11 @@ export default class CandidateController {
         };
         const data: AccountResponseDTO[] = [];
 
-        for ( const account of result )
-          data.push({
-            ...account,
-            roles: undefined,
-          });
+        for (const account of result)
+            data.push({
+                ...account,
+                roles: undefined,
+            });
 
         return { data, paging };
     }
@@ -101,11 +101,11 @@ export default class CandidateController {
         const { result } = await this.candidateServices.searchCandidates({ term, order, sort, rowsPerPage: 1000 });
         const data: AccountResponseDTO[] = [];
 
-        for ( const account of result )
-          data.push({
-            ...account,
-            roles: undefined,
-          });
+        for (const account of result)
+            data.push({
+                ...account,
+                roles: undefined,
+            });
 
         return { data };
     }

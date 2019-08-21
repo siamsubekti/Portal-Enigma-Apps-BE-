@@ -7,52 +7,55 @@ import { AcademyDTO, AcademiesQueryDTO, AcademiesQueryResult } from '../models/a
 @Injectable()
 export default class AcademyService {
     constructor(
-    @InjectRepository(Academy)
-    private readonly academyRepository: Repository<Academy>,
-    ) {}
+        @InjectRepository(Academy)
+        private readonly academyRepository: Repository<Academy>,
+    ) { }
 
     async all(queryParams: AcademiesQueryDTO): Promise<AcademiesQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Academy> = this.academyRepository.createQueryBuilder('a').select('a');
 
         if (queryParams.term) {
-          let { term } = queryParams;
-          term = `%${term}%`;
-          query = query
-            .orWhere('a.code LIKE :term', { term })
-            .orWhere('a.name LIKE :term', { term })
-            .orWhere('a.phone LIKE :term', { term })
-            .orWhere('a.type LIKE :term', { term });
+            let { term } = queryParams;
+            term = `%${term}%`;
+            query = query
+                .orWhere('a.code LIKE :term', { term })
+                .orWhere('a.name LIKE :term', { term })
+                .orWhere('a.phone LIKE :term', { term })
+                .orWhere('a.type LIKE :term', { term });
         }
 
         if (queryParams.order && queryParams.sort) {
-          const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-          const orderCols: { [key: string]: string } = {
-            code: 'a.code',
-            name: 'a.name',
-            phone: 'a.phone',
-            type: 'a.type',
-          };
+            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+            const orderCols: { [key: string]: string } = {
+                code: 'a.code',
+                name: 'a.name',
+                phone: 'a.phone',
+                type: 'a.type',
+            };
 
-          query = query.orderBy( orderCols[ queryParams.order ], sort );
+            query = query.orderBy(orderCols[queryParams.order], sort);
         } else
-          query = query.orderBy( 'a.name', 'ASC' );
+            query = query.orderBy('a.name', 'ASC');
 
-        query.offset( queryParams.page > 1 ? ( queryParams.rowsPerPage * queryParams.page ) + 1 : 0 );
-        query.limit( queryParams.rowsPerPage );
+        query.offset(offset);
+        query.limit(queryParams.rowsPerPage);
 
-        const result: [ Academy[], number ] = await query.getManyAndCount();
+        const result: [Academy[], number] = await query.getManyAndCount();
 
         return {
-          result: result[0],
-          totalRows: result[1],
+            result: result[0],
+            totalRows: result[1],
         };
     }
 
     async insert(academyDTO: AcademyDTO): Promise<Academy> {
         const checkCode: Academy = await this.academyRepository.findOne({
-            where: {code: academyDTO.code}});
+            where: { code: academyDTO.code },
+        });
         const checkPhone: Academy = await this.academyRepository.findOne({
-            where: {phone: academyDTO.phone}});
+            where: { phone: academyDTO.phone },
+        });
         if (checkCode) throw new BadRequestException('Code Has Been Use');
         if (checkPhone) throw new BadRequestException('Phone Has Been Use');
         try {
@@ -75,7 +78,7 @@ export default class AcademyService {
     }
 
     async update(id: number, academyDTO: AcademyDTO): Promise<Academy> {
-        const academy: Academy = await this.academyRepository.findOne({where: {id}});
+        const academy: Academy = await this.academyRepository.findOne({ where: { id } });
         if (!academy) throw new NotFoundException(`Academy with id: ${id} Not Found`);
         try {
             const data: Academy = this.academyRepository.merge(academy, academyDTO);
@@ -87,7 +90,7 @@ export default class AcademyService {
     }
 
     async delete(id: number): Promise<DeleteResult> {
-        const academy: boolean = await this.academyRepository.count({id}) >  0;
+        const academy: boolean = await this.academyRepository.count({ id }) > 0;
         if (!academy) throw new NotFoundException(`Academy with id: ${id} Not Found`);
         try {
             const removeAcademy: DeleteResult = await this.academyRepository.delete(id);
