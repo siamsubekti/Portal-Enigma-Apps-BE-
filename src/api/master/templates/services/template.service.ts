@@ -22,7 +22,7 @@ export default class TemplateService {
             where: { name: templateDto.name },
         });
 
-        if (template) throw new BadRequestException('Data ini telah ada');
+        if (template) throw new BadRequestException('Data already exists.');
         else return await this.templateRepository.save(templateDto);
     }
 
@@ -40,7 +40,7 @@ export default class TemplateService {
         if (!data) throw new NotFoundException(`Template with id: ${id} not found`);
         else {
             const exist: boolean = await this.templateRepository.count({ where: { name: templateDto.name } }) === 1;
-            if (exist && templateDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && templateDto.name !== data.name) throw new BadRequestException('Name already exists.');
             data = this.templateRepository.merge(data, templateDto);
             return await this.templateRepository.save(data);
         }

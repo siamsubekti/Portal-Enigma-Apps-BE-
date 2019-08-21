@@ -60,7 +60,7 @@ export default class ServicesService {
 
     async create(serviceDto: ServiceDTO): Promise<Service> {
         const service: Service = await this.serviceRepository.findOne({ where: { code: serviceDto.code } });
-        if (service) throw new BadRequestException('Data ini telah ada (PAKEK BAHASA INGGERIS BIAR KEKINIAN OY!).');
+        if (service) throw new BadRequestException('Data already exists.');
         else return await this.serviceRepository.save(serviceDto);
     }
 

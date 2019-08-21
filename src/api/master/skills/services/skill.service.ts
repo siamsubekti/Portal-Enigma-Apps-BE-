@@ -21,7 +21,7 @@ export default class SkillService {
         const skill: Skill = await this.skillRepository.findOne({
             where: { name: skillDto.name },
         });
-        if (skill) throw new BadRequestException('Data ini telah ada');
+        if (skill) throw new BadRequestException('Data already exists.');
         else return await this.skillRepository.save(skillDto);
     }
 
@@ -38,7 +38,7 @@ export default class SkillService {
         if (!data) throw new NotFoundException(`Skill with id: ${id} not found`);
         else {
             const exist: boolean = await this.skillRepository.count({ where: { name: skillDto.name } }) === 1;
-            if (exist && skillDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && skillDto.name !== data.name) throw new BadRequestException('Name already exists.');
             data = this.skillRepository.merge(data, skillDto);
             return await this.skillRepository.save(data);
         }

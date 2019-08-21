@@ -24,7 +24,7 @@ export default class ParameterService {
 
     async create(parameterDto: ParameterDTO): Promise<Parameter> {
         const parameter: Parameter = await this.parameterRepository.findOne({ where: { key: parameterDto.key } });
-        if (parameter) throw new BadRequestException('Data ini telah ada');
+        if (parameter) throw new BadRequestException('Data already exists.');
         else return await this.parameterRepository.save(parameterDto);
     }
 
@@ -36,7 +36,7 @@ export default class ParameterService {
         if (!parameter) throw new NotFoundException(`Parameter with id: ${id} not found`);
         else {
             const exist: boolean = await this.parameterRepository.count({ where: { key: parameterDto.key } }) === 1;
-            if (exist && parameterDto.key !== parameter.key) throw new BadRequestException('Data ini telah ada');
+            if (exist && parameterDto.key !== parameter.key) throw new BadRequestException('Data already exists.');
             parameter = this.parameterRepository.merge(parameter, parameterDto);
             return await this.parameterRepository.save(parameter);
         }
