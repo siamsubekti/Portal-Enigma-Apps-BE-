@@ -1,8 +1,9 @@
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import Menu from '../models/menu.entity';
-import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, InternalServerErrorException, BadRequestException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MenuDTO, MenuQueryDTO, MenuQueryResult } from '../models/menu.dto';
+import Role from '../../roles/models/role.entity';
 
 @Injectable()
 export default class MenuService {
@@ -95,9 +96,21 @@ export default class MenuService {
         }
     }
 
+    async findRelations(id: number): Promise<Menu> {
+        return await this.menuRepository.findOne({ where: { id }, relations: ['roles', 'childrenMenu', 'parentMenu'] });
+    }
+
     async delete(id: number): Promise<DeleteResult> {
-        const result: boolean = await this.menuRepository.count({ id }) > 0;
-        if (!result) throw new NotFoundException(`Menu with id: ${id} Not Found`);
+        const menu: Menu = await this.findRelations(id);
+        const roles: Role[] = await Promise.resolve(menu.roles);
+        const child: Menu[] = await Promise.resolve(menu.childrenMenu);
+        const parent: Menu = await Promise.resolve(menu.parentMenu);
+
+        if (!menu) throw new NotFoundException(`Menu with id: ${id} Not Found`);
+        if (menu && roles.length > 0) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
+        if (menu && child.length > 0) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
+        if (menu && parent) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
+        else
         try {
             const removeMenu: DeleteResult = await this.menuRepository.delete(id);
             return removeMenu;
