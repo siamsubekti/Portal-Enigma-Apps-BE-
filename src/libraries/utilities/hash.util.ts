@@ -19,7 +19,7 @@ export default class HashUtil {
     return bcrypt.compare(input, hash);
   }
 
-  createRandomString(length: number = 32, type?: 'hex' | 'base64' | 'url-safe', characters?: string): string {
+  createRandomString(length: number = 32, type: 'hex' | 'base64' | 'url-safe' = 'base64', characters?: string): string {
     const options: any = { length, type };
 
     if (characters) {
