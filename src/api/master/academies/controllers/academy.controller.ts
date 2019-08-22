@@ -23,7 +23,7 @@ export default class AcademyController {
         private readonly config: AppConfig) { }
 
     @Get()
-    @ApiOperation({ title: 'List of Academies.', description: 'Get list of academies from database.'})
+    @ApiOperation({ title: 'List of Academies.', description: 'Get list of academies from database.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, or phone)', type: ['code', 'name', 'phone'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -41,16 +41,16 @@ export default class AcademyController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result: data = [], totalRows } = await this.academyService.all({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
-        page,
-        rowsPerPage,
-        totalPages: Math.ceil( totalRows / rowsPerPage ),
-        totalRows,
+            page: Number(page),
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
         };
         return { data, paging };
     }
 
     @Get('search')
-    @ApiOperation({ title: 'Search Academy.', description: 'Search academy.'})
+    @ApiOperation({ title: 'Search Academy.', description: 'Search academy.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, phone, or type)', type: ['code', 'name', 'phone', 'type'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })

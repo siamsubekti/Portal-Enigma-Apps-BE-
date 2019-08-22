@@ -36,7 +36,7 @@ export default class ServicesController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result: data = [], totalRows } = await this.service.find({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
-            page,
+            page: Number(page),
             rowsPerPage,
             totalPages: Math.ceil(totalRows / rowsPerPage),
             totalRows,
@@ -50,7 +50,7 @@ export default class ServicesController {
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-   @ApiOkResponse({ description: 'If success search Services', type: ServiceSearchResponse })
+    @ApiOkResponse({ description: 'If success search Services', type: ServiceSearchResponse })
     @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,

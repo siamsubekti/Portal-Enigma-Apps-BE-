@@ -24,7 +24,7 @@ export default class ParameterService {
 
     async create(parameterDto: ParameterDTO): Promise<Parameter> {
         const parameter: Parameter = await this.parameterRepository.findOne({ where: { key: parameterDto.key } });
-        if (parameter) throw new BadRequestException('Data ini telah ada');
+        if (parameter) throw new BadRequestException('Data already exists.');
         else return await this.parameterRepository.save(parameterDto);
     }
 
@@ -36,7 +36,7 @@ export default class ParameterService {
         if (!parameter) throw new NotFoundException(`Parameter with id: ${id} not found`);
         else {
             const exist: boolean = await this.parameterRepository.count({ where: { key: parameterDto.key } }) === 1;
-            if (exist && parameterDto.key !== parameter.key) throw new BadRequestException('Data ini telah ada');
+            if (exist && parameterDto.key !== parameter.key) throw new BadRequestException('Data already exists.');
             parameter = this.parameterRepository.merge(parameter, parameterDto);
             return await this.parameterRepository.save(parameter);
         }
@@ -50,6 +50,7 @@ export default class ParameterService {
     }
 
     async find(queryParams: ParameterQueryDTO): Promise<ParameterQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Parameter> = this.parameterRepository.createQueryBuilder('p');
 
         if (queryParams.term) {
@@ -70,7 +71,7 @@ export default class ParameterService {
         } else
             query = query.orderBy('p.key', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Parameter[], number] = await query.getManyAndCount();

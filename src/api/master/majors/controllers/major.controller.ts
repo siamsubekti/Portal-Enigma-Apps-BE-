@@ -20,10 +20,10 @@ export default class MajorController {
     constructor(
         private readonly majorService: MajorService,
         private readonly config: AppConfig,
-        ) { }
+    ) { }
 
     @Get()
-    @ApiOperation({ title: 'List of Majors.', description: 'Get list of majors from database.'})
+    @ApiOperation({ title: 'List of Majors.', description: 'Get list of majors from database.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: 'name', required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
@@ -41,16 +41,16 @@ export default class MajorController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result: data = [], totalRows } = await this.majorService.all({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
-        page,
-        rowsPerPage,
-        totalPages: Math.ceil( totalRows / rowsPerPage ),
-        totalRows,
+            page: Number(page),
+            rowsPerPage,
+            totalPages: Math.ceil(totalRows / rowsPerPage),
+            totalRows,
         };
         return { data, paging };
     }
 
     @Get('search')
-    @ApiOperation({ title: 'Search Major.', description: 'Search major.'})
+    @ApiOperation({ title: 'Search Major.', description: 'Search major.' })
     @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (name)', type: ['name'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })

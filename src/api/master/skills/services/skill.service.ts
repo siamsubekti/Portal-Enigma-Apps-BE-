@@ -21,7 +21,7 @@ export default class SkillService {
         const skill: Skill = await this.skillRepository.findOne({
             where: { name: skillDto.name },
         });
-        if (skill) throw new BadRequestException('Data ini telah ada');
+        if (skill) throw new BadRequestException('Data already exists.');
         else return await this.skillRepository.save(skillDto);
     }
 
@@ -38,7 +38,7 @@ export default class SkillService {
         if (!data) throw new NotFoundException(`Skill with id: ${id} not found`);
         else {
             const exist: boolean = await this.skillRepository.count({ where: { name: skillDto.name } }) === 1;
-            if (exist && skillDto.name !== data.name) throw new BadRequestException('Data ini telah ada.');
+            if (exist && skillDto.name !== data.name) throw new BadRequestException('Name already exists.');
             data = this.skillRepository.merge(data, skillDto);
             return await this.skillRepository.save(data);
         }
@@ -76,6 +76,7 @@ export default class SkillService {
     }
 
     async find(queryParams: SkillQueryDTO): Promise<SkillQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Skill> = this.skillRepository.createQueryBuilder('skill');
 
         if (queryParams.term) {
@@ -96,7 +97,7 @@ export default class SkillService {
         } else
             query = query.orderBy('skill.name', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Skill[], number] = await query.getManyAndCount();

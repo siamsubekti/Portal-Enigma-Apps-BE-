@@ -18,6 +18,7 @@ export default class ServicesService {
     }
 
     async find(queryParams: ServiceQueryDTO): Promise<ServiceQueryResult> {
+        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * ( queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Service> = this.serviceRepository.createQueryBuilder('s');
 
         if (queryParams.term) {
@@ -38,11 +39,12 @@ export default class ServicesService {
         } else
             query = query.orderBy('s.code', 'ASC');
 
-        query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+        query.offset(offset);
         query.limit(queryParams.rowsPerPage);
 
         const result: [Service[], number] = await query.getManyAndCount();
         // Logger.log(queryParams, 'ServiceService@findAll', true);
+        // console.log('queryParams:', queryParams, 'offset:', offset, 'limit:', limit);
 
         return {
             result: result[0],
@@ -60,7 +62,7 @@ export default class ServicesService {
 
     async create(serviceDto: ServiceDTO): Promise<Service> {
         const service: Service = await this.serviceRepository.findOne({ where: { code: serviceDto.code } });
-        if (service) throw new BadRequestException('Data ini telah ada (PAKEK BAHASA INGGERIS BIAR KEKINIAN OY!).');
+        if (service) throw new BadRequestException('Data already exists.');
         else return await this.serviceRepository.save(serviceDto);
     }
 
