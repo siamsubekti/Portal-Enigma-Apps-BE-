@@ -1,6 +1,17 @@
 import { Controller, Get, UseInterceptors, Param, Post, Body, Delete, HttpCode, InternalServerErrorException, Put, Query, UseGuards } from '@nestjs/common';
 import ServicesService from '../services/services.service';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiBadRequestResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+    ApiOkResponse,
+    ApiOperation,
+    ApiUseTags,
+    ApiCreatedResponse,
+    ApiNotFoundResponse,
+    ApiImplicitQuery,
+    ApiBadRequestResponse,
+    ApiUnauthorizedResponse,
+    ApiUnprocessableEntityResponse,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ServiceResponse, ServicePageResponse, ServiceDTO, ServiceResponses, ServiceSearchResponse } from '../models/service.dto';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -93,8 +104,10 @@ export default class ServicesController {
 
     @Delete(':id')
     @HttpCode(204)
+    @ApiNoContentResponse({ description: 'If successfully deleted.' })
     @ApiOperation({ title: 'Delete Service', description: 'API to delete service by id.' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiUnprocessableEntityResponse({ description: 'If service have any relations', type: ApiExceptionResponse })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.service.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;
