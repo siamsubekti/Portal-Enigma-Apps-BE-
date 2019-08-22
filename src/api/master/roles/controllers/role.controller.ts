@@ -57,6 +57,7 @@ export default class RoleController {
   @ApiOkResponse({ description: 'Search result of major.', type: ApiResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  @UseInterceptors(ResponseRebuildInterceptor)
   async search(
     @Query('term') term?: string,
     @Query('order') order: 'code' | 'name' = 'name',
