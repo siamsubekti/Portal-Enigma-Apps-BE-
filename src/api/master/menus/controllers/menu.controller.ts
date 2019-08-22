@@ -1,8 +1,19 @@
 import MenuService from '../services/menu.service';
 import { MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
-import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Delete, UseGuards, Query } from '@nestjs/common';
+import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Delete, UseGuards, Query, HttpCode } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+    ApiUseTags,
+    ApiOperation,
+    ApiOkResponse,
+    ApiInternalServerErrorResponse,
+    ApiCreatedResponse,
+    ApiNotFoundResponse,
+    ApiImplicitQuery,
+    ApiUnauthorizedResponse,
+    ApiUnprocessableEntityResponse,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
 import Menu from '../models/menu.entity';
@@ -118,7 +129,10 @@ export default class MenuController {
     }
 
     @Delete(':id')
+    @HttpCode(204)
     @ApiOperation({ title: 'Delete Menu', description: 'Delete Menu' })
+    @ApiNoContentResponse({ description: 'If successfully deleted.' })
+    @ApiUnprocessableEntityResponse({ description: 'If menu have any relation.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: `Menu Not Found`, type: ApiExceptionResponse })
     async deleteMenu(@Param('id') id: number): Promise<DeleteResult> {
