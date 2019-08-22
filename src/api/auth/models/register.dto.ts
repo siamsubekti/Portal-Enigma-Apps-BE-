@@ -36,8 +36,8 @@ export class AccountRegisterDTO {
 
   @IsDefined()
   @IsNotEmpty()
-  @ApiModelProperty({type: 'date', description: 'Birth of date.', required: true})
-  birthDate: Date;
+  @ApiModelProperty({type: 'string', description: 'Birth of date.', required: true, example: '03-12-1995'})
+  birthDate: string;
 }
 
 export class AccountRegisterResponseDTO {

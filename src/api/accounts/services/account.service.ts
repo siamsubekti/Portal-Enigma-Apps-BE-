@@ -28,6 +28,7 @@ export default class AccountService {
   }
 
   async all(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
+    const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
     const orderCols: { [key: string]: string } = {
       username: 'a.username',
       fullname: 'p.fullname',
@@ -50,7 +51,7 @@ export default class AccountService {
     }
 
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
-    query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+    query.offset(offset);
     query.limit(queryParams.rowsPerPage);
 
     const result: [Account[], number] = await query.getManyAndCount();
