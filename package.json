@@ -38,6 +38,7 @@
     "class-validator": "^0.9.1",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.4",
+    "crypto-random-string": "^3.0.1",
     "csurf": "^1.10.0",
     "dotenv": "^8.0.0",
     "express-handlebars": "^3.1.0",
