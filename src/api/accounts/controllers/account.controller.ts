@@ -51,7 +51,7 @@ export default class AccountController {
     const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
     const { result = [], totalRows } = await this.accountService.all({ term, order, sort, page, rowsPerPage });
     const paging: PagingData = {
-      page,
+      page: Number(page),
       rowsPerPage,
       totalPages: Math.ceil(totalRows / rowsPerPage),
       totalRows,
