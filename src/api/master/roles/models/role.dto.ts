@@ -15,10 +15,10 @@ export class RoleDTO {
   @IsNotEmpty()
   name: string;
 
-  @ApiModelProperty()
+  @ApiModelProperty({type: [Service]})
   services: Service[];
 
-  @ApiModelProperty()
+  @ApiModelProperty({type: [Menu]})
   menus: Menu[];
 }
 

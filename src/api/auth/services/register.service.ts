@@ -75,6 +75,7 @@ export default class RegisterService {
       profile.nickname = this.getNickname(form.fullname);
       profile.email = form.username;
       profile.phone = form.phone;
+      profile.birthdate = moment(form.birthDate, 'DD-MM-YYYY').toDate();
       profile = await this.profileService.save(profile);
 
       let account: Account = new Account();
