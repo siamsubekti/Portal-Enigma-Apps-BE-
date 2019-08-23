@@ -1,5 +1,5 @@
 import * as nodemailer from 'nodemailer';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import AppConfig from '../../config/app.config';
 import { EmailMessage } from './email-message.model';
 
@@ -19,7 +19,7 @@ export default class MailerUtil {
   async send(message: EmailMessage): Promise<any> {
     const response: any = await this.mailer.sendMail(message);
 
-    Logger.debug(response);
+    // Logger.debug(response);
 
     return response;
   }

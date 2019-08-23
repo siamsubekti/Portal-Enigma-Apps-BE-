@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Role from '../models/role.entity';
 import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
@@ -100,9 +100,18 @@ export default class RoleService {
         }
     }
 
+    async getRelations(id: number): Promise<Role> {
+        return await this.roleRepository.findOne({ where: { id }, relations: ['account', 'services', 'menus'] });
+    }
+
     async delete(id: number): Promise<DeleteResult> {
-        const countId: boolean = await this.roleRepository.count({ id }) > 0;
-        if (!countId) throw new NotFoundException(`Role with id: ${id} Not Found`);
+        const roles: Role = await this.getRelations(id);
+        const menus: Menu[] = await Promise.resolve(roles.menus);
+        const services: Service[] = await Promise.resolve(roles.services);
+        if (!roles) throw new NotFoundException(`Role with id: ${id} Not Found`);
+        else if ( roles && menus.length > 0 ) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
+        else if ( roles && services.length > 0 ) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
+        else
         try {
             const result: DeleteResult = await this.roleRepository.delete(id);
             return result;

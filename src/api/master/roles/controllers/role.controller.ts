@@ -1,9 +1,9 @@
 import RoleService from '../services/role.service';
 import { RoleResponse, RolePagedResponse, RoleDTO } from '../models/role.dto';
-import { Get, Controller, Body, Post, Param, Put, Delete, UseInterceptors, UseGuards, Query } from '@nestjs/common';
+import { Get, Controller, Body, Post, Param, Put, Delete, UseInterceptors, UseGuards, Query, HttpCode } from '@nestjs/common';
 import {
   ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
-  ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse,
+  ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse, ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
@@ -107,8 +107,11 @@ export default class RoleController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
+  @ApiNoContentResponse({ description: 'If successfully deleted.'})
   @ApiOperation({ title: 'Delete Role', description: 'Delete Role' })
   @ApiNotFoundResponse({ description: 'Role Not Found', type: ApiExceptionResponse })
+  @ApiUnprocessableEntityResponse({ description: 'If role have any relation.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'Internal Server Error', type: ApiExceptionResponse })
   async deleteRole(@Param('id') params: number): Promise<DeleteResult> {
     const { affected }: DeleteResult = await this.roleService.delete(params);
