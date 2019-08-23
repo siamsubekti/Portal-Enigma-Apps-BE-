@@ -22,12 +22,12 @@ import { PagingData } from '../../../libraries/responses/response.class';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../../api/auth/guards/cookie.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { DocumentDTO, DocumentResponse } from 'src/api/resumes/document/models/document.dto';
-import DocumentService from 'src/api/resumes/document/services/document.service';
-import { ResponseRebuildInterceptor } from 'src/libraries/responses/response.interceptor';
+import { DocumentDTO, DocumentResponse } from '../../../api/resumes/document/models/document.dto';
+import DocumentService from '../../../api/resumes/document/services/document.service';
+import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { Response } from 'express';
-import Document from 'src/api/resumes/document/models/document.entity';
-import { multerOptions } from 'src/config/multer.config';
+import Document from '../../../api/resumes/document/models/document.entity';
+import { multerOptions } from '../../../config/multer.config';
 
 @Controller('candidates')
 @ApiUseTags('Candidates')
@@ -57,7 +57,7 @@ export default class CandidateController {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
         const { result = [], totalRows } = await this.candidateServices.getCandidates({ term, order, sort, page, rowsPerPage });
         const paging: PagingData = {
-            page,
+            page: Number(page),
             rowsPerPage,
             totalPages: Math.ceil(totalRows / rowsPerPage),
             totalRows,
