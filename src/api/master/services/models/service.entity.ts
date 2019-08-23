@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import Role from '../../roles/models/role.entity';
 import { HttpMethod } from 'src/config/constants';
+import Role from '../../roles/models/role.entity';
 
 @Entity({ name: 'mst_services' })
 export default class Service {

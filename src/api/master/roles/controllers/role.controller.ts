@@ -2,8 +2,17 @@ import RoleService from '../services/role.service';
 import { RoleResponse, RolePagedResponse, RoleDTO } from '../models/role.dto';
 import { Get, Controller, Body, Post, Param, Put, Delete, UseInterceptors, UseGuards, Query, HttpCode } from '@nestjs/common';
 import {
-  ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse,
-  ApiUseTags, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiImplicitQuery, ApiUnauthorizedResponse, ApiUnprocessableEntityResponse, ApiNoContentResponse,
+  ApiOperation,
+  ApiOkResponse,
+  ApiInternalServerErrorResponse,
+  ApiUseTags,
+  ApiCreatedResponse,
+  ApiBadRequestResponse,
+  ApiNotFoundResponse,
+  ApiImplicitQuery,
+  ApiUnauthorizedResponse,
+  ApiUnprocessableEntityResponse,
+  ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { ApiExceptionResponse, ApiResponse } from '../../../../libraries/responses/response.type';
 import { DeleteResult } from 'typeorm';
@@ -107,7 +116,7 @@ export default class RoleController {
 
   @Delete(':id')
   @HttpCode(204)
-  @ApiNoContentResponse({ description: 'If successfully deleted.'})
+  @ApiNoContentResponse({ description: 'If successfully deleted.' })
   @ApiOperation({ title: 'Delete Role', description: 'Delete Role' })
   @ApiNotFoundResponse({ description: 'Role Not Found', type: ApiExceptionResponse })
   @ApiUnprocessableEntityResponse({ description: 'If role have any relation.', type: ApiExceptionResponse })

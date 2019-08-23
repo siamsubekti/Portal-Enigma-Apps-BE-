@@ -29,7 +29,7 @@ export default class Menu {
     parentMenu: Menu;
 
     @OneToMany(() => Menu, (menu: Menu) => menu.parentMenu)
-    childrenMenu: Promise<Menu[]>;
+    childrenMenu: Promise<Menu[]> | Menu[];
 
     @ManyToMany(() => Role, (role: Role) => role.menus)
     roles: Promise<Role[]>;
