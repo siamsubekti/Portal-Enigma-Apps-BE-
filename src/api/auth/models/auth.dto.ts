@@ -1,8 +1,8 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty } from 'class-validator';
-import { IApiResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
-import Service from '../../master/services/models/service.entity';
+import { AccountStatus } from '../../../config/constants';
+import { ServiceDTO } from '../../master/services/models/service.dto';
 
 export class LoginCredentialDTO {
   @IsDefined()
@@ -20,19 +20,30 @@ export class LoginResponseDTO {
   @ApiModelProperty({type: 'string', description: 'Account ID for the logged-in user.'})
   accountId: string;
 
-  @ApiModelProperty({type: 'string', description: 'Session ID for the logged-in user.'})
+  @ApiModelProperty({enum: AccountStatus, description: 'Account status for logged-in user.', default: AccountStatus.ACTIVE})
+  accountStatus: AccountStatus;
+
+  @ApiModelProperty({type: 'string', description: 'Session ID for the logged-in user.', required: false})
   sessionId: string;
 
-  @ApiModelProperty({type: Service, description: 'Service endpoint to get privileges.'})
-  redirectTo: Service;
+  @ApiModelProperty({type: ServiceDTO, description: 'Service endpoint to get privileges.', required: false})
+  redirectTo?: ServiceDTO;
 }
 
-export class LoginResponse implements IApiResponse {
+export class LoginResponse {
   @ApiModelProperty({type: ResponseStatus})
-  status: ResponseStatus;
+  status?: ResponseStatus;
 
   @ApiModelProperty({type: LoginResponseDTO})
   data: LoginResponseDTO;
+}
+
+export class AuthServicesResponse {
+  @ApiModelProperty({type: ResponseStatus})
+  status?: ResponseStatus;
+
+  @ApiModelProperty({type: [ServiceDTO], description: 'Auth service endpoints.'})
+  data: ServiceDTO[];
 }
 
 export interface JwtPayload {

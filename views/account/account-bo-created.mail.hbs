@@ -38,14 +38,28 @@
 							<td>
 								<h3>Hi, {{ name }}</h3>
 								<p>
-                  Welcome to Enigma Portal, you'll have to activate your account first before you can login to your dashboard.
-                  Follow the link below to activate your account.
+                  Your account has been created with the following credential:
                 </p>
 								<!-- Callout Panel -->
-								<p class="callout" style="text-align: center;">
-									<a href="{{ activationLink }}">Activate Your Account</a>
-								</p>
+								<div class="callout" style="text-align: center;">
+									<table style="width: 100%;">
+                    <tbody>
+                      <tr>
+                        <th width="10%">Username</th>
+                        <td width="3%">:</td>
+                        <td width="87%">{{ username }}</td>
+                      </tr>
+                      <tr>
+                        <th width="10%">Password</th>
+                        <td width="3%">:</td>
+                        <td width="87%">{{ password }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+								</div>
 								<!-- /Callout Panel -->
+
+                <p>Please change your password the first time you login to <a href="{{ baseUrl }}" title="Enigma Portal Backoffice">Enigma Portal Backoffice.</a></p>
 							</td>
 						</tr>
 					</table>
