@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
-import { HttpMethod } from 'src/config/constants';
 import Role from '../../roles/models/role.entity';
+import { HttpMethod, ServiceType } from '../../../../config/constants';
 
 @Entity({ name: 'mst_services' })
 export default class Service {
@@ -19,6 +19,9 @@ export default class Service {
 
     @Column({ type: 'varchar', length: 6, nullable: false })
     method: HttpMethod;
+
+    @Column({ name: 'service_type', type: 'varchar', length: 11, nullable: false, default: 'BACKOFFICE' })
+    serviceType: ServiceType;
 
     @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
     createdAt: Date;

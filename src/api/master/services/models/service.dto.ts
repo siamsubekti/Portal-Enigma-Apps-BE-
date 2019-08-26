@@ -2,10 +2,12 @@ import { ApiModelProperty } from '@nestjs/swagger';
 import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses/response.interface';
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import Service from './service.entity';
-import { IsNotEmpty, IsDefined, MaxLength, IsEnum } from 'class-validator';
-import { HttpMethod } from '../../../../config/constants';
+import { IsNotEmpty, IsDefined, MaxLength, IsEnum, IsOptional } from 'class-validator';
+import { HttpMethod, ServiceType } from '../../../../config/constants';
 
 export class ServiceDTO {
+  @ApiModelProperty({ description: 'ID of a service.', type: 'number', required: false })
+  id?: number;
 
   @ApiModelProperty({ description: 'Code of a service.', type: 'string', uniqueItems: true, required: true, maxLength: 50 })
   @IsDefined()
@@ -13,24 +15,32 @@ export class ServiceDTO {
   @MaxLength(50)
   code: string;
 
-  @ApiModelProperty({ description: 'Name a service.', type: 'string', required: true, maxLength: 255 })
+  @ApiModelProperty({ description: 'Name of a service.', type: 'string', required: true, maxLength: 255 })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(255)
   name: string;
 
-  @ApiModelProperty({ description: 'End point URL of service.', type: 'string', required: true, maxLength: 128 })
+  @ApiModelProperty({ description: 'End point URL of a service.', type: 'string', required: true, maxLength: 128 })
   @IsDefined()
   @IsNotEmpty()
   @MaxLength(128)
   endpointUrl: string;
 
-  @ApiModelProperty({ description: 'HTTP method of service.', enum: HttpMethod, required: true, maxLength: 6 })
+  @ApiModelProperty({ description: 'HTTP method of a service.', enum: HttpMethod, required: true, maxLength: 6 })
   @IsDefined()
   @IsNotEmpty()
   @IsEnum(HttpMethod)
   @MaxLength(6)
   method: HttpMethod;
+
+  @ApiModelProperty({ description: 'Service type of a service.', enum: ServiceType, required: true, maxLength: 11 })
+  @IsOptional()
+  @IsDefined()
+  @IsNotEmpty()
+  @IsEnum(ServiceType)
+  @MaxLength(11)
+  serviceType?: ServiceType;
 }
 
 export class ServiceResponse implements IApiResponse {
