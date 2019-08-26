@@ -107,15 +107,11 @@ export default class RoleService {
 
     async delete(id: number): Promise<DeleteResult> {
         const roles: Role = await this.getRelations(id);
-        const account: Account = await Promise.resolve(roles.account);
         if (!roles) throw new NotFoundException(`Role with id: ${id} Not Found`);
-        else if ( roles && account[0] !== undefined ) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
-        else
-        try {
-            const result: DeleteResult = await this.roleRepository.delete(id);
-            return result;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+        else if (roles) {
+            const account: Account = await Promise.resolve(roles.account);
+            if (account[0] !== undefined) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
+            else return await this.roleRepository.delete(id);
         }
     }
 
