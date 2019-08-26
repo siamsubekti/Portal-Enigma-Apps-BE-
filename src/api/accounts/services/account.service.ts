@@ -100,7 +100,7 @@ export default class AccountService {
     const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
       .innerJoinAndSelect('a.profile', 'p');
 
-    query.orWhere('p.email = :email', { email });
+    query.where('p.email = :email', { email });
     query.where('a.status = :status', { status: AccountStatus.ACTIVE });
 
     return query.getCount();
@@ -110,7 +110,7 @@ export default class AccountService {
     const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
       .innerJoinAndSelect('a.profile', 'p');
 
-    query.orWhere('p.email = :email', { email });
+    query.where('p.email = :email', { email });
     query.where('a.status = :status', { status: AccountStatus.ACTIVE });
     query.limit(1);
 
@@ -240,7 +240,7 @@ export default class AccountService {
 
       const response: any = await this.mailUtil.send({
         from: this.config.get('MAIL_SENDER'),
-        to,
+        to: `${name}<${to}>`,
         subject: 'Enigma Portal Backoffice Account Activation',
         html,
       });

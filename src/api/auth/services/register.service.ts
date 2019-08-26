@@ -131,14 +131,14 @@ export default class RegisterService {
   private async sendActivationEmail(credential: AccountRegistrationCredential): Promise<boolean> {
     try {
       const { account: { username: to, fullname: name }, key, token } = credential;
-      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/register/activation/${key}/${token}`;
+      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/#/register/activation/${key}/${token}`;
       const html: string = await this.templateUtil.renderToString('auth/account-activation.mail.hbs', {
         name, activationLink, baseUrl: this.config.get('FRONTEND_PORTAL_URL'),
       });
 
       const response: any = await this.mailUtil.send({
         from: this.config.get('MAIL_SENDER'),
-        to,
+        to: `${name}<${to}>`,
         subject: 'Enigma Portal Account Activation',
         html,
       });

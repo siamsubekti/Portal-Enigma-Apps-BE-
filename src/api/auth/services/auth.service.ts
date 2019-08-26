@@ -216,28 +216,22 @@ export default class AuthService {
 
   private async sendPasswordResetEmail(credential: PasswordResetCredential): Promise<boolean> {
     try {
-      const { account: { profile: { fullname: name }, username: to }, key, token } = credential;
-      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/auth/password/reset/${key}/${token}`);
+      const { account: { profile: { fullname: name, email: to } }, key, token } = credential;
+      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/#/auth/password/reset/${key}/${token}`);
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
         name, resetPasswordLink, baseUrl: this.config.get('FRONTEND_PORTAL_URL'),
       });
 
       const config: any = {
         from: this.config.get('MAIL_SENDER'),
-        to,
+        to: `${name}<${to}>`,
         subject: 'Enigma Portal Account Password Reset',
         html,
       };
 
-      Logger.log(config);
-
       const response: any = await this.mailUtil.send(config);
-
-      Logger.log(response);
-
       return (response ? true : false);
     } catch (exception) {
-      Logger.warn(credential, 'AuthService @sendPasswordResetEmail', true);
       Logger.error(exception, undefined, 'AuthService @sendPasswordResetEmail', true);
 
       return false;
