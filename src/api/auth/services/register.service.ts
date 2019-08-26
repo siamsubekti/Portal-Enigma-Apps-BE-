@@ -75,6 +75,7 @@ export default class RegisterService {
       profile.nickname = this.getNickname(form.fullname);
       profile.email = form.username;
       profile.phone = form.phone;
+      profile.birthdate = moment(form.birthDate, 'DD-MM-YYYY').toDate();
       profile = await this.profileService.save(profile);
 
       let account: Account = new Account();
@@ -114,7 +115,7 @@ export default class RegisterService {
 
     const expiresIn: number = Number(this.config.get('PASSWORD_RESET_EXPIRES')); // 30 minutes in seconds
     const key: string = await this.hashUtil.createMd5Hash(`${account.fullname}-${account.username}-${moment().valueOf()}-activation`);
-    const token: string = await this.hashUtil.create(`${account.fullname}-${account.username}-${moment().valueOf()}-${key}`);
+    const token: string = this.hashUtil.createRandomString(72);
     const jwt: string = jwtSign({ account, token }, this.config.get('HASH_SECRET'), { expiresIn });
     const client: IORedis.Redis = await this.redisService.getClient();
 
@@ -127,7 +128,7 @@ export default class RegisterService {
   private async sendActivationEmail(credential: AccountRegistrationCredential): Promise<boolean> {
     try {
       const { account: { username: to, fullname: name }, key, token } = credential;
-      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/register/activation/${encodeURI(key)}/${encodeURI(token)}`;
+      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/register/activation/${key}/${token}`;
       const html: string = await this.templateUtil.renderToString('auth/account-activation.mail.hbs', {
         name, activationLink, baseUrl: this.config.get('API_BASE_URL'),
       });

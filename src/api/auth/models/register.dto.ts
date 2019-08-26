@@ -33,6 +33,11 @@ export class AccountRegisterDTO {
   @MinLength(10)
   @ApiModelProperty({type: 'string', description: 'New candidate phone number.', required: true})
   phone: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @ApiModelProperty({type: 'string', description: 'Birthdate.', required: true, example: '03-12-1995'})
+  birthDate: string;
 }
 
 export class AccountRegisterResponseDTO {
