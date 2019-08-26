@@ -1,5 +1,5 @@
 import MenuService from '../services/menu.service';
-import { MenuPagedResponse, MenuDTO, MenuResponse } from '../models/menu.dto';
+import { MenuPagedResponse, MenuDTO, MenuResponse, MenuSearchResponse, MenuResponses } from '../models/menu.dto';
 import { UseInterceptors, Get, Controller, Post, Body, Param, Put, Delete, UseGuards, Query, HttpCode } from '@nestjs/common';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import {
@@ -57,6 +57,25 @@ export default class MenuController {
         return { data, paging };
     }
 
+    @Get('search')
+    @ApiOperation({ title: 'Search Menu.', description: 'Search menu.' })
+    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name)', type: ['code', 'name'], required: false })
+    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+    @ApiOkResponse({ description: 'Search result of menus.', type: MenuSearchResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async search(
+        @Query('term') term?: string,
+        @Query('order') order: 'code' | 'name' = 'name',
+        @Query('sort') sort: 'asc' | 'desc' = 'asc',
+    ): Promise<MenuResponses> {
+        const { result: data = [] } = await this.menuService.all({ term, order, sort });
+
+        return { data };
+    }
+
     @Get(':id')
     @ApiOperation({ title: 'Detail Menu', description: 'Detail Menu' })
     @ApiOkResponse({ description: 'OK', type: MenuResponse })
@@ -81,25 +100,6 @@ export default class MenuController {
     async getMenuWithSub(@Param('id') id: number): Promise<Menu> {
         const menu: Menu = await this.menuService.getRelations(id);
         return menu;
-    }
-
-    @Get('search')
-    @ApiOperation({ title: 'Search Menu.', description: 'Search menu.' })
-    @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
-    @ApiImplicitQuery({ name: 'order', description: 'Order columns (code, name, order, or icon)', type: ['code', 'name', 'order', 'icon'], required: false })
-    @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-    @ApiOkResponse({ description: 'Search result of menus.', type: ApiResponse })
-    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-    @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
-    @UseInterceptors(ResponseRebuildInterceptor)
-    async search(
-        @Query('term') term?: string,
-        @Query('order') order: 'code' | 'name' | 'order' | 'icon' = 'name',
-        @Query('sort') sort: 'asc' | 'desc' = 'asc',
-    ): Promise<MenuResponse> {
-        const { result: data = [] } = await this.menuService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
-
-        return { data };
     }
 
     @Post()
