@@ -63,7 +63,7 @@ export default class MenuService {
     }
 
     async get(id: number): Promise<Menu> {
-        return await this.menuRepository.findOne({ where: { id } });
+        return await this.menuRepository.findOne({ where: { id }, relations: ['parentMenu'] });
     }
 
     async getRelations(id: number): Promise<Menu> {
