@@ -54,38 +54,6 @@ export default class RegionService {
         }
     }
 
-    async search(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
-        let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
-
-        if (queryParams.term) {
-            let { term } = queryParams;
-            term = `%${term}%`;
-            query = query
-                .orWhere('region.type LIKE :term', { term })
-                .orWhere('region.name LIKE :term', { term });
-        }
-
-        if (queryParams.order && queryParams.sort) {
-            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            const orderCols: { [key: string]: string } = {
-                type: 'region.type',
-                name: 'region.name',
-            };
-            query = query.orderBy(orderCols[queryParams.order], sort);
-        } else
-            query = query.orderBy('region.name', 'ASC');
-
-        query.limit(100);
-
-        const result: [Region[], number] = await query.getManyAndCount();
-        // Logger.log(queryParams, 'RegionService@search', true);
-
-        return {
-            result: result[0],
-            totalRows: result[1],
-        };
-    }
-
     async find(queryParams: RegionQueryDTO): Promise<RegionQueryResult> {
         const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Region> = this.regionRepository.createQueryBuilder('region');
