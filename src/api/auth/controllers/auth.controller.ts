@@ -69,7 +69,7 @@ export default class AuthController {
       });
 
       response.json(body);
-    } else if (credential && credential.accountStatus === AccountStatus.SUSPENDED) {
+    } else if (credential && credential.accountStatus === AccountStatus.SUSPENDED && credential.sessionId) {
       const resStatus: ResponseStatus = {
         code: HttpStatus.UNPROCESSABLE_ENTITY.toString(),
         description: 'Account password must be changed.',
@@ -77,7 +77,9 @@ export default class AuthController {
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential, resStatus);
 
       response.status(HttpStatus.UNPROCESSABLE_ENTITY).json(body);
-    } else
+    } else if (credential && credential.accountStatus === AccountStatus.SUSPENDED && !credential.sessionId)
+      throw new ForbiddenException('Your account is being suspended.');
+    else
       throw new ForbiddenException('Invalid account credential.');
   }
 

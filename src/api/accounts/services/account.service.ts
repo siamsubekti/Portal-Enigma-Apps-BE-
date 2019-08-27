@@ -122,11 +122,11 @@ export default class AccountService {
   }
 
   async findByUsername(username: string): Promise<Account> {
-    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
 
   async findSuspendedAccount(username: string): Promise<Account> {
-    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.SUSPENDED }, relations: ['profile'] });
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'], where: { username, status: AccountStatus.SUSPENDED }, relations: ['profile'] });
   }
 
   async get(id: string): Promise<Account> {

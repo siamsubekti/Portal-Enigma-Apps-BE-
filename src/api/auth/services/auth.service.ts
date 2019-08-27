@@ -63,7 +63,9 @@ export default class AuthService {
           redirectTo: account.status === AccountStatus.ACTIVE ? await this.service.findByCode('MST_ACCOUNT_PRIVILEGES') : null,
         };
 
-      if (account.status === AccountStatus.SUSPENDED) {
+      // Logger.log(account, 'AuthService@login', true);
+
+      if (account.status === AccountStatus.SUSPENDED && !account.lastlogin) {
         const { key, token } = await this.prePasswordCreate(account);
 
         loginResponse.sessionId = `${key}/${token}`;

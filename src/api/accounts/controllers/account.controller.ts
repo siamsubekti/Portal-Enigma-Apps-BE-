@@ -156,7 +156,7 @@ export default class AccountController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async deactivate(@Param('id') id: string): Promise<void> {
     try {
-      await this.accountService.setStatus(id, AccountStatus.ACTIVE);
+      await this.accountService.setStatus(id, AccountStatus.INACTIVE);
     } catch (error) {
       throw error;
     }

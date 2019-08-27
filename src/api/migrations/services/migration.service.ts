@@ -22,6 +22,7 @@ import {
   AccountStatus,
   HttpMethod,
   ServiceType,
+  AccountType,
 } from '../../../config/constants';
 
 @Injectable()
@@ -389,6 +390,7 @@ export default class MigrationService {
       username: 'admin',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
+      accountType: AccountType.ADMINISTRATOR,
       profile,
     });
 
@@ -414,6 +416,7 @@ export default class MigrationService {
       username: 'staff1',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
+      accountType: AccountType.STAFF,
       profile,
     });
 
