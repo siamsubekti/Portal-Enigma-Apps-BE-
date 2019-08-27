@@ -57,6 +57,7 @@ export default class MenuService {
         menu.name = form.name;
         menu.order = form.order;
         menu.icon = form.icon;
+        menu.path = form.path;
         menu.parentMenu = parent;
 
         return await this.menuRepository.save(menu);

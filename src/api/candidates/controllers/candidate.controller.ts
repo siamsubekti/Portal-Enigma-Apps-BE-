@@ -48,6 +48,7 @@ export default class CandidateController {
     @ApiOkResponse({ description: 'List of registered candidates.', type: ApiPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
     async get(
         @Query('term') term?: string,
         @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
