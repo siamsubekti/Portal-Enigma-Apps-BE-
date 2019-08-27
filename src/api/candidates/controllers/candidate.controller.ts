@@ -16,7 +16,7 @@ import {
     ApiNotFoundResponse,
 } from '@nestjs/swagger';
 import CandidateService from '../services/candidate.service';
-import { ApiPagedResponse, ApiExceptionResponse } from '../../../libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO } from '../../../api/accounts/models/account.dto';
 import { PagingData } from '../../../libraries/responses/response.class';
 import AppConfig from '../../../config/app.config';
@@ -28,6 +28,7 @@ import { ResponseRebuildInterceptor } from '../../../libraries/responses/respons
 import { Response } from 'express';
 import Document from '../../../api/resumes/document/models/document.entity';
 import { multerOptions } from '../../../config/multer.config';
+import Account from '../../../api/accounts/models/account.entity';
 
 @Controller('candidates')
 @ApiUseTags('Candidates')
@@ -45,9 +46,10 @@ export default class CandidateController {
     @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
     @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
     @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
-    @ApiOkResponse({ description: 'List of registered candidates.', type: ApiPagedResponse })
+    @ApiOkResponse({ description: 'List of registered candidates.', type: AccountPagedResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
     async get(
         @Query('term') term?: string,
         @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
@@ -81,12 +83,13 @@ export default class CandidateController {
     @ApiOkResponse({ description: 'Search result of candidates.', type: AccountSearchResponse })
     @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
     @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
     async search(
         @Query('term') term?: string,
         @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<AccountPagedResponse> {
-        const { result } = await this.candidateServices.searchCandidates({ term, order, sort, rowsPerPage: 1000 });
+        const { result } = await this.candidateServices.getCandidates({ term, order, sort, page: 1, rowsPerPage: 1000 });
         const data: AccountResponseDTO[] = [];
 
         for (const account of result)
@@ -96,6 +99,15 @@ export default class CandidateController {
             });
 
         return { data };
+    }
+
+    @Get('registered')
+    @ApiOperation({ title: 'List registered candidates.', description: 'API to get data registered candidates.' })
+    @ApiOkResponse({ description: 'Success get registered candidates.', type: AccountPagedResponse })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+    @UseInterceptors(ResponseRebuildInterceptor)
+    async registeredCandidate(): Promise<Account[]> {
+        return await this.candidateServices.getRegisteredCandidate();
     }
 
     @Post('upload')
