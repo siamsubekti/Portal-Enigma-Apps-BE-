@@ -12,7 +12,7 @@ import {
   ApiNoContentResponse,
   ApiCreatedResponse,
 } from '@nestjs/swagger';
-import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request, Post } from '@nestjs/common';
+import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request, Post, HttpCode } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
@@ -156,13 +156,14 @@ export default class AccountController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async deactivate(@Param('id') id: string): Promise<void> {
     try {
-      await this.accountService.setStatus(id, AccountStatus.ACTIVE);
+      await this.accountService.setStatus(id, AccountStatus.INACTIVE);
     } catch (error) {
       throw error;
     }
   }
 
   @Delete(':id')
+  @HttpCode(204)
   @ApiOperation({ title: 'Delete an account', description: 'Delete account and all of its related content.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
   @ApiNoContentResponse({ description: 'Account data has beend deleted.' })

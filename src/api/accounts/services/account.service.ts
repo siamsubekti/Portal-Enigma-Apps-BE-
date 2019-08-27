@@ -6,11 +6,14 @@ import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivileg
 import { AccountStatus } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
+import ProfileService from './profile.service';
 import Role from '../../master/roles/models/role.entity';
 import RoleService from '../../../api/master/roles/services/role.service';
-import ProfileService from './profile.service';
-import HashUtil from '../../../libraries/utilities/hash.util';
 import MenuService from '../../../api/master/menus/services/menu.service';
+import HashUtil from '../../../libraries/utilities/hash.util';
+import TemplateUtil from '../../../libraries/utilities/template.util';
+import MailerUtil from '../../../libraries/mailer/mailer.util';
+import AppConfig from '../../../config/app.config';
 
 @Injectable()
 export default class AccountService {
@@ -21,6 +24,9 @@ export default class AccountService {
     private readonly profilService: ProfileService,
     private readonly menuService: MenuService,
     private readonly hashUtil: HashUtil,
+    private readonly mailUtil: MailerUtil,
+    private readonly templateUtil: TemplateUtil,
+    private readonly config: AppConfig,
   ) { }
 
   repository(): Repository<Account> {
@@ -90,16 +96,37 @@ export default class AccountService {
     return await this.account.save(account);
   }
 
+  async countByUsernameOrEmail(email: string): Promise<number> {
+    const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
+      .innerJoinAndSelect('a.profile', 'p');
+
+    query.where('p.email = :email', { email });
+    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
+
+    return query.getCount();
+  }
+
+  async findByUsernameOrEmail(email: string): Promise<Account> {
+    const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
+      .innerJoinAndSelect('a.profile', 'p');
+
+    query.where('p.email = :email', { email });
+    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
+    query.limit(1);
+
+    return query.getOne();
+  }
+
   async countByUsername(username: string): Promise<number> {
     return this.account.count({ where: { username, status: AccountStatus.ACTIVE } });
   }
 
   async findByUsername(username: string): Promise<Account> {
-    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
   }
 
   async findSuspendedAccount(username: string): Promise<Account> {
-    return this.account.findOne({ select: ['id', 'username', 'password', 'status'], where: { username, status: AccountStatus.SUSPENDED }, relations: ['profile'] });
+    return this.account.findOne({ select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'], where: { username, status: AccountStatus.SUSPENDED }, relations: ['profile'] });
   }
 
   async get(id: string): Promise<Account> {
@@ -185,7 +212,7 @@ export default class AccountService {
 
     profile = await this.profilService.save(profile);
 
-    const account: Account = new Account();
+    let account: Account = new Account();
     account.username = accountDto.username;
     account.password = await this.hashUtil.create(process.env.DEFAULT_PASSWORD);
     account.profile = profile;
@@ -196,6 +223,34 @@ export default class AccountService {
       account.roles = Promise.resolve(roles);
     }
 
-    return await this.account.save(account);
+    account = await this.account.save(account);
+
+    this.sendAccountCreatedEmail(account);
+
+    return account;
+  }
+
+  private async sendAccountCreatedEmail(account: Account): Promise<boolean> {
+    try {
+      const { username, profile: { fullname: name, email: to } } = account;
+      const password: string = process.env.DEFAULT_PASSWORD;
+      const html: string = await this.templateUtil.renderToString(
+        'account/account-bo-created.hbs',
+        { name, username, password, baseUrl: this.config.get('API_BASE_URL') });
+
+      const response: any = await this.mailUtil.send({
+        from: this.config.get('MAIL_SENDER'),
+        to: `${name}<${to}>`,
+        subject: 'Enigma Portal Backoffice Account Activation',
+        html,
+      });
+
+      if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
+      return ( response ? true : false);
+    } catch (exception) {
+      Logger.error(exception, exception, 'AccountService@sendAccountCreatedEmail', true);
+
+      return false;
+    }
   }
 }

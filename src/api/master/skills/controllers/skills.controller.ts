@@ -1,6 +1,16 @@
 import { Controller, Get, Post, Body, Delete, Param, Put, InternalServerErrorException, HttpCode, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import SkillService from '../services/skill.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import {
+    ApiUseTags,
+    ApiOperation,
+    ApiBadRequestResponse,
+    ApiOkResponse,
+    ApiNotFoundResponse,
+    ApiCreatedResponse,
+    ApiUnauthorizedResponse,
+    ApiImplicitQuery,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { SkillDTO, SkillPageResponse, SkillResponse, SkillResponses, SkillSearchResponse } from '../models/skill.dto';
 import Skill from '../models/skill.entity';
 import { DeleteResult } from 'typeorm';
@@ -33,7 +43,7 @@ export default class SkillsController {
         @Query('page') page: number = 1,
     ): Promise<SkillResponses> {
         const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-        const { result: data = [], totalRows } = await this.skillService.search({ term, sort, page, rowsPerPage });
+        const { result: data = [], totalRows } = await this.skillService.find({ term, sort, page, rowsPerPage });
         const paging: PagingData = {
             page: Number(page),
             rowsPerPage,
@@ -54,7 +64,7 @@ export default class SkillsController {
         @Query('term') term?: string,
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<SkillResponses> {
-        const { result: data = [] } = await this.skillService.search({ term, sort });
+        const { result: data = [] } = await this.skillService.find({ term, sort, page: 1, rowsPerPage: 1000 });
 
         return { data };
     }
@@ -96,6 +106,7 @@ export default class SkillsController {
     @HttpCode(204)
     @ApiOperation({ title: 'Delete Skill', description: 'API Delete skill' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiNoContentResponse({ description: 'Successfully delete skill.' })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: DeleteResult = await this.skillService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

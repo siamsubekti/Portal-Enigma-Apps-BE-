@@ -26,8 +26,8 @@ export default class RegisterController {
 
   @Post('activation/:key/:token')
   @ApiOperation({ title: 'Activate Candidate Account.', description: 'Activate new candidate account based on two parameters.' })
-  @ApiImplicitParam({ name: 'token', description: 'Activation token.', required: true })
   @ApiImplicitParam({ name: 'key', description: 'Activation key.', required: true })
+  @ApiImplicitParam({ name: 'token', description: 'Activation token.', required: true })
   @ApiCreatedResponse({ description: 'Candidate account successfuly activated.', type: AccountRegisterResponse })
   @ApiBadRequestResponse({ description: 'Parameter validation failed.', type: ApiExceptionResponse })
   async activate(@Param('key') key: string, @Param('token') token: string): Promise<AccountRegisterResponseDTO> {

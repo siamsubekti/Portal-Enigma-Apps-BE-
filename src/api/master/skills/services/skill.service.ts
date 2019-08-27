@@ -44,37 +44,6 @@ export default class SkillService {
         }
     }
 
-    async search(queryParams: SkillQueryDTO): Promise<SkillQueryResult> {
-        let query: SelectQueryBuilder<Skill> = this.skillRepository.createQueryBuilder('skill');
-
-        if (queryParams.term) {
-            let { term } = queryParams;
-            term = `%${term}%`;
-            query = query
-                .orWhere('skill.name LIKE :term', { term })
-                .orWhere('skill.description LIKE :term', { term });
-        }
-
-        if (queryParams.sort) {
-            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            // const orderCols: { [key: string]: string } = {
-            //     name: 'job.name',
-            // };
-            query = query.orderBy('skill.name', sort);
-        } else
-            query = query.orderBy('skill.name', 'ASC');
-
-        query.limit(100);
-
-        const result: [Skill[], number] = await query.getManyAndCount();
-        // Logger.log(queryParams, 'SkillsService@search', true);
-
-        return {
-            result: result[0],
-            totalRows: result[1],
-        };
-    }
-
     async find(queryParams: SkillQueryDTO): Promise<SkillQueryResult> {
         const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Skill> = this.skillRepository.createQueryBuilder('skill');

@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { sign as jwtSign, verify as jwtVerify } from 'jsonwebtoken';
 import { IORedis } from 'redis';
 import { Validator } from 'class-validator';
@@ -7,14 +7,15 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
 import { AccountPrivilege } from '../../accounts/models/account.dto';
-import { AccountStatus } from '../../../config/constants';
+import { AccountStatus, ServiceType } from '../../../config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
-import ServicesService from 'src/api/master/services/services/services.service';
+import Service from '../../master/services/models/service.entity';
+import ServicesService from '../../master/services/services/services.service';
 
 @Injectable()
 export default class AuthService {
@@ -28,6 +29,10 @@ export default class AuthService {
     private readonly config: AppConfig,
   ) { }
 
+  async getAuthServices(): Promise<Service[]> {
+    return await this.service.findAllByServiceType(ServiceType.PUBLIC);
+  }
+
   async getAccountPrivileges(accountId: string): Promise<AccountPrivilege> {
     try {
       return this.accountService.buildAccountPrivileges(accountId);
@@ -39,26 +44,38 @@ export default class AuthService {
 
   async login(credential: LoginCredentialDTO): Promise<LoginResponseDTO> {
     let loginResponse: LoginResponseDTO = null;
-    const account: Account = await this.accountService.findByUsername(credential.username);
+    let account: Account = await this.accountService.findByUsername(credential.username);
+    if (!account) account = await this.accountService.findSuspendedAccount(credential.username);
+
+    if (!account) throw new HttpException({
+      status: HttpStatus.NOT_FOUND,
+      error: `Account data related to this credential could not be found.`,
+    }, HttpStatus.NOT_FOUND);
 
     try {
-      if (!account) {
-        const suspendedAccount: Account = await this.accountService.findSuspendedAccount(credential.username);
-        if (suspendedAccount && await this.hashUtil.compare(credential.password, suspendedAccount.password))
-          loginResponse = {
-            accountId: suspendedAccount.id,
-            sessionId: null,
-            redirectTo: null,
-          };
-        return loginResponse;
-      } else if (account && await this.hashUtil.compare(credential.password, account.password))
+      const validPassword: boolean = await this.hashUtil.compare(credential.password, account.password);
+
+      if (validPassword)
         loginResponse = {
           accountId: account.id,
-          sessionId: await this.createSession(account),
-          redirectTo: await this.service.findByCode('MST_ACCOUNT_PRIVILEGES'),
+          accountStatus: account.status,
+          sessionId: account.status === AccountStatus.ACTIVE ? await this.createSession(account) : null,
+          redirectTo: account.status === AccountStatus.ACTIVE ? await this.service.findByCode('MST_ACCOUNT_PRIVILEGES') : null,
         };
 
+      // Logger.log(account, 'AuthService@login', true);
+
+      if (account.status === AccountStatus.SUSPENDED && !account.lastlogin) {
+        const { key, token } = await this.prePasswordCreate(account);
+
+        loginResponse.sessionId = `${key}/${token}`;
+      }
+
       // Logger.log({ account }, 'AuthService@login', true);
+      if (account.status === AccountStatus.ACTIVE) {
+        account.lastlogin = moment().toDate();
+        await this.accountService.save(account);
+      }
 
       return loginResponse;
     } catch (error) {
@@ -83,8 +100,8 @@ export default class AuthService {
     }
   }
 
-  async prePasswordReset(form: PasswordResetRequestDTO): Promise<void> {
-    const account: Account = await this.accountService.findByUsername(form.username);
+  async prePasswordReset(form: PasswordResetRequestDTO): Promise<boolean> {
+    const account: Account = await this.accountService.findByUsernameOrEmail(form.username);
 
     if (!account) throw new HttpException({
       status: HttpStatus.NOT_FOUND,
@@ -95,7 +112,7 @@ export default class AuthService {
       const expiresIn: number = Number(this.config.get('PASSWORD_RESET_EXPIRES')); // 30 minutes in seconds
       const client: IORedis.Redis = await this.redisService.getClient();
       const key: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}-password-reset`);
-      const token: string = await this.hashUtil.create(`${account.id}-${account.username}-${moment().valueOf()}-${key}`);
+      const token: string = this.hashUtil.createRandomString(72);
       const jwt: string = jwtSign({ aid: account.id, token }, this.config.get('HASH_SECRET'), { expiresIn });
 
       await this.accountService.setStatus(account.id, AccountStatus.SUSPENDED);
@@ -103,8 +120,10 @@ export default class AuthService {
       await client.expire(key, expiresIn); // 30 minutes in seconds
       this.sendPasswordResetEmail({ account, key, token });
 
+      return true;
+
     } catch (exception) {
-      Logger.error(exception, undefined, 'AuthService', true);
+      Logger.error(exception, undefined, 'AuthService@prePasswordReset', true);
 
       throw new HttpException({
         status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -113,7 +132,7 @@ export default class AuthService {
     }
   }
 
-  async passwordReset(form: PasswordResetDTO, key: string, token: string): Promise<void> {
+  async passwordReset(form: PasswordResetDTO, key: string, token: string): Promise<LoginResponseDTO> {
     const validator: Validator = new Validator();
 
     if (validator.notEquals(form.confirmPassword, form.password))
@@ -135,16 +154,37 @@ export default class AuthService {
         throw new Error('Invalid password reset request token.');
 
       form.password = await this.hashUtil.create(form.password);
-      await this.accountService.resetPassword(payload.aid, form.password);
+      const account: Account = await this.accountService.resetPassword(payload.aid, form.password);
+
+      return {
+        accountId: account.id,
+        accountStatus: account.status,
+        sessionId: null,
+        redirectTo: await this.service.findByCode('AUTH_LOGIN'),
+      };
 
     } catch (exception) {
-      Logger.error(exception);
+      Logger.error(exception, undefined, `AuthService@passwordReset`, true);
 
       throw new HttpException({
         status: HttpStatus.BAD_REQUEST,
         error: `Password reset cannot continue due to invalid key/token combination.`,
       }, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async prePasswordCreate(account: Account): Promise<PasswordResetCredential> {
+    const expiresIn: number = Number(this.config.get('PASSWORD_RESET_EXPIRES')); // 30 minutes in seconds
+    const client: IORedis.Redis = await this.redisService.getClient();
+    const key: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}-password-reset`);
+    const token: string = this.hashUtil.createRandomString(72);
+    const jwt: string = jwtSign({ aid: account.id, token }, this.config.get('HASH_SECRET'), { expiresIn });
+
+    // await this.accountService.setStatus(account.id, AccountStatus.SUSPENDED);
+    await client.set(key, jwt);
+    await client.expire(key, expiresIn); // 30 minutes in seconds
+
+    return { account, key, token };
   }
 
   async validateSession(cookie: string): Promise<Account> {
@@ -178,21 +218,23 @@ export default class AuthService {
 
   private async sendPasswordResetEmail(credential: PasswordResetCredential): Promise<boolean> {
     try {
-      const { account: { profile: { fullname: name }, username: to }, key, token } = credential;
-      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/auth/forgot-password/${key}/${token}`);
+      const { account: { profile: { fullname: name, email: to } }, key, token } = credential;
+      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/#/auth/password/reset/${key}/${token}`);
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
-        name, resetPasswordLink, baseUrl: this.config.get('API_BASE_URL'),
-      });
-      const response: any = await this.mailUtil.send({
-        from: this.config.get('MAIL_SENDER'),
-        to,
-        subject: 'Enigma Portal Account Password Reset',
-        html,
+        name, resetPasswordLink, baseUrl: this.config.get('FRONTEND_PORTAL_URL'),
       });
 
+      const config: any = {
+        from: this.config.get('MAIL_SENDER'),
+        to: `${name}<${to}>`,
+        subject: 'Enigma Portal Account Password Reset',
+        html,
+      };
+
+      const response: any = await this.mailUtil.send(config);
       return (response ? true : false);
     } catch (exception) {
-      Logger.error(exception, exception, 'AuthService @sendPasswordResetEmail');
+      Logger.error(exception, undefined, 'AuthService @sendPasswordResetEmail', true);
 
       return false;
     }

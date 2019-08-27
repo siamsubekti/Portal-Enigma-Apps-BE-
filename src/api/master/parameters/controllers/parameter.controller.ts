@@ -2,7 +2,17 @@ import { Controller, Get, InternalServerErrorException, Post, Put, Delete, HttpC
 import ParameterService from '../services/parameter.service';
 import ParameterDTO, { ParameterResponse, ParameterPageResponse, ParameterResponses } from '../models/parameter.dto';
 import Parameter from '../models/parameter.entity';
-import { ApiOkResponse, ApiOperation, ApiUseTags, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import {
+    ApiOkResponse,
+    ApiOperation,
+    ApiUseTags,
+    ApiBadRequestResponse,
+    ApiNotFoundResponse,
+    ApiCreatedResponse,
+    ApiUnauthorizedResponse,
+    ApiImplicitQuery,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import CookieAuthGuard from '../../../../api/auth/guards/cookie.guard';
 import { ResponseRebuildInterceptor } from '../../../../libraries/responses/response.interceptor';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -57,7 +67,7 @@ export default class ParameterController {
         @Query('order') order: 'key' | 'value' = 'key',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<ParameterResponses> {
-        const { result: data = [] } = await this.parameterService.find({ term, order, sort });
+        const { result: data = [] } = await this.parameterService.find({ term, order, sort, page: 1, rowsPerPage: 1000 });
         // Logger.log(`RESULT ${data}`);
         return { data };
     }
@@ -99,6 +109,7 @@ export default class ParameterController {
     @HttpCode(204)
     @ApiOperation({ title: 'Delete Paramter', description: 'API to delete Parameter' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiNoContentResponse({ description: 'Successfully delete parameter.' })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected } = await this.parameterService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

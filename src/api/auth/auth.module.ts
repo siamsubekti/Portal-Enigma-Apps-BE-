@@ -8,11 +8,13 @@ import AuthController from './controllers/auth.controller';
 import CookieStrategy from './strategies/cookie.strategy';
 import RegisterService from './services/register.service';
 import ServicesModule from '../master/services/services.module';
+import RoleModule from '../master/roles/role.module';
 
 @Module({
   imports: [
     ConfigModule,
     AccountModule,
+    RoleModule,
     ServicesModule,
     PassportModule.register({defaultStrategy: 'cookie', property: 'account', session: false}),
   ],

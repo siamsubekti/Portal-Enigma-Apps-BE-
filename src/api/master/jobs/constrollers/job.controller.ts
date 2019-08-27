@@ -1,6 +1,16 @@
 import { Controller, Get, Post, Delete, Body, Param, Put, HttpCode, InternalServerErrorException, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import JobService from '../services/job.service';
-import { ApiUseTags, ApiOperation, ApiOkResponse, ApiBadRequestResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import {
+    ApiUseTags,
+    ApiOperation,
+    ApiOkResponse,
+    ApiBadRequestResponse,
+    ApiCreatedResponse,
+    ApiNotFoundResponse,
+    ApiUnauthorizedResponse,
+    ApiImplicitQuery,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { JobDTO, JobResponse, JobPageResponse, JobResponses, JobSearchResponse } from '../models/job.dto';
 import Job from '../models/job.entity';
 import { ApiExceptionResponse } from '../../../../libraries/responses/response.type';
@@ -54,7 +64,7 @@ export default class JobController {
         @Query('term') term?: string,
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<JobResponses> {
-        const { result: data = [] } = await this.jobService.search({ term, sort });
+        const { result: data = [] } = await this.jobService.find({ term, sort, page: 1, rowsPerPage: 1000 });
 
         return { data };
     }
@@ -96,6 +106,7 @@ export default class JobController {
     @HttpCode(204)
     @ApiOperation({ title: 'Delete Job', description: 'API delete Job by ID' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiNoContentResponse({ description: 'Successfully delete job.' })
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: DeleteResult = await this.jobService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

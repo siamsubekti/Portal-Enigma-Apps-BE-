@@ -9,6 +9,7 @@ import {
     ApiCreatedResponse,
     ApiUnauthorizedResponse,
     ApiImplicitQuery,
+    ApiNoContentResponse,
 } from '@nestjs/swagger';
 import { TemplateDTO, TemplatePageResponse, TemplateResponse, TemplateResponses, TemplateSearchResponse } from '../models/template.dto';
 import Template from '../models/template.entity';
@@ -66,7 +67,7 @@ export default class TemplateController {
         @Query('order') order: 'type' | 'name' = 'name',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<TemplateResponses> {
-        const { result: data = [] } = await this.templateService.search({ term, order, sort });
+        const { result: data = [] } = await this.templateService.find({ term, order, sort, page: 1, rowsPerPage: 1000 });
 
         return { data };
     }
@@ -108,6 +109,7 @@ export default class TemplateController {
     @HttpCode(204)
     @ApiOperation({ title: 'Delete Template', description: 'API delete template' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiNoContentResponse({ description: 'Successfully delete template.'})
     async delete(@Param('id') id: number): Promise<any> {
         const { affected }: any = await this.templateService.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;

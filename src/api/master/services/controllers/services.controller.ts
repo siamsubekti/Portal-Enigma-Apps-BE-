@@ -68,7 +68,7 @@ export default class ServicesController {
         @Query('order') order: 'code' | 'name' = 'name',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<ServiceResponses> {
-        const { result: data = [] } = await this.service.search({ term, order, sort });
+        const { result: data = [] } = await this.service.find({ term, order, sort, page: 1, rowsPerPage: 1000 });
 
         return { data };
     }

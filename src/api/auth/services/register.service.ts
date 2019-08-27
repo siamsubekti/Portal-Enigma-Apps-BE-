@@ -19,12 +19,15 @@ import Profile from '../../accounts/models/profile.entity';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
 import ProfileService from '../../accounts/services/profile.service';
+import RoleService from '../../master/roles/services/role.service';
+import Role from '../../master/roles/models/role.entity';
 
 @Injectable()
 export default class RegisterService {
   constructor(
     private readonly accountService: AccountService,
     private readonly profileService: ProfileService,
+    private readonly roleService: RoleService,
     private readonly hashUtil: HashUtil,
     private readonly mailUtil: MailerUtil,
     private readonly templateUtil: TemplateUtil,
@@ -83,7 +86,7 @@ export default class RegisterService {
       account.password = form.password;
       account.profile = profile;
       account.status = AccountStatus.ACTIVE;
-      account.roles = Promise.resolve([]);
+      account.roles = Promise.resolve((await this.roleService.all({term: 'CANDIDATE'})).result as Role[]);
       account = await this.accountService.save(account);
 
       const client: IORedis.Redis = await this.redisService.getClient();
@@ -128,21 +131,22 @@ export default class RegisterService {
   private async sendActivationEmail(credential: AccountRegistrationCredential): Promise<boolean> {
     try {
       const { account: { username: to, fullname: name }, key, token } = credential;
-      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/register/activation/${key}/${token}`;
+      const activationLink: string = `${this.config.get('FRONTEND_PORTAL_URL')}/#/register/activation/${key}/${token}`;
       const html: string = await this.templateUtil.renderToString('auth/account-activation.mail.hbs', {
-        name, activationLink, baseUrl: this.config.get('API_BASE_URL'),
+        name, activationLink, baseUrl: this.config.get('FRONTEND_PORTAL_URL'),
       });
 
       const response: any = await this.mailUtil.send({
         from: this.config.get('MAIL_SENDER'),
-        to,
+        to: `${name}<${to}>`,
         subject: 'Enigma Portal Account Activation',
         html,
       });
 
+      if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
       return ( response ? true : false);
     } catch (exception) {
-      Logger.error(exception, exception, 'RegisterService @sendActivationEmail');
+      Logger.error(exception, exception, 'RegisterService@sendActivationEmail');
 
       return false;
     }
