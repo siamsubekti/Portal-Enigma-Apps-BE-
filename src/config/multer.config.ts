@@ -1,23 +1,26 @@
+import * as md5 from 'md5';
 import { existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
-import { HttpException, HttpStatus } from '@nestjs/common';
-import md5 = require('md5');
-import { parse } from 'path';
+import { HttpException, HttpStatus, Logger } from '@nestjs/common';
+import { parse, join } from 'path';
+import AppConfig from './app.config';
+
+const config: AppConfig = new AppConfig();
 
 // Multer configuration
 export const multerConfig: any = {
-    dest: process.env.UPLOAD_LOCATION,
+    dest: config.get('UPLOAD_LOCATION'),
 };
 
 // Multer upload options
 export const multerOptions: any = {
     // Enable file size limits
     limits: {
-        fileSize: +process.env.MAX_FILE_SIZE,
+        fileSize: +config.get('MAX_FILE_SIZE'),
     },
     // Check the mimetypes to allow for upload
     fileFilter: (req: any, file: any, cb: any): any => {
-        console.log(`filtering file for account_id = ${req.user.id}`);
+        Logger.log(`filtering file for account_id = ${req.user.id}`, 'multerConfig@options', true);
         if (file.mimetype.match(/\/(vnd.openxmlformats-officedocument.wordprocessingml.document|pdf|jpg|jpeg|msword)$/)) cb(null, true);
         else cb(new HttpException('Unsupported file type.', HttpStatus.BAD_REQUEST), false);
     },
@@ -27,10 +30,10 @@ export const multerOptions: any = {
         destination: (req: any, file: any, cb: any): any => {
             const { id } = req.user;
 
-            const uploadPath: string = multerConfig.dest + `/candidates/${id}/`;
+            const uploadPath: string = join(config.get('BASE_PATH'), multerConfig.dest, 'documents', 'candidates', md5(id));
             // Create folder if doesn't exist
-            if (!existsSync(uploadPath)) mkdirSync(uploadPath);
-            console.log(`creating directory for file ${file.filename}`);
+            if (!existsSync(uploadPath)) mkdirSync(uploadPath, { recursive: true });
+            Logger.log(`creating directory for file ${file.filename}`, 'multerConfig@options', true);
 
             cb(null, uploadPath);
         },
@@ -39,9 +42,9 @@ export const multerOptions: any = {
         filename: (req: any, file: { filename: string, originalname: string }, cb: any): any => {
             // Calling the callback passing the random name generated with the original extension name
             const { name: filename, ext } = parse(file.originalname);
-            file.originalname = `${filename.replace(/[_. ]/g, '-').toLowerCase()}` + `${ext}`;
+            file.originalname = `${filename.replace(/[_. ]/g, '-').toLowerCase()}${ext}`;
             file.filename = `${md5(filename)}${ext}`;
-            console.log(`process uploading file with account_id = ${req.user.id}`);
+            Logger.log(`process uploading file with account_id = ${req.user.id}`);
 
             cb(null, file.filename);
         },

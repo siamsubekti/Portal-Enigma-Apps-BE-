@@ -1,5 +1,5 @@
 import * as moment from 'moment-timezone';
-import { Injectable, Logger, HttpException, HttpStatus, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, HttpException, HttpStatus, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivilege } from '../models/account.dto';
@@ -166,6 +166,18 @@ export default class AccountService {
     return await this.save(account);
   }
 
+  async deactive(id: string): Promise<Account> {
+    const account: Account = await this.account.findOne(id);
+    if (!account) throw new NotFoundException('Account not found.');
+    else {
+      account.status = AccountStatus.INACTIVE;
+      account.roles = Promise.resolve([]);
+      account.updatedAt = new Date();
+
+      return await this.save(account);
+    }
+  }
+
   async resetPassword(id: string, password: string): Promise<Account> {
     const account: Account = await this.account.findOne(id);
     account.password = password;
@@ -246,7 +258,7 @@ export default class AccountService {
       });
 
       if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
-      return ( response ? true : false);
+      return (response ? true : false);
     } catch (exception) {
       Logger.error(exception, exception, 'AccountService@sendAccountCreatedEmail', true);
 
