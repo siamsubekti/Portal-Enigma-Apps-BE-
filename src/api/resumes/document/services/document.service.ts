@@ -29,17 +29,7 @@ export default class DocumentService {
         else return file;
     }
 
-    // async getFile(document: DocumentDTO): Promise<Buffer> {
-    //     const filename = document.name;
-    //     const filepath = document.filepath;
-
-    //     const pdf = await new Promise<Buffer>((resolve, reject) => {
-    //       fs.readFile(filepath, {}, (err, data) => {
-    //         if (err) reject(err)
-    //         else resolve(data)
-    //       })
-    //     })
-    //     return pdf
-    //   }
-
+    async findByAccountId(accountId: string): Promise<Document[]> {
+        return this.document.find({ where: { accountId } });
+    }
 }
