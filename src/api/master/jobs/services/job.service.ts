@@ -44,37 +44,6 @@ export default class JobService {
         }
     }
 
-    async search(queryParams: JobQueryDTO): Promise<JobQueryResult> {
-        let query: SelectQueryBuilder<Job> = this.jobRepository.createQueryBuilder('job');
-
-        if (queryParams.term) {
-            let { term } = queryParams;
-            term = `%${term}%`;
-            query = query
-                .orWhere('job.name LIKE :term', { term })
-                .orWhere('job.description LIKE :term', { term });
-        }
-
-        if (queryParams.sort) {
-            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            // const orderCols: { [key: string]: string } = {
-            //     name: 'job.name',
-            // };
-            query = query.orderBy('job.name', sort);
-        } else
-            query = query.orderBy('job.name', 'ASC');
-
-        query.limit(100);
-
-        const result: [Job[], number] = await query.getManyAndCount();
-        // Logger.log(queryParams, 'JobService@search', true);
-
-        return {
-            result: result[0],
-            totalRows: result[1],
-        };
-    }
-
     async find(queryParams: JobQueryDTO): Promise<JobQueryResult> {
         const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
         let query: SelectQueryBuilder<Job> = this.jobRepository.createQueryBuilder('job');
@@ -89,9 +58,6 @@ export default class JobService {
 
         if (queryParams.sort) {
             const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            // const orderCols: { [key: string]: string } = {
-            //     name: 'job.name',
-            // };
             query = query.orderBy('job.name', sort);
         } else
             query = query.orderBy('job.name', 'ASC');

@@ -1,6 +1,16 @@
 import { Controller, Get, Post, Body, Delete, Param, HttpCode, InternalServerErrorException, Put, UseInterceptors, UseGuards, Query } from '@nestjs/common';
 import RegionService from '../services/region.service';
-import { ApiUseTags, ApiOperation, ApiBadRequestResponse, ApiOkResponse, ApiCreatedResponse, ApiNotFoundResponse, ApiUnauthorizedResponse, ApiImplicitQuery } from '@nestjs/swagger';
+import {
+    ApiUseTags,
+    ApiOperation,
+    ApiBadRequestResponse,
+    ApiOkResponse,
+    ApiCreatedResponse,
+    ApiNotFoundResponse,
+    ApiUnauthorizedResponse,
+    ApiImplicitQuery,
+    ApiNoContentResponse,
+} from '@nestjs/swagger';
 import { RegionDTO, RegionResponse, RegionPageResponse, RegionResponses, RegionSearchResponse } from '../models/region.dto';
 import Region from '../models/region.entity';
 import { DeleteResult } from 'typeorm';
@@ -72,7 +82,7 @@ export default class RegionController {
         @Query('order') order?: 'type' | 'name',
         @Query('sort') sort: 'asc' | 'desc' = 'asc',
     ): Promise<RegionResponses> {
-        const { result: data = [] } = await this.regionServices.search({ term, order, sort });
+        const { result: data = [] } = await this.regionServices.find({ term, order, sort, page: 1, rowsPerPage: 1000 });
 
         return { data };
     }
@@ -124,6 +134,7 @@ export default class RegionController {
     @HttpCode(204)
     @ApiOperation({ title: 'Delete Region', description: 'API delete region' })
     @ApiNotFoundResponse({ description: 'Not found.', type: ApiExceptionResponse })
+    @ApiNoContentResponse({ description: 'Successfully delete region.' })
     async delete(@Param('id') id: string): Promise<any> {
         const { affected }: DeleteResult = await this.regionServices.remove(id);
         return (affected !== 1) ? new InternalServerErrorException() : null;
