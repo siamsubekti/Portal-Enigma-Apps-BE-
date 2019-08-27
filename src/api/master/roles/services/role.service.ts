@@ -7,6 +7,7 @@ import ServicesService from '../../services/services/services.service';
 import MenuService from '../../menus/services/menu.service';
 import Menu from '../../menus/models/menu.entity';
 import Service from '../../services/models/service.entity';
+import Account from '../../../../api/accounts/models/account.entity';
 
 @Injectable()
 export default class RoleService {
@@ -101,22 +102,16 @@ export default class RoleService {
     }
 
     async getRelations(id: number): Promise<Role> {
-        return await this.roleRepository.findOne({ where: { id }, relations: ['account', 'services', 'menus'] });
+        return await this.roleRepository.findOne({ where: { id }, relations: ['account'] });
     }
 
     async delete(id: number): Promise<DeleteResult> {
         const roles: Role = await this.getRelations(id);
-        const menus: Menu[] = await Promise.resolve(roles.menus);
-        const services: Service[] = await Promise.resolve(roles.services);
         if (!roles) throw new NotFoundException(`Role with id: ${id} Not Found`);
-        else if ( roles && menus.length > 0 ) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
-        else if ( roles && services.length > 0 ) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
-        else
-        try {
-            const result: DeleteResult = await this.roleRepository.delete(id);
-            return result;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
+        else if (roles) {
+            const account: Account = await Promise.resolve(roles.account);
+            if (account[0] !== undefined) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
+            else return await this.roleRepository.delete(id);
         }
     }
 

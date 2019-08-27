@@ -1,9 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import Account from '../../../api/accounts/models/account.entity';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult } from '../../../api/accounts/models/account.dto';
 import { AccountType } from '../../../config/constants';
+import Account from '../../../api/accounts/models/account.entity';
 
 @Injectable()
 export default class CandidateService {
@@ -12,6 +12,7 @@ export default class CandidateService {
   ) { }
 
   async getCandidates(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
+    const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
     const orderCols: { [key: string]: string } = {
       username: 'a.username',
       fullname: 'p.fullname',
@@ -33,7 +34,7 @@ export default class CandidateService {
     }
 
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
-    query.offset(queryParams.page > 1 ? (queryParams.rowsPerPage * queryParams.page) + 1 : 0);
+    query.offset( offset );
     query.limit(queryParams.rowsPerPage);
 
     const result: [Account[], number] = await query.getManyAndCount();
