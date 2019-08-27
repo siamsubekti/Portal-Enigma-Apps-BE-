@@ -1,5 +1,20 @@
-import { Controller, Post, Body, Res, ForbiddenException, Delete, UseGuards, Req, NotFoundException, Put, Param, UseInterceptors, HttpStatus } from '@nestjs/common';
 import { Response, Request } from 'express';
+import {
+  UseGuards,
+  Controller,
+  Param,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Res,
+  Req,
+  ForbiddenException,
+  NotFoundException,
+  UseInterceptors,
+  HttpStatus,
+} from '@nestjs/common';
 import {
   ApiUseTags,
   ApiOperation,
@@ -14,15 +29,17 @@ import {
   ApiImplicitParam,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import { LoginCredentialDTO, LoginResponse, LoginResponseDTO } from '../models/auth.dto';
-import { PasswordResetRequestDTO, PasswordResetDTO } from '../models/password-reset.dto';
-import { ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
+import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
+import { ResponseStatus } from '../../../libraries/responses/response.class';
+import { LoginCredentialDTO, LoginResponse, LoginResponseDTO, AuthServicesResponse } from '../models/auth.dto';
+import { PasswordResetRequestDTO, PasswordResetDTO, PasswordResetResponse } from '../models/password-reset.dto';
+import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
+import { AccountStatus } from '../../../config/constants';
 import ResponseUtil from '../../../libraries/responses/response.util';
 import AuthService from '../services/auth.service';
 import CookieAuthGuard from '../guards/cookie.guard';
 import AppConfig from '../../../config/app.config';
-import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
-import { ResponseStatus } from 'src/libraries/responses/response.class';
+import Service from '../../master/services/models/service.entity';
 
 @ApiUseTags('Authentication')
 @Controller('auth')
@@ -38,12 +55,12 @@ export default class AuthController {
   @ApiCreatedResponse({ description: 'User successfuly logged-in.', type: LoginResponse })
   @ApiForbiddenResponse({ description: 'Invalid user account credential.', type: ApiExceptionResponse })
   @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
-  @ApiUnprocessableEntityResponse({ description: 'Account not active yet.', type: ApiExceptionResponse })
+  @ApiUnprocessableEntityResponse({ description: 'New account in suspended status.', type: ApiExceptionResponse })
   @ApiImplicitBody({ name: 'LoginCredentialDTO', description: 'User account form data.', type: LoginCredentialDTO })
   async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
     const credential: LoginResponseDTO = await this.authService.login(form);
 
-    if (credential && credential.sessionId !== null) {
+    if (credential && credential.accountStatus === AccountStatus.ACTIVE) {
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential);
       response.cookie('EPSESSION', credential.sessionId, {
         maxAge: Number(this.config.get('SESSION_EXPIRES')),
@@ -52,15 +69,18 @@ export default class AuthController {
       });
 
       response.json(body);
-    } else if (credential && credential.sessionId === null) {
+    } else if (credential && credential.accountStatus === AccountStatus.SUSPENDED && credential.sessionId) {
       const resStatus: ResponseStatus = {
         code: HttpStatus.UNPROCESSABLE_ENTITY.toString(),
-        description: 'Please reset your password !',
+        description: 'Account password must be changed.',
       };
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential, resStatus);
 
       response.status(HttpStatus.UNPROCESSABLE_ENTITY).json(body);
-    } else throw new ForbiddenException('Invalid account credential.');
+    } else if (credential && credential.accountStatus === AccountStatus.SUSPENDED && !credential.sessionId)
+      throw new ForbiddenException('Your account is being suspended.');
+    else
+      throw new ForbiddenException('Invalid account credential.');
   }
 
   @Delete('logout')
@@ -77,29 +97,39 @@ export default class AuthController {
     else throw new NotFoundException('Session ID is invalid.');
   }
 
-  @Post('password-reset')
+  @Put('password/reset/:key/:token')
+  @UseInterceptors(ResponseRebuildInterceptor)
+  @ApiOperation({ title: 'Account Password Update', description: 'Update user account password (can also be used to reset new backoffice user account password).' })
+  @ApiImplicitParam({ name: 'key', description: 'Activation key.', required: true })
+  @ApiImplicitParam({ name: 'token', description: 'Activation token.', required: true })
+  @ApiImplicitBody({ name: 'PasswordResetDTO', description: 'Password reset form data.', type: PasswordResetDTO })
+  @ApiOkResponse({ description: 'Account password changed.', type: LoginResponse })
+  @ApiBadRequestResponse({ description: 'User password reset form validation failed.', type: ApiExceptionResponse })
+  async passwordResetUpdate(@Body() form: PasswordResetDTO, @Param('key') key: string, @Param('token') token: string): Promise<LoginResponse> {
+    const data: LoginResponseDTO = await this.authService.passwordReset(form, key, token);
+
+    return { data };
+  }
+
+  @Post('password/reset')
   @UseInterceptors(ResponseRebuildInterceptor)
   @ApiOperation({ title: 'User Password Reset', description: 'Request to reset user password.' })
   @ApiImplicitBody({ name: 'PasswordResetRequestDTO', description: 'Password reset request form data.', type: PasswordResetRequestDTO })
-  @ApiCreatedResponse({ description: 'Successful request to reset password.', type: ApiResponse })
+  @ApiCreatedResponse({ description: 'Successful request to reset password.', type: PasswordResetResponse })
   @ApiBadRequestResponse({ description: 'User account email validation failed.', type: ApiExceptionResponse })
-  async passwordResetRequest(@Body() form: PasswordResetRequestDTO): Promise<boolean> {
-    await this.authService.prePasswordReset(form);
+  async passwordResetRequest(@Body() form: PasswordResetRequestDTO): Promise<PasswordResetResponse> {
+    const data: boolean = await this.authService.prePasswordReset(form);
 
-    return true;
+    return { status: { code: '201', description: 'Please check your email and follow the instructions.' }, data };
   }
 
-  @Put('password-reset/:key/:token')
+  @Get('services')
   @UseInterceptors(ResponseRebuildInterceptor)
-  @ApiOperation({ title: 'User Password Update', description: 'Update user password.' })
-  @ApiImplicitParam({ name: 'token', description: 'Activation token.', required: true })
-  @ApiImplicitParam({ name: 'key', description: 'Activation key.', required: true })
-  @ApiImplicitBody({ name: 'PasswordResetDTO', description: 'Password reset form data.', type: PasswordResetDTO })
-  @ApiOkResponse({ description: 'User password updated successfuly.', type: ApiResponse })
-  @ApiBadRequestResponse({ description: 'User password reset form validation failed.', type: ApiExceptionResponse })
-  async passwordResetUpdate(@Body() form: PasswordResetDTO, @Param('key') key: string, @Param('token') token: string): Promise<boolean> {
-    await this.authService.passwordReset(form, key, token);
+  @ApiOperation({ title: 'Available Auth Services', description: 'Get a list of available auth services.' })
+  @ApiOkResponse({ description: 'List of auth services.', type: AuthServicesResponse })
+  async services(): Promise<AuthServicesResponse> {
+    const data: Service[] = await this.authService.getAuthServices();
 
-    return true;
+    return { data };
   }
 }

@@ -60,6 +60,12 @@ export enum HttpMethod {
   DELETE = 'DELETE',
 }
 
+export enum ServiceType {
+  PUBLIC = 'PUBLIC',
+  BACKOFFICE = 'BACKOFFICE',
+  FRONTOFFICE = 'FRONTOFFICE',
+  PORTAL = 'PORTAL',
+}
 
 const HttpStatusMessage: any = {
   100: 'Continue',

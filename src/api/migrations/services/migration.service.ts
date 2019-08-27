@@ -21,6 +21,8 @@ import {
   ProfileMaritalStatus,
   AccountStatus,
   HttpMethod,
+  ServiceType,
+  AccountType,
 } from '../../../config/constants';
 
 @Injectable()
@@ -48,154 +50,207 @@ export default class MigrationService {
   private async createDefaultServices(): Promise<void> {
     const data: ServiceDTO[] = [
       {
+        code: 'AUTH_LOGIN',
+        name: 'Login Service',
+        endpointUrl: '/auth/login',
+        method: HttpMethod.POST,
+        serviceType: ServiceType.PUBLIC,
+      },
+      {
+        code: 'AUTH_LOGOUT',
+        name: 'Logout Service',
+        endpointUrl: '/auth/logout',
+        method: HttpMethod.DELETE,
+        serviceType: ServiceType.PUBLIC,
+      },
+      {
+        code: 'AUTH_PASSWORD_RESET',
+        name: 'Password Reset Request',
+        endpointUrl: '/auth/password/reset',
+        method: HttpMethod.POST,
+        serviceType: ServiceType.PUBLIC,
+      },
+      {
+        code: 'AUTH_PASSWORD_UPDATE',
+        name: 'Password Reset Update Service',
+        endpointUrl: '/auth/password/reset',
+        method: HttpMethod.PUT,
+        serviceType: ServiceType.PUBLIC,
+      },
+      {
         code: 'MST_SERVICE_CREATE',
         name: 'Create Service',
         endpointUrl: '/services',
         method: HttpMethod.POST,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_SERVICE_UPDATE',
         name: 'Update Service',
         endpointUrl: '/services',
         method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_SERVICE_DELETE',
         name: 'Delete Service',
         endpointUrl: '/services',
         method: HttpMethod.DELETE,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_SERVICE_LIST',
         name: 'List All Services',
         endpointUrl: '/services',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_SERVICE_SEARCH',
         name: 'Search Services',
         endpointUrl: '/services/search',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_SERVICE_GET',
         name: 'Get Single Service',
         endpointUrl: '/services',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_CREATE',
         name: 'Create Menu',
         endpointUrl: '/menus',
         method: HttpMethod.POST,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_UPDATE',
         name: 'Update Menu',
         endpointUrl: '/menus',
         method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_DELETE',
         name: 'Delete Menu',
         endpointUrl: '/menus',
         method: HttpMethod.DELETE,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_LIST',
         name: 'List All Menus',
         endpointUrl: '/menus',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_SEARCH',
         name: 'Search Menus',
         endpointUrl: '/menus/search',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_MENU_GET',
         name: 'Get Single Menu',
         endpointUrl: '/menus',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_CREATE',
         name: 'Create Role',
         endpointUrl: '/roles',
         method: HttpMethod.POST,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_UPDATE',
         name: 'Update Role',
         endpointUrl: '/roles',
         method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_DELETE',
         name: 'Delete Role',
         endpointUrl: '/roles',
         method: HttpMethod.DELETE,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_LIST',
         name: 'List All Roles',
         endpointUrl: '/roles',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_SEARCH',
         name: 'Search Roles',
         endpointUrl: '/roles/search',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ROLE_GET',
         name: 'Get Single Role',
         endpointUrl: '/roles',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_CREATE',
         name: 'Create Account',
         endpointUrl: '/accounts',
         method: HttpMethod.POST,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_UPDATE',
         name: 'Update Account',
         endpointUrl: '/accounts',
         method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_DELETE',
         name: 'Delete Account',
         endpointUrl: '/accounts',
         method: HttpMethod.DELETE,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_LIST',
         name: 'List All Accounts',
         endpointUrl: '/accounts',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_SEARCH',
         name: 'Search Accounts',
         endpointUrl: '/accounts/search',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_GET',
         name: 'Get Account',
         endpointUrl: '/accounts',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
       {
         code: 'MST_ACCOUNT_PRIVILEGES',
         name: 'Get Account Privileges',
         endpointUrl: '/accounts/privileges',
         method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
       },
     ];
 
@@ -219,7 +274,7 @@ export default class MigrationService {
         code: 'MASTER',
         name: 'Master Data',
         path: '/master',
-        icon: 'settings',
+        icon: 'settings-2',
         order: 1,
       },
     ];
@@ -288,6 +343,24 @@ export default class MigrationService {
         services: [],
         menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
       },
+      {
+        code: 'CANDIDATE',
+        name: 'Candidate',
+        services: [],
+        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+      },
+      {
+        code: 'TRAINEE',
+        name: 'Trainee',
+        services: [],
+        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+      },
+      {
+        code: 'TRAINER',
+        name: 'Trainer',
+        services: [],
+        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+      },
     ];
 
     Logger.log(`Creating ${data.length} roles...`);
@@ -317,6 +390,7 @@ export default class MigrationService {
       username: 'admin',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
+      accountType: AccountType.ADMINISTRATOR,
       profile,
     });
 
@@ -342,6 +416,7 @@ export default class MigrationService {
       username: 'staff1',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
+      accountType: AccountType.STAFF,
       profile,
     });
 
