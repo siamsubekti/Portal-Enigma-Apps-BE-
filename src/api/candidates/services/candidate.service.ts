@@ -16,6 +16,10 @@ export default class CandidateService {
     private readonly docService: DocumentService,
   ) { }
 
+  async find(id: string): Promise<Account> {
+    return this.candidate.findOne(id);
+  }
+
   async getCandidates(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
     const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
     const orderCols: { [key: string]: string } = {
