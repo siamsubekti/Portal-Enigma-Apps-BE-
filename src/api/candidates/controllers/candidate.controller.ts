@@ -119,7 +119,7 @@ export default class CandidateController {
     const candidate: Account = await this.candidateServices.find(id);
     const documents: Document[] = candidate ? await this.docService.findByAccountId(md5(candidate.id)) : [];
     const docs: string[] = documents.map((doc: Document) => {
-      return `documents/${md5(candidate.id)}/${doc.name}`;
+      return `documents/download/${md5(candidate.id)}/${doc.name}`;
     });
 
     if (!candidate) throw new NotFoundException(`Candidate account ID ${id} is invalid.`);
