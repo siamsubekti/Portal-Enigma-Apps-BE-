@@ -10,7 +10,7 @@ export default class Document {
     @Column({ type: 'varchar', length: 255, nullable: false })
     name: string;
 
-    @Column({ type: 'varchar', length: 5, nullable: false })
+    @Column({ type: 'varchar', length: 255, nullable: false })
     type: string;
 
     @Column({ type: 'int', nullable: false })

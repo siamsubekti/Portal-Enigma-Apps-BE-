@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult } from '../../../api/accounts/models/account.dto';
@@ -15,6 +15,10 @@ export default class CandidateService {
     private readonly candidate: Repository<Account>,
     private readonly docService: DocumentService,
   ) { }
+
+  async find(id: string): Promise<Account> {
+    return this.candidate.findOne(id);
+  }
 
   async getCandidates(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
     const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
@@ -44,7 +48,6 @@ export default class CandidateService {
     query.limit(queryParams.rowsPerPage);
 
     const result: [Account[], number] = await query.getManyAndCount();
-    Logger.log(queryParams, 'getCandidate@all', true);
 
     return {
       result: result[0],

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import Document from '../models/document.entity';
 import { Repository } from 'typeorm';
@@ -23,13 +23,15 @@ export default class DocumentService {
         return this.document.save(documentDto);
     }
 
-    async getFilenameByPath(path: string): Promise<Document> {
-        const file: Document = await this.document.findOne({ where: { filepath: path } });
-        if (!file) throw new NotFoundException('Path not found.');
-        else return file;
+    async findByAccountIdAndName(accountId: string, name: string): Promise<Document> {
+        return await this.document.findOne({ accountId, name });
+    }
+
+    async getFilenameByPath(filepath: string): Promise<Document> {
+        return await this.document.findOne({ filepath });
     }
 
     async findByAccountId(accountId: string): Promise<Document[]> {
-        return this.document.find({ where: { accountId } });
+        return this.document.find({ accountId });
     }
 }
