@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult } from '../../../api/accounts/models/account.dto';
@@ -44,7 +44,6 @@ export default class CandidateService {
     query.limit(queryParams.rowsPerPage);
 
     const result: [Account[], number] = await query.getManyAndCount();
-    Logger.log(queryParams, 'getCandidate@all', true);
 
     return {
       result: result[0],

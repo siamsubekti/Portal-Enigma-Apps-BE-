@@ -99,19 +99,14 @@ export default class MenuService {
 
     async delete(id: number): Promise<DeleteResult> {
         const menu: Menu = await this.findRelations(id);
-        const roles: Role[] = await Promise.resolve(menu.roles);
-        const parent: Menu = await Promise.resolve(menu.parentMenu);
 
         if (!menu) throw new NotFoundException(`Menu with id: ${id} Not Found`);
-        if (menu && roles.length > 0) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
-        if (menu && parent[0] !== undefined) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
-        else
-            try {
-                const removeMenu: DeleteResult = await this.menuRepository.delete(id);
-                return removeMenu;
-            } catch (error) {
-                throw new InternalServerErrorException();
-            }
+        if (menu) {
+            const roles: Role[] = await Promise.resolve(menu.roles);
+            const parent: Menu = await Promise.resolve(menu.parentMenu);
+            if (roles.length > 0) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
+            if (parent[0] !== undefined) throw new UnprocessableEntityException('Failed to delete, menu is use by another.');
+        } else return await this.menuRepository.delete(id);
     }
 
     async createBulk(data: MenuDTO[]): Promise<Menu[]> {

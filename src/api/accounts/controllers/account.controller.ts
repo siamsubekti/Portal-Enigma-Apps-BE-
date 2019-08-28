@@ -21,7 +21,6 @@ import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import Account from '../models/account.entity';
 import AccountService from '../services/account.service';
-import { AccountStatus } from '../../../config/constants';
 
 @Controller('accounts')
 @ApiUseTags('Accounts')
@@ -156,7 +155,7 @@ export default class AccountController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async deactivate(@Param('id') id: string): Promise<void> {
     try {
-      await this.accountService.setStatus(id, AccountStatus.INACTIVE);
+      await this.accountService.deactive(id);
     } catch (error) {
       throw error;
     }
