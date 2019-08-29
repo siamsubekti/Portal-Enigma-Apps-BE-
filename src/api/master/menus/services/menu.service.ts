@@ -49,14 +49,10 @@ export default class MenuService {
 
   async add(form: MenuDTO): Promise<Menu> {
     const checkCode: Menu = await this.menuRepository.findOne({ where: { code: form.code } });
-    if (checkCode) throw new BadRequestException('Code has been use.');
-    const parent: Menu = await this.menuRepository.findOne({ where: { id: form.parentMenu.id } });
+    if (checkCode) throw new BadRequestException('Code has been used.');
 
-    const menu: Menu = new Menu();
-    menu.code = form.code;
-    menu.name = form.name;
-    menu.order = form.order;
-    menu.icon = form.icon;
+    const parent: Menu = await this.menuRepository.findOne({ where: { id: form.parentMenu.id } });
+    const menu: Menu = this.menuRepository.create(form);
     menu.parentMenu = parent;
 
     return await this.menuRepository.save(menu);
