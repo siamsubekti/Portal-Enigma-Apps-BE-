@@ -30,9 +30,9 @@ export const multerOptions: any = {
         destination: (req: any, file: any, cb: any): any => {
             const { id } = req.user;
 
-            const uploadPath: string = join(config.get('BASE_PATH'), multerConfig.dest, 'documents', 'candidates', md5(id));
+            const uploadPath: string = join(multerConfig.dest, 'documents', 'candidates', md5(id));
             // Create folder if doesn't exist
-            if (!existsSync(uploadPath)) mkdirSync(uploadPath, { recursive: true });
+            if (!existsSync(uploadPath)) mkdirSync(join(config.get('BASE_PATH'), uploadPath), { recursive: true });
             Logger.log(`creating directory for file ${file.filename}`, 'multerConfig@options', true);
 
             cb(null, uploadPath);

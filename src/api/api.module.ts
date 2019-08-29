@@ -21,6 +21,7 @@ import DegreeModule from './master/degrees/degree.module';
 import RoleModule from './master/roles/role.module';
 import ServicesModule from './master/services/services.module';
 import MenuModule from './master/menus/menu.module';
+import MessageModule from './messages/messages.module';
 
 @Module({
   imports: [
@@ -41,12 +42,13 @@ import MenuModule from './master/menus/menu.module';
     DegreeModule,
     RoleModule,
     MenuModule,
-    AccountModule,
-    ParameterModule,
     ServicesModule,
-    CandidateModule,
+    ParameterModule,
+    AccountModule,
     DocumentModule,
+    CandidateModule,
+    MessageModule,
   ],
-  controllers: [ApiController],
+  controllers: [ ApiController ],
 })
 export default class ApiModule { }
