@@ -4,6 +4,7 @@ import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult } from '../models/service.dto';
 import { ServiceType } from '../../../../config/constants';
+import Role from '../../roles/models/role.entity';
 
 @Injectable()
 export default class ServicesService {
@@ -71,9 +72,12 @@ export default class ServicesService {
 
   async remove(id: number): Promise<DeleteResult> {
     const service: Service = await this.findById(id);
-    if (!service) throw new NotFoundException(`Service with id : ${id} not found.`);
-    else if (service && service.roles.length > 0) throw new UnprocessableEntityException('Failed to delete, service is use by another.');
-    else return await this.serviceRepository.delete(id);
+    if (!service) throw new NotFoundException(`Service with ID ${id} cannot be found.`);
+
+    const roles: Role[] = service ? await service.roles : [];
+    if (roles.length > 0) throw new UnprocessableEntityException(`Unable to delete service, this service is currently being used by ${roles.length} role(s).`);
+
+    return await this.serviceRepository.delete(id);
   }
 
   async update(id: number, form: ServiceDTO): Promise<Service> {
