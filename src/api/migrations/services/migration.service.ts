@@ -266,6 +266,27 @@ export default class MigrationService {
         method: HttpMethod.GET,
         serviceType: ServiceType.BACKOFFICE,
       },
+      {
+        code: 'INBOX_LIST',
+        name: 'Inbox List',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'INBOX_GET',
+        name: 'Get Single Inbox',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'INBOX_CREATE',
+        name: 'Create Inbox',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.POST,
+        serviceType: ServiceType.PORTAL,
+      },
     ];
 
     Logger.log(`Creating ${data.length} services...`);
@@ -297,6 +318,13 @@ export default class MigrationService {
         path: '/master',
         icon: 'settings-2',
         order: 2,
+      },
+      {
+        code: 'INBOX',
+        name: 'Inbox',
+        path: '/inbox',
+        icon: 'inbox-outline',
+        order: 3,
       },
     ];
 
