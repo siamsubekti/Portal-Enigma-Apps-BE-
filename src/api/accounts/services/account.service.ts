@@ -1,9 +1,9 @@
 import * as moment from 'moment-timezone';
 import { Injectable, Logger, HttpException, HttpStatus, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Repository, SelectQueryBuilder, In } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivilege } from '../models/account.dto';
-import { AccountStatus } from '../../../config/constants';
+import { AccountStatus, AccountType } from '../../../config/constants';
 import Account from '../models/account.entity';
 import Profile from '../models/profile.entity';
 import ProfileService from './profile.service';
@@ -104,6 +104,10 @@ export default class AccountService {
     query.where('a.status = :status', { status: AccountStatus.ACTIVE });
 
     return query.getCount();
+  }
+
+  async findByAccountType(...accountTypes: AccountType[]): Promise<Account[]> {
+    return this.account.find({ where: { accountType: In(accountTypes) }, relations: ['profile'] });
   }
 
   async findByUsernameOrEmail(email: string): Promise<Account> {
@@ -247,7 +251,7 @@ export default class AccountService {
       const { username, profile: { fullname: name, email: to } } = account;
       const password: string = process.env.DEFAULT_PASSWORD;
       const html: string = await this.templateUtil.renderToString(
-        'account/account-bo-created.hbs',
+        'account/account-bo-created.mail.hbs',
         { name, username, password, baseUrl: this.config.get('API_BASE_URL') });
 
       const response: any = await this.mailUtil.send({

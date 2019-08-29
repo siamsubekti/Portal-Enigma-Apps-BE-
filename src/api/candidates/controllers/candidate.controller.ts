@@ -1,4 +1,5 @@
 import * as md5 from 'md5';
+import * as moment from 'moment';
 import {
   Controller,
   Get,
@@ -21,7 +22,7 @@ import { ApiExceptionResponse } from '../../../libraries/responses/response.type
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { CandidateDocumentResponse } from '../models/candidate.dto';
-import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO } from '../../accounts/models/account.dto';
+import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO, AccountQueryDTO } from '../../accounts/models/account.dto';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import DocumentService from '../../resumes/document/services/document.service';
@@ -42,6 +43,8 @@ export default class CandidateController {
   @Get()
   @ApiOperation({ title: 'List of registered Candidates.', description: 'Get list of registered candidates.' })
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+  @ApiImplicitQuery({ name: 'start', description: 'Start date range (DD-MM-YYYY)', type: 'string', required: false })
+  @ApiImplicitQuery({ name: 'end', description: 'End date range (DD-MM-YYYY)', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
   @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
@@ -51,12 +54,19 @@ export default class CandidateController {
   @UseInterceptors(ResponseRebuildInterceptor)
   async get(
     @Query('term') term?: string,
+    @Query('start') startDate?: string,
+    @Query('end') endDate?: string,
     @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
     @Query('page') page: number = 1,
   ): Promise<AccountPagedResponse> {
     const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-    const { result = [], totalRows } = await this.candidateServices.getCandidates({ term, order, sort, page, rowsPerPage });
+    const queryParams: AccountQueryDTO = {
+      term, order, sort, page,
+      startDate: startDate ? moment(startDate, 'DD-MM-YYYY') : undefined,
+      endDate: endDate ? moment(endDate, 'DD-MM-YYYY') : undefined,
+    };
+    const { result = [], totalRows } = await this.candidateServices.getCandidates(queryParams);
     const paging: PagingData = {
       page: Number(page),
       rowsPerPage,
@@ -98,15 +108,6 @@ export default class CandidateController {
       });
 
     return { data };
-  }
-
-  @Get('registered')
-  @ApiOperation({ title: 'List registered candidates.', description: 'API to get data registered candidates.' })
-  @ApiOkResponse({ description: 'Success get registered candidates.', type: AccountPagedResponse })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
-  @UseInterceptors(ResponseRebuildInterceptor)
-  async registeredCandidate(): Promise<Account[]> {
-    return await this.candidateServices.getRegisteredCandidate();
   }
 
   @Get('documents/:accountId')

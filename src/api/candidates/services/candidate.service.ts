@@ -1,12 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult } from '../../../api/accounts/models/account.dto';
-import { AccountType } from '../../../config/constants';
 import Account from '../../../api/accounts/models/account.entity';
-import DocumentService from '../../../api/resumes/document/services/document.service';
 import Document from '../../../api/resumes/document/models/document.entity';
-import * as moment from 'moment';
+import DocumentService from '../../../api/resumes/document/services/document.service';
+import ValidatorUtil from 'src/libraries/utilities/validator.util';
 
 @Injectable()
 export default class CandidateService {
@@ -14,6 +14,7 @@ export default class CandidateService {
     @InjectRepository(Account)
     private readonly candidate: Repository<Account>,
     private readonly docService: DocumentService,
+    private readonly validatorUtil: ValidatorUtil,
   ) { }
 
   async find(id: string): Promise<Account> {
@@ -21,6 +22,7 @@ export default class CandidateService {
   }
 
   async getCandidates(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
+    const { startDate, endDate } = queryParams;
     const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
     const orderCols: { [key: string]: string } = {
       username: 'a.username',
@@ -42,7 +44,16 @@ export default class CandidateService {
         .orWhere('p.phone LIKE :term', { term });
     }
 
-    query.where('a.account_type = :type', { type: AccountType.CANDIDATE });
+    if (startDate && startDate.isValid() && !endDate) {
+      query.andWhere('DATE(a.created_at) = :startDate', { startDate: startDate.format('YYYY-MM-DD') });
+      Logger.log(`start date only ${startDate.toDate()}`);
+    } else if (startDate && endDate && this.validatorUtil.validateDateBetween(startDate, endDate)) {
+      query.andWhere('DATE(a.created_at) BETWEEN :startDate AND :endDate', { startDate: startDate.format('YYYY-MM-DD'), endDate: endDate.format('YYYY-MM-DD') });
+      Logger.log(`start date (${startDate.toDate()}) between end date (${endDate.toDate()})`);
+    } else
+      throw new BadRequestException('Validation failed for start and end date range, end date cannot be earlier than start date, both date range must be a valid date.');
+
+    // query.andWhere('a.account_type = :type', { type: AccountType.CANDIDATE });
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
     query.offset(offset);
     query.limit(queryParams.rowsPerPage);

@@ -6,6 +6,7 @@ import ResponseUtil from './responses/response.util';
 import HashUtil from './utilities/hash.util';
 import MailerUtil from './mailer/mailer.util';
 import TemplateUtil from './utilities/template.util';
+import ValidatorUtil from './utilities/validator.util';
 
 @Global()
 @Module({
@@ -17,7 +18,7 @@ import TemplateUtil from './utilities/template.util';
       imports: [ConfigModule],
     }),
   ],
-  exports: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
-  providers: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil],
+  exports: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil, ValidatorUtil],
+  providers: [HashUtil, MailerUtil, ResponseUtil, TemplateUtil, ValidatorUtil],
 })
 export default class LibraryModule { }

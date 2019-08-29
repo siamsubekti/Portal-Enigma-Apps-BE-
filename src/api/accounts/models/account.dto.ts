@@ -1,11 +1,12 @@
+import * as moment from 'moment';
 import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail, IsEnum, IsOptional } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
+import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountType } from '../../../config/constants';
 import Account from './account.entity';
 import Role from '../../master/roles/models/role.entity';
 import Menu from '../../master/menus/models/menu.entity';
 import Service from '../../master/services/models/service.entity';
-import { AccountStatus, ProfileGender, ProfileReligion, ProfileMaritalStatus, AccountType } from '../../../config/constants';
 
 export class AccountDTO {
   username: string;
@@ -141,6 +142,8 @@ export class AccountProfileDTO {
 
 export class AccountQueryDTO {
   term?: string;
+  startDate?: moment.Moment;
+  endDate?: moment.Moment;
   order?: 'username' | 'fullname' | 'nickname';
   sort?: 'asc' | 'desc';
   page?: number;
