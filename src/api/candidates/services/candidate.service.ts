@@ -7,6 +7,7 @@ import Account from '../../../api/accounts/models/account.entity';
 import Document from '../../../api/resumes/document/models/document.entity';
 import DocumentService from '../../../api/resumes/document/services/document.service';
 import ValidatorUtil from 'src/libraries/utilities/validator.util';
+import { AccountType } from 'src/config/constants';
 
 @Injectable()
 export default class CandidateService {
@@ -50,10 +51,10 @@ export default class CandidateService {
     } else if (startDate && endDate && this.validatorUtil.validateDateBetween(startDate, endDate)) {
       query.andWhere('DATE(a.created_at) BETWEEN :startDate AND :endDate', { startDate: startDate.format('YYYY-MM-DD'), endDate: endDate.format('YYYY-MM-DD') });
       Logger.log(`start date (${startDate.toDate()}) between end date (${endDate.toDate()})`);
-    } else
+    } else if (startDate && endDate && !this.validatorUtil.validateDateBetween(startDate, endDate))
       throw new BadRequestException('Validation failed for start and end date range, end date cannot be earlier than start date, both date range must be a valid date.');
 
-    // query.andWhere('a.account_type = :type', { type: AccountType.CANDIDATE });
+    query.andWhere('a.account_type = :type', { type: AccountType.CANDIDATE });
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
     query.offset(offset);
     query.limit(queryParams.rowsPerPage);
