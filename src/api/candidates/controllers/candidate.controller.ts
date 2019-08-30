@@ -21,8 +21,8 @@ import {
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
-import { CandidateDocumentResponse } from '../models/candidate.dto';
-import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO, AccountQueryDTO } from '../../accounts/models/account.dto';
+import { CandidateDocumentResponse, CandidateQueryDTO } from '../models/candidate.dto';
+import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO } from '../../accounts/models/account.dto';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import DocumentService from '../../resumes/document/services/document.service';
@@ -45,7 +45,7 @@ export default class CandidateController {
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'start', description: 'Start date range (DD-MM-YYYY)', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'end', description: 'End date range (DD-MM-YYYY)', type: 'string', required: false })
-  @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
+  @ApiImplicitQuery({ name: 'order', description: 'Order columns (fullname, email, birthdate, age)', type: ['fullname', 'email', 'birthdate', 'age'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
   @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
   @ApiOkResponse({ description: 'List of registered candidates.', type: AccountPagedResponse })
@@ -56,12 +56,12 @@ export default class CandidateController {
     @Query('term') term?: string,
     @Query('start') startDate?: string,
     @Query('end') endDate?: string,
-    @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
+    @Query('order') order: 'fullname' | 'email' | 'birthdate' | 'age' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
     @Query('page') page: number = 1,
   ): Promise<AccountPagedResponse> {
     const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
-    const queryParams: AccountQueryDTO = {
+    const queryParams: CandidateQueryDTO = {
       term, order, sort, page,
       startDate: startDate ? moment(startDate, 'DD-MM-YYYY') : undefined,
       endDate: endDate ? moment(endDate, 'DD-MM-YYYY') : undefined,
@@ -87,7 +87,7 @@ export default class CandidateController {
   @Get('search')
   @ApiOperation({ title: 'Search candidates.', description: 'Search candidates.' })
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
-  @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
+  @ApiImplicitQuery({ name: 'order', description: 'Order columns (fullname, email, birthdate, age)', type: ['fullname', 'email', 'birthdate', 'age'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
   @ApiOkResponse({ description: 'Search result of candidates.', type: AccountSearchResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
@@ -95,7 +95,7 @@ export default class CandidateController {
   @UseInterceptors(ResponseRebuildInterceptor)
   async search(
     @Query('term') term?: string,
-    @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
+    @Query('order') order: 'fullname' | 'email' | 'birthdate' | 'age' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
   ): Promise<AccountPagedResponse> {
     const { result } = await this.candidateServices.getCandidates({ term, order, sort, page: 1, rowsPerPage: 1000 });

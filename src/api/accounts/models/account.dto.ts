@@ -1,4 +1,3 @@
-import * as moment from 'moment';
 import { IsNotEmpty, IsDefined, MinLength, MaxLength, IsEmail, IsEnum, IsOptional } from 'class-validator';
 import { ApiModelProperty } from '@nestjs/swagger';
 import { ResponseStatus, PagingData } from '../../../libraries/responses/response.class';
@@ -142,8 +141,6 @@ export class AccountProfileDTO {
 
 export class AccountQueryDTO {
   term?: string;
-  startDate?: moment.Moment;
-  endDate?: moment.Moment;
   order?: 'username' | 'fullname' | 'nickname';
   sort?: 'asc' | 'desc';
   page?: number;

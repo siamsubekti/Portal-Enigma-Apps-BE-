@@ -2,12 +2,13 @@ import * as moment from 'moment';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
-import { AccountQueryDTO, AccountQueryResult } from '../../../api/accounts/models/account.dto';
+import { AccountType } from 'src/config/constants';
+import { AccountQueryResult } from '../../../api/accounts/models/account.dto';
+import { CandidateQueryDTO } from '../models/candidate.dto';
+import ValidatorUtil from 'src/libraries/utilities/validator.util';
 import Account from '../../../api/accounts/models/account.entity';
 import Document from '../../../api/resumes/document/models/document.entity';
 import DocumentService from '../../../api/resumes/document/services/document.service';
-import ValidatorUtil from 'src/libraries/utilities/validator.util';
-import { AccountType } from 'src/config/constants';
 
 @Injectable()
 export default class CandidateService {
@@ -22,27 +23,28 @@ export default class CandidateService {
     return this.candidate.findOne(id);
   }
 
-  async getCandidates(queryParams: AccountQueryDTO): Promise<AccountQueryResult<Account[]>> {
+  async getCandidates(queryParams: CandidateQueryDTO): Promise<AccountQueryResult<Account[]>> {
     const { startDate, endDate } = queryParams;
     const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
     const orderCols: { [key: string]: string } = {
-      username: 'a.username',
       fullname: 'p.fullname',
-      nickname: 'p.nickname',
+      email: 'p.email',
+      birthdate: 'p.birthdate',
+      age: 'age',
     };
     const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
     const query: SelectQueryBuilder<Account> = this.candidate.createQueryBuilder('a')
       .innerJoinAndSelect('a.profile', 'p');
 
+    query.addSelect('YEAR(CURDATE()) - YEAR(p.birthdate)', 'age');
     if (queryParams.term) {
       let { term } = queryParams;
       term = `%${term}%`;
       query
         .orWhere('a.username LIKE :term', { term })
-        .orWhere('a.status LIKE :term', { term })
         .orWhere('p.fullname LIKE :term', { term })
-        .orWhere('p.nickname LIKE :term', { term })
-        .orWhere('p.phone LIKE :term', { term });
+        .orWhere('p.phone LIKE :term', { term })
+        .orWhere('p.email LIKE :term', { term });
     }
 
     if (startDate && startDate.isValid() && !endDate) {
