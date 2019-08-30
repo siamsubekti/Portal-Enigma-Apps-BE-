@@ -22,6 +22,7 @@ export class MenuDTO {
     order: number;
 
     @ApiModelProperty({ description: 'Menu icon', type: 'string', required: true })
+    @IsOptional()
     @IsDefined()
     @IsNotEmpty()
     icon?: string;
