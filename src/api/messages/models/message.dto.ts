@@ -54,6 +54,7 @@ export class MessageDTO {
 }
 
 export class MessageQueryParams {
+  read?: boolean;
   term?: string;
   page?: number;
   rowsPerPage?: number;

@@ -24,10 +24,11 @@ export default class MessageService {
     return this.messageRepository;
   }
 
-  async count(term?: string): Promise<number> {
+  async count(queryParams: MessageQueryParams): Promise<number> {
     const query: SelectQueryBuilder<Message> = this.messageRepository.createQueryBuilder('m');
 
-    if (term) {
+    if (queryParams.term) {
+      let { term } = queryParams;
       term = `%${term}%`;
 
       query.orWhere('m.email LIKE :term', { term });
@@ -35,6 +36,11 @@ export default class MessageService {
       query.orWhere('m.subject LIKE :term', { term });
       query.orWhere('m.content LIKE :term', { term });
     }
+
+    if (queryParams.read === true)
+      query.where('m.read_at IS NOT NULL');
+    else if (queryParams.read === false)
+      query.where('m.read_at IS NULL');
 
     return await query.getCount();
   }
@@ -55,6 +61,11 @@ export default class MessageService {
       query.orWhere('m.subject LIKE :term', { term });
       query.orWhere('m.content LIKE :term', { term });
     }
+
+    if (queryParams.read === true)
+      query.where('read_at IS NOT NULL');
+    else if (queryParams.read === false)
+      query.where('read_at IS NULL');
 
     query.orderBy(order, sort);
     query.offset(offset);

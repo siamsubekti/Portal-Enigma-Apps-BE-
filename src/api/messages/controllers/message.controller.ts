@@ -52,16 +52,38 @@ export default class MessageController {
   ): Promise<MessagePagedResponse> {
     const rowsPerPage: number = +this.config.get('ROWS_PER_PAGE');
     const queryParams: MessageQueryParams = { term, order, sort, page, rowsPerPage };
-    const totalRows: number = await this.messageService.count(term);
-    const data: any[] = totalRows > 0 ? await this.messageService.all(queryParams) : [];
-    const paging: PagingData = {
-      page: +page,
-      totalPages: Math.ceil(totalRows / rowsPerPage),
-      totalRows,
-      rowsPerPage,
-    };
 
-    return { data, paging };
+    return await this.allMessages(queryParams);
+  }
+
+  @Get('/:readStatus')
+  @UseGuards(CookieAuthGuard)
+  @ApiOperation({ title: 'List of messages.', description: 'Get list of messages.' })
+  @ApiImplicitParam({ name: 'readStatus', description: 'Read or unread status', type: ['read', 'unread'], required: true })
+  @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
+  @ApiImplicitQuery({
+    name: 'order',
+    description: 'Order columns (email, fullname, subject, created date, or read date)',
+    type: ['email', 'fullname', 'subject', 'createdAt', 'readAt'],
+    required: false,
+  })
+  @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
+  @ApiImplicitQuery({ name: 'page', description: 'Current page number', type: 'number', required: false })
+  @ApiOkResponse({ description: 'List of messages.', type: MessagePagedResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async allByReadStatus(
+    @Param('readStatus') readStatus: 'read' | 'unread',
+    @Query('term') term?: string,
+    @Query('order') order: 'email' | 'fullname' | 'subject' | 'createdAt' | 'readAt' = 'createdAt',
+    @Query('sort') sort: 'asc' | 'desc' = 'desc',
+    @Query('page') page: number = 1,
+  ): Promise<MessagePagedResponse> {
+    const read: boolean = (!readStatus ? undefined : ( readStatus && readStatus === 'unread' ? false : true ));
+    const rowsPerPage: number = +this.config.get('ROWS_PER_PAGE');
+    const queryParams: MessageQueryParams = { read, term, order, sort, page, rowsPerPage };
+
+    return await this.allMessages(queryParams);
   }
 
   @Get(':id')
@@ -87,5 +109,19 @@ export default class MessageController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async create(@Body() data: ContactFormDTO): Promise<Message> {
     return this.messageService.create(data);
+  }
+
+  private async allMessages(queryParams: MessageQueryParams): Promise<MessagePagedResponse> {
+    const { page, rowsPerPage } = queryParams;
+    const totalRows: number = await this.messageService.count(queryParams);
+    const data: any[] = totalRows > 0 ? await this.messageService.all(queryParams) : [];
+    const paging: PagingData = {
+      page,
+      totalPages: Math.ceil(totalRows / rowsPerPage),
+      totalRows,
+      rowsPerPage,
+    };
+
+    return { data, paging };
   }
 }
