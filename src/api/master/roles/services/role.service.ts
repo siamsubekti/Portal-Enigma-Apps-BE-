@@ -11,129 +11,135 @@ import Account from '../../../../api/accounts/models/account.entity';
 
 @Injectable()
 export default class RoleService {
-    constructor(
-        @InjectRepository(Role)
-        private readonly roleRepository: Repository<Role>,
-        private readonly serviceServices: ServicesService,
-        private readonly menuServices: MenuService,
-    ) { }
+  constructor(
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
+    private readonly serviceServices: ServicesService,
+    private readonly menuServices: MenuService,
+  ) { }
 
-    async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
-        const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
-        let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r');
+  async all(queryParams: RoleQueryDTO): Promise<RoleQueryResult> {
+    const offset: number = queryParams.page > 1 ? (queryParams.rowsPerPage * (queryParams.page - 1)) : 0;
+    let query: SelectQueryBuilder<Role> = this.roleRepository.createQueryBuilder('r');
 
-        if (queryParams.term) {
-            let { term } = queryParams;
-            term = `%${term}%`;
-            query = query
-                .orWhere('r.code LIKE :term', { term })
-                .orWhere('r.name LIKE :term', { term });
-        }
-
-        if (queryParams.order && queryParams.sort) {
-            const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
-            const orderCols: { [key: string]: string } = {
-                code: 'r.code',
-                name: 'r.name',
-            };
-
-            query = query.orderBy(orderCols[queryParams.order], sort);
-        } else
-            query = query.orderBy('r.name', 'ASC');
-
-        query.offset(offset);
-        query.limit(queryParams.rowsPerPage);
-
-        const result: [Role[], number] = await query.getManyAndCount();
-
-        return {
-            result: result[0],
-            totalRows: result[1],
-        };
+    if (queryParams.term) {
+      let { term } = queryParams;
+      term = `%${term}%`;
+      query = query
+        .orWhere('r.code LIKE :term', { term })
+        .orWhere('r.name LIKE :term', { term });
     }
 
-    async insert(roleDTO: RoleDTO): Promise<Role> {
-        const checkCode: Role = await this.roleRepository.findOne({
-            where: { code: roleDTO.code },
-        });
-        // // Logger.log(checkCode);
-        if (checkCode) throw new BadRequestException('This role code is already taken.');
-        try {
-            const { code, name, menus, services } = roleDTO;
-            const role: Role = new Role();
-            const menu: Menu[] = await this.menuServices.findAllRelated(menus);
-            const service: Service[] = await this.serviceServices.findAllRelated(services);
+    if (queryParams.order && queryParams.sort) {
+      const sort: 'ASC' | 'DESC' = queryParams.sort.toUpperCase() as 'ASC' | 'DESC';
+      const orderCols: { [key: string]: string } = {
+        code: 'r.code',
+        name: 'r.name',
+      };
 
-            role.code = code;
-            role.name = name;
-            role.menus = Promise.resolve(menu);
-            role.services = Promise.resolve(service);
+      query = query.orderBy(orderCols[queryParams.order], sort);
+    } else
+      query = query.orderBy('r.name', 'ASC');
 
-            return await this.roleRepository.save(role);
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
-        }
+    query.offset(offset);
+    query.limit(queryParams.rowsPerPage);
+
+    const result: [Role[], number] = await query.getManyAndCount();
+
+    return {
+      result: result[0],
+      totalRows: result[1],
+    };
+  }
+
+  async insert(roleDTO: RoleDTO): Promise<Role> {
+    const checkCode: Role = await this.roleRepository.findOne({
+      where: { code: roleDTO.code },
+    });
+    // // Logger.log(checkCode);
+    if (checkCode) throw new BadRequestException('This role code is already taken.');
+    try {
+      const { code, name, menus, services } = roleDTO;
+      const role: Role = new Role();
+      const menu: Menu[] = await this.menuServices.findAllRelated(menus);
+      const service: Service[] = await this.serviceServices.findAllRelated(services);
+
+      role.code = code;
+      role.name = name;
+      role.menus = Promise.resolve(menu);
+      role.services = Promise.resolve(service);
+
+      return await this.roleRepository.save(role);
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async get(id: number): Promise<Role> {
+    const role: Role = await this.roleRepository.findOne(id);
+    if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
+    try {
+      return role;
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async update(id: number, roleDTO: RoleDTO): Promise<Role> {
+    const role: Role = await this.roleRepository.findOne(id);
+    if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
+    try {
+      const { code, name, menus, services } = roleDTO;
+      role.code = code;
+      role.name = name;
+      role.menus = Promise.resolve(menus);
+      role.services = Promise.resolve(services);
+      const result: Role = await this.roleRepository.save(role);
+      return result;
+    } catch (error) {
+      throw new InternalServerErrorException('Internal Server Error');
+    }
+  }
+
+  async getRelations(id: number): Promise<Role> {
+    return await this.roleRepository.findOne({ where: { id }, relations: ['account'] });
+  }
+
+  async delete(id: number): Promise<DeleteResult> {
+    let role: Role = await this.get(id);
+    if (!role) throw new NotFoundException(`Role with ID ${id} cannot be found.`);
+
+    const account: Account = await role.account;
+
+    if (account)
+      throw new UnprocessableEntityException(`Unable to delete role, this role is currently being used by a user account.`);
+
+    role.menus = Promise.resolve([]);
+    role.services = Promise.resolve([]);
+    role = await this.roleRepository.save(role);
+
+    return await this.roleRepository.delete(role.id);
+  }
+
+  async createBulk(data: RoleDTO[]): Promise<Role[]> {
+    const roles: Role[] = [];
+
+    for (const item of data) {
+      const { code, name, menus, services } = item;
+      const role: Role = new Role();
+      role.code = code;
+      role.name = name;
+      role.menus = Promise.resolve(menus);
+      role.services = Promise.resolve(services);
+
+      roles.push(role);
     }
 
-    async get(id: number): Promise<Role> {
-        const role: Role = await this.roleRepository.findOne(id);
-        if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
-        try {
-            return role;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
-        }
-    }
+    return await this.roleRepository.save(roles);
+  }
 
-    async update(id: number, roleDTO: RoleDTO): Promise<Role> {
-        const role: Role = await this.roleRepository.findOne(id);
-        if (!role) throw new NotFoundException(`Role with id: ${id} Not Found`);
-        try {
-            const { code, name, menus, services } = roleDTO;
-            role.code = code;
-            role.name = name;
-            role.menus = Promise.resolve(menus);
-            role.services = Promise.resolve(services);
-            const result: Role = await this.roleRepository.save(role);
-            return result;
-        } catch (error) {
-            throw new InternalServerErrorException('Internal Server Error');
-        }
-    }
-
-    async getRelations(id: number): Promise<Role> {
-        return await this.roleRepository.findOne({ where: { id }, relations: ['account'] });
-    }
-
-    async delete(id: number): Promise<DeleteResult> {
-        const roles: Role = await this.getRelations(id);
-        if (!roles) throw new NotFoundException(`Role with id: ${id} Not Found`);
-        else if (roles) {
-            const account: Account = await Promise.resolve(roles.account);
-            if (account[0] !== undefined) throw new UnprocessableEntityException('Failed to delete, roles is use by another.');
-            else return await this.roleRepository.delete(id);
-        }
-    }
-
-    async createBulk(data: RoleDTO[]): Promise<Role[]> {
-        const roles: Role[] = [];
-
-        for (const item of data) {
-            const { code, name, menus, services } = item;
-            const role: Role = new Role();
-            role.code = code;
-            role.name = name;
-            role.menus = Promise.resolve(menus);
-            role.services = Promise.resolve(services);
-
-            roles.push(role);
-        }
-
-        return await this.roleRepository.save(roles);
-    }
-
-    async findAllRelated(roles: Role[]): Promise<Role[]> {
-        const roleIds: number[] = roles.map((item: Role) => item.id);
-        return await this.roleRepository.findByIds(roleIds);
-    }
+  async findAllRelated(roles: Role[]): Promise<Role[]> {
+    const roleIds: number[] = roles.map((item: Role) => item.id);
+    return await this.roleRepository.findByIds(roleIds);
+  }
 }

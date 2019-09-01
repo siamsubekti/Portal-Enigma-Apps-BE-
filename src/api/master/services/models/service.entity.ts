@@ -27,5 +27,5 @@ export default class Service {
     createdAt: Date;
 
     @ManyToMany(() => Role, (role: Role) => role.services)
-    roles?: Role[];
+    roles?: Promise<Role[]>;
 }
