@@ -1,4 +1,4 @@
-import { Controller, UseInterceptors, Post, Body, Get, Query, Param, UseGuards } from '@nestjs/common';
+import { Controller, UseInterceptors, Post, Body, Get, Query, Param, UseGuards, Put } from '@nestjs/common';
 import {
   ApiImplicitBody,
   ApiOperation,
@@ -96,6 +96,20 @@ export default class MessageController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async find(@Param('id') id: number): Promise<MessageResponse> {
     const data: any = await this.messageService.find(id);
+
+    return { data };
+  }
+
+  @Put(':id/read')
+  @UseGuards(CookieAuthGuard)
+  @ApiOperation({ title: 'Update message read status.', description: 'Update read date of a message.' })
+  @ApiImplicitParam({ name: 'id', description: 'Message ID', type: 'string' })
+  @ApiOkResponse({ description: 'Detailed message.', type: MessageResponse })
+  @ApiNotFoundResponse({ description: 'Message not found.', type: ApiExceptionResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async updateRead(@Param('id') id: number): Promise<MessageResponse> {
+    const data: any = await this.messageService.read(id);
 
     return { data };
   }
