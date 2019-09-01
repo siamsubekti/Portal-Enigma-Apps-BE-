@@ -252,6 +252,41 @@ export default class MigrationService {
         method: HttpMethod.GET,
         serviceType: ServiceType.BACKOFFICE,
       },
+      {
+        code: 'MST_ACCOUNT_DEACTIVATE',
+        name: 'Deactivate Account',
+        endpointUrl: '/accounts',
+        method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'CAND_REGISTERED_LIST',
+        name: 'Candidate Registered List',
+        endpointUrl: '/candidates',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'INBOX_LIST',
+        name: 'Inbox List',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'INBOX_GET',
+        name: 'Get Single Inbox',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'INBOX_CREATE',
+        name: 'Create Inbox',
+        endpointUrl: '/inboxs',
+        method: HttpMethod.POST,
+        serviceType: ServiceType.PORTAL,
+      },
     ];
 
     Logger.log(`Creating ${data.length} services...`);
@@ -271,11 +306,25 @@ export default class MigrationService {
          order: 0,
       },
       {
+        code: 'CANDIDATE',
+        name: 'Candidate',
+        path: '/candidate',
+        icon: 'people-outline',
+        order: 1,
+      },
+      {
         code: 'MASTER',
         name: 'Master Data',
         path: '/master',
         icon: 'settings-2',
-        order: 1,
+        order: 2,
+      },
+      {
+        code: 'INBOX',
+        name: 'Inbox',
+        path: '/inbox',
+        icon: 'inbox-outline',
+        order: 3,
       },
     ];
 
@@ -317,6 +366,13 @@ export default class MigrationService {
         path: '/master/services',
         order: 3,
         parentMenu: parents['MASTER'],
+      },
+      {
+        code: 'CANDIDATE_REGISTERED',
+        name: 'Candidate Registered',
+        path: '/candidate/registered',
+        order: 4,
+        parentMenu: parents['CANDIDATE'],
       },
     ];
 

@@ -52,10 +52,9 @@ export default class AccountService {
         .orWhere('a.status LIKE :term', { term })
         .orWhere('p.fullname LIKE :term', { term })
         .orWhere('p.nickname LIKE :term', { term })
-        .orWhere('p.phone LIKE :term', { term })
-        .where('a.status = :status', { status: AccountStatus.ACTIVE });
+        .orWhere('p.phone LIKE :term', { term });
     }
-
+    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
     query.offset(offset);
     query.limit(queryParams.rowsPerPage);
