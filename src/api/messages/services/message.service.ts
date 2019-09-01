@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { AccountType } from '../../../config/constants';
@@ -74,11 +74,21 @@ export default class MessageService {
     return await query.getMany();
   }
 
+  async read(id: number): Promise<Message> {
+    const message: Message = await this.find(id);
+
+    if (!message) throw new NotFoundException(`Message with ID ${id} cannot be found.`);
+
+    message.readAt = new Date();
+    return await this.update(message);
+  }
+
   async find(id: number): Promise<Message> {
     return this.messageRepository.findOne(id);
   }
 
   async update(data: Message): Promise<Message> {
+    data.updatedAt = new Date();
     return this.messageRepository.save(data);
   }
 

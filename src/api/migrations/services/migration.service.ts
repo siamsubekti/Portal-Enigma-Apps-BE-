@@ -288,6 +288,13 @@ export default class MigrationService {
         serviceType: ServiceType.BACKOFFICE,
       },
       {
+        code: 'MESSAGES_READ_UPDATE',
+        name: 'Update Message Read Status',
+        endpointUrl: '/messages',
+        method: HttpMethod.PUT,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
         code: 'MESSAGES_CREATE',
         name: 'Create New Message',
         endpointUrl: '/messages',
@@ -529,6 +536,110 @@ export default class MigrationService {
 
     account = this.account.repository().create({
       username: 'candidate2@candidates.com',
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      accountType: AccountType.CANDIDATE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
+
+    profile = this.profile.repository().create({
+      fullname: 'Candidate Three',
+      nickname: 'canthree',
+      email: 'candidate3@candidates.com',
+      phone: '-',
+      gender: ProfileGender.MALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2002, 1, 1, 0, 0, 0, 0),
+    });
+
+    account = this.account.repository().create({
+      username: 'candidate3@candidates.com',
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      accountType: AccountType.CANDIDATE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
+
+    profile = this.profile.repository().create({
+      fullname: 'Candidate Four',
+      nickname: 'canfour',
+      email: 'candidate4@candidates.com',
+      phone: '-',
+      gender: ProfileGender.MALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2003, 1, 1, 0, 0, 0, 0),
+    });
+
+    account = this.account.repository().create({
+      username: 'candidate4@candidates.com',
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      accountType: AccountType.CANDIDATE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
+
+    profile = this.profile.repository().create({
+      fullname: 'Candidate Five',
+      nickname: 'canfive',
+      email: 'candidate5@candidates.com',
+      phone: '-',
+      gender: ProfileGender.MALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2004, 1, 1, 0, 0, 0, 0),
+    });
+
+    account = this.account.repository().create({
+      username: 'candidate5@candidates.com',
+      password: await this.hash.create('P@ssw0rd'),
+      status: AccountStatus.ACTIVE,
+      accountType: AccountType.CANDIDATE,
+      profile,
+    });
+
+    account = await this.account.save(account);
+    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+
+    await this.account.save(account);
+
+    Logger.log(`Account ${account.username} created.`);
+
+    profile = this.profile.repository().create({
+      fullname: 'Candidate Six',
+      nickname: 'cansix',
+      email: 'candidate6@candidates.com',
+      phone: '-',
+      gender: ProfileGender.MALE,
+      religion: ProfileReligion.ISLAM,
+      maritalStatus: ProfileMaritalStatus.SINGLE,
+      birthdate: new Date(2005, 1, 1, 0, 0, 0, 0),
+    });
+
+    account = this.account.repository().create({
+      username: 'candidate6@candidates.com',
       password: await this.hash.create('P@ssw0rd'),
       status: AccountStatus.ACTIVE,
       accountType: AccountType.CANDIDATE,
