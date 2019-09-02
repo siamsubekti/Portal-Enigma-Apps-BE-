@@ -288,13 +288,6 @@ export default class MigrationService {
         serviceType: ServiceType.BACKOFFICE,
       },
       {
-        code: 'MESSAGES_READ_UPDATE',
-        name: 'Message Update',
-        endpointUrl: '/messages',
-        method: HttpMethod.PUT,
-        serviceType: ServiceType.BACKOFFICE,
-      },
-      {
         code: 'MESSAGES_GET',
         name: 'Get Single Message',
         endpointUrl: '/messages',
