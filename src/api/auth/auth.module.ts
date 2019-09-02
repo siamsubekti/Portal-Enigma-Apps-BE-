@@ -9,6 +9,7 @@ import CookieStrategy from './strategies/cookie.strategy';
 import RegisterService from './services/register.service';
 import ServicesModule from '../master/services/services.module';
 import RoleModule from '../master/roles/role.module';
+import AuthCandidateController from './controllers/auth-candidate.controller';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import RoleModule from '../master/roles/role.module';
   ],
   exports: [ AuthService, RegisterService, CookieStrategy ],
   providers: [ AuthService, RegisterService, CookieStrategy ],
-  controllers: [ AuthController, RegisterController ],
+  controllers: [ AuthController, RegisterController, AuthCandidateController ],
 })
 export default class AuthModule {}

@@ -100,7 +100,7 @@ export default class AccountService {
       .innerJoinAndSelect('a.profile', 'p');
 
     query.where('p.email = :email', { email });
-    query.where('a.account_type = :type', { type: ( candidate ? AccountType.CANDIDATE : Not( AccountType.CANDIDATE )) });
+    query.where('a.account_type = :type', { type: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)) });
     query.where('a.status = :status', { status: AccountStatus.ACTIVE });
 
     return query.getCount();
@@ -111,10 +111,16 @@ export default class AccountService {
       .innerJoinAndSelect('a.profile', 'p');
 
     query.where('p.email = :email', { email });
-    query.where('a.account_type = :type', { type: ( candidate ? AccountType.CANDIDATE : Not( AccountType.CANDIDATE )) });
-    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
+
+    if (candidate)
+      query.andWhere('a.account_type = :accountType', { accountType: AccountType.CANDIDATE });
+    else
+      query.andWhere('a.account_type != :accountType', { accountType: AccountType.CANDIDATE });
+
+    query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE });
     query.limit(1);
 
+    Logger.log(query.getSql());
     return query.getOne();
   }
 
@@ -122,7 +128,7 @@ export default class AccountService {
     return this.account.count({
       where: {
         username,
-        accountType: ( candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE) ),
+        accountType: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)),
         status: AccountStatus.ACTIVE,
       },
     });
@@ -133,7 +139,7 @@ export default class AccountService {
       select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'],
       where: {
         username,
-        accountType: ( candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE) ),
+        accountType: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)),
         status: AccountStatus.ACTIVE,
       },
       relations: ['profile'],
