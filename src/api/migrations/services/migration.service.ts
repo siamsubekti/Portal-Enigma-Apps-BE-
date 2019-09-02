@@ -384,7 +384,7 @@ export default class MigrationService {
       {
         code: 'CANDIDATE_REGISTERED',
         name: 'Candidate Registered',
-        path: '/candidate/registered',
+        path: '/candidates/registered',
         order: 4,
         parentMenu: parents['CANDIDATE'],
       },
