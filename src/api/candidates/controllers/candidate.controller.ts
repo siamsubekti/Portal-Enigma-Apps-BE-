@@ -62,7 +62,7 @@ export default class CandidateController {
   ): Promise<AccountPagedResponse> {
     const rowsPerPage: number = Number(this.config.get('ROWS_PER_PAGE'));
     const queryParams: CandidateQueryDTO = {
-      term, order, sort, page,
+      term, order, sort, page, rowsPerPage,
       startDate: startDate ? moment(startDate, 'DD-MM-YYYY') : undefined,
       endDate: endDate ? moment(endDate, 'DD-MM-YYYY') : undefined,
     };
