@@ -8,6 +8,8 @@ export class PasswordResetRequestDTO {
   @IsNotEmpty()
   @ApiModelProperty({type: 'string', description: 'Login user email address or username', required: true})
   username: string;
+
+  candidate?: boolean;
 }
 
 export class PasswordResetDTO {
@@ -36,6 +38,7 @@ export class PasswordResetCredential {
   account: Account;
   key: string;
   token: string;
+  candidate?: boolean;
 }
 
 export class PasswordResetPayload {

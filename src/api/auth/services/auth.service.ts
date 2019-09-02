@@ -101,7 +101,7 @@ export default class AuthService {
   }
 
   async prePasswordReset(form: PasswordResetRequestDTO): Promise<boolean> {
-    const account: Account = await this.accountService.findByUsernameOrEmail(form.username);
+    const account: Account = await this.accountService.findByEmail(form.username);
 
     if (!account) throw new HttpException({
       status: HttpStatus.NOT_FOUND,

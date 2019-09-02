@@ -14,6 +14,8 @@ export class LoginCredentialDTO {
   @IsNotEmpty()
   @ApiModelProperty({type: 'string', description: 'Login password related to the user.', required: true})
   password: string;
+
+  candidate?: boolean;
 }
 
 export class LoginResponseDTO {
