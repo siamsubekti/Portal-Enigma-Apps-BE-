@@ -295,6 +295,20 @@ export default class MigrationService {
         serviceType: ServiceType.BACKOFFICE,
       },
       {
+        code: 'CAND_REGISTERED_LIST',
+        name: 'Candidate Registered List',
+        endpointUrl: '/candidates',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
+        code: 'CAND_DOCUMENT_LINK',
+        name: 'Candidate Document Link',
+        endpointUrl: '/candidates/documents',
+        method: HttpMethod.GET,
+        serviceType: ServiceType.BACKOFFICE,
+      },
+      {
         code: 'MESSAGES_LIST',
         name: 'Messages List',
         endpointUrl: '/messages',
@@ -412,7 +426,7 @@ export default class MigrationService {
       {
         code: 'CANDIDATE_REGISTERED',
         name: 'Candidate Registered',
-        path: '/candidate/registered',
+        path: '/candidates/registered',
         order: 4,
         parentMenu: parents['CANDIDATE'],
       },
