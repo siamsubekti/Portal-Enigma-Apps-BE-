@@ -31,10 +31,10 @@ export default class MessageService {
       let { term } = queryParams;
       term = `%${term}%`;
 
-      query.orWhere('m.email LIKE :term', { term });
-      query.orWhere('m.fullname LIKE :term', { term });
-      query.orWhere('m.subject LIKE :term', { term });
-      query.orWhere('m.content LIKE :term', { term });
+      query.orWhere('m.email LIKE :term', { term })
+      .orWhere('m.fullname LIKE :term', { term })
+      .orWhere('m.subject LIKE :term', { term })
+      .orWhere('m.content LIKE :term', { term });
     }
 
     if (queryParams.read === true)
@@ -56,10 +56,11 @@ export default class MessageService {
       let { term } = queryParams;
       term = `%${term}%`;
 
-      query.orWhere('m.email LIKE :term', { term });
-      query.orWhere('m.fullname LIKE :term', { term });
-      query.orWhere('m.subject LIKE :term', { term });
-      query.orWhere('m.content LIKE :term', { term });
+      query
+      .orWhere('m.email LIKE :term', { term })
+      .orWhere('m.fullname LIKE :term', { term })
+      .orWhere('m.subject LIKE :term', { term })
+      .orWhere('m.content LIKE :term', { term });
     }
 
     if (queryParams.read === true)
