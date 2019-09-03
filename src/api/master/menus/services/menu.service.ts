@@ -37,7 +37,7 @@ export default class MenuService {
       query = query.orderBy('m.name', 'ASC');
 
     query.offset(offset);
-    query.limit(1000);
+    query.limit(queryParams.rowsPerPage);
 
     const result: [Menu[], number] = await query.getManyAndCount();
 
