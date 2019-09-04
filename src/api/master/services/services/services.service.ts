@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import Service from '../models/service.entity';
-import { Repository, DeleteResult, SelectQueryBuilder } from 'typeorm';
+import { Repository, DeleteResult, SelectQueryBuilder, Like } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ServiceDTO, ServiceQueryDTO, ServiceQueryResult } from '../models/service.dto';
 import { ServiceType } from '../../../../config/constants';
@@ -62,6 +62,26 @@ export default class ServicesService {
 
   async findAllByServiceType(serviceType: ServiceType): Promise<Service[]> {
     return await this.serviceRepository.find({ serviceType });
+  }
+
+  async findAllPublicBackofficeServices(): Promise<Service[]> {
+    return await this.serviceRepository.find({
+      where: {
+        serviceType: ServiceType.PUBLIC,
+        code: Like('AUTH_%'),
+      },
+      order: { code: 'ASC' },
+    });
+  }
+
+  async findAllPublicFrontofficeServices(): Promise<Service[]> {
+    return await this.serviceRepository.find({
+      where: {
+        serviceType: ServiceType.PUBLIC,
+        code: Like('CAND_%'),
+      },
+      order: { code: 'ASC' },
+    });
   }
 
   async create(serviceDto: ServiceDTO): Promise<Service> {

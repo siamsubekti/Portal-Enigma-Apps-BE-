@@ -1,7 +1,7 @@
 import * as moment from 'moment-timezone';
 import { Injectable, Logger, HttpException, HttpStatus, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder, In } from 'typeorm';
+import { Repository, SelectQueryBuilder, In, Not } from 'typeorm';
 import { AccountQueryDTO, AccountQueryResult, AccountProfileDTO, AccountPrivilege } from '../models/account.dto';
 import { AccountStatus, AccountType } from '../../../config/constants';
 import Account from '../models/account.entity';
@@ -95,37 +95,58 @@ export default class AccountService {
     return await this.account.save(account);
   }
 
-  async countByUsernameOrEmail(email: string): Promise<number> {
+  async countByEmail(email: string, candidate: boolean = false): Promise<number> {
     const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
       .innerJoinAndSelect('a.profile', 'p');
 
     query.where('p.email = :email', { email });
+    query.where('a.account_type = :type', { type: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)) });
     query.where('a.status = :status', { status: AccountStatus.ACTIVE });
 
     return query.getCount();
   }
 
-  async findByAccountType(...accountTypes: AccountType[]): Promise<Account[]> {
-    return this.account.find({ where: { accountType: In(accountTypes) }, relations: ['profile'] });
-  }
-
-  async findByUsernameOrEmail(email: string): Promise<Account> {
+  async findByEmail(email: string, candidate: boolean = false): Promise<Account> {
     const query: SelectQueryBuilder<Account> = this.account.createQueryBuilder('a')
       .innerJoinAndSelect('a.profile', 'p');
 
     query.where('p.email = :email', { email });
-    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
+
+    if (candidate)
+      query.andWhere('a.account_type = :accountType', { accountType: AccountType.CANDIDATE });
+    else
+      query.andWhere('a.account_type != :accountType', { accountType: AccountType.CANDIDATE });
+
+    query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE });
     query.limit(1);
 
     return query.getOne();
   }
 
-  async countByUsername(username: string): Promise<number> {
-    return this.account.count({ where: { username, status: AccountStatus.ACTIVE } });
+  async countByUsername(username: string, candidate: boolean = false): Promise<number> {
+    return this.account.count({
+      where: {
+        username,
+        accountType: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)),
+        status: AccountStatus.ACTIVE,
+      },
+    });
   }
 
-  async findByUsername(username: string): Promise<Account> {
-    return this.account.findOne({ select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'], where: { username, status: AccountStatus.ACTIVE }, relations: ['profile'] });
+  async findByUsername(username: string, candidate: boolean = false): Promise<Account> {
+    return this.account.findOne({
+      select: ['id', 'username', 'password', 'status', 'lastlogin', 'accountType'],
+      where: {
+        username,
+        accountType: (candidate ? AccountType.CANDIDATE : Not(AccountType.CANDIDATE)),
+        status: AccountStatus.ACTIVE,
+      },
+      relations: ['profile'],
+    });
+  }
+
+  async findByAccountType(...accountTypes: AccountType[]): Promise<Account[]> {
+    return this.account.find({ where: { accountType: In(accountTypes) }, relations: ['profile'] });
   }
 
   async findSuspendedAccount(username: string): Promise<Account> {

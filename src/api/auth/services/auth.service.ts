@@ -7,7 +7,7 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
 import { AccountPrivilege } from '../../accounts/models/account.dto';
-import { AccountStatus, ServiceType } from '../../../config/constants';
+import { AccountStatus } from '../../../config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
@@ -29,8 +29,12 @@ export default class AuthService {
     private readonly config: AppConfig,
   ) { }
 
-  async getAuthServices(): Promise<Service[]> {
-    return await this.service.findAllByServiceType(ServiceType.PUBLIC);
+  async getFrontofficeAuthService(): Promise<Service[]> {
+    return await this.service.findAllPublicFrontofficeServices();
+  }
+
+  async getBackofficeAuthService(): Promise<Service[]> {
+    return await this.service.findAllPublicBackofficeServices();
   }
 
   async getAccountPrivileges(accountId: string): Promise<AccountPrivilege> {
@@ -44,13 +48,10 @@ export default class AuthService {
 
   async login(credential: LoginCredentialDTO): Promise<LoginResponseDTO> {
     let loginResponse: LoginResponseDTO = null;
-    let account: Account = await this.accountService.findByUsername(credential.username);
+    let account: Account = await this.accountService.findByUsername(credential.username, credential.candidate);
     if (!account) account = await this.accountService.findSuspendedAccount(credential.username);
 
-    if (!account) throw new HttpException({
-      status: HttpStatus.NOT_FOUND,
-      error: `Account data related to this credential could not be found.`,
-    }, HttpStatus.NOT_FOUND);
+    if (!account) return null;
 
     try {
       const validPassword: boolean = await this.hashUtil.compare(credential.password, account.password);
@@ -101,7 +102,7 @@ export default class AuthService {
   }
 
   async prePasswordReset(form: PasswordResetRequestDTO): Promise<boolean> {
-    const account: Account = await this.accountService.findByUsernameOrEmail(form.username);
+    const account: Account = await this.accountService.findByEmail(form.username, form.candidate);
 
     if (!account) throw new HttpException({
       status: HttpStatus.NOT_FOUND,
@@ -118,7 +119,7 @@ export default class AuthService {
       await this.accountService.setStatus(account.id, AccountStatus.SUSPENDED);
       await client.set(key, jwt);
       await client.expire(key, expiresIn); // 30 minutes in seconds
-      this.sendPasswordResetEmail({ account, key, token });
+      this.sendPasswordResetEmail({ account, key, token }, form.candidate);
 
       return true;
 
@@ -216,12 +217,15 @@ export default class AuthService {
     return sessionId;
   }
 
-  private async sendPasswordResetEmail(credential: PasswordResetCredential): Promise<boolean> {
+  private async sendPasswordResetEmail(credential: PasswordResetCredential, candidate: boolean): Promise<boolean> {
     try {
+      let baseUrl: string = this.config.get('FRONTEND_BACKOFFICE_URL');
+      if (candidate) baseUrl = this.config.get('FRONTEND_PORTAL_URL');
+
       const { account: { profile: { fullname: name, email: to } }, key, token } = credential;
-      const resetPasswordLink: string = encodeURI(`${this.config.get('FRONTEND_PORTAL_URL')}/#/auth/password/reset/${key}/${token}`);
+      const resetPasswordLink: string = encodeURI(`${baseUrl}/#/auth/password/reset/${key}/${token}`);
       const html: string = await this.templateUtil.renderToString('auth/password-reset.mail.hbs', {
-        name, resetPasswordLink, baseUrl: this.config.get('FRONTEND_PORTAL_URL'),
+        name, resetPasswordLink, baseUrl,
       });
 
       const config: any = {
