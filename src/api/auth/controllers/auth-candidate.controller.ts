@@ -51,12 +51,12 @@ export default class AuthCandidateController {
     ) { }
 
     @Post('login')
-    @ApiOperation({ title: 'User Login', description: 'User login service required before accessing other services.' })
-    @ApiCreatedResponse({ description: 'User successfuly logged-in.', type: LoginResponse })
-    @ApiForbiddenResponse({ description: 'Invalid user account credential.', type: ApiExceptionResponse })
+    @ApiOperation({ title: 'Candidate Login', description: 'Candidate login service required before accessing other services.' })
+    @ApiCreatedResponse({ description: 'Candidate successfuly logged-in.', type: LoginResponse })
+    @ApiForbiddenResponse({ description: 'Invalid candidate account credential.', type: ApiExceptionResponse })
     @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
     @ApiUnprocessableEntityResponse({ description: 'New account in suspended status.', type: ApiExceptionResponse })
-    @ApiImplicitBody({ name: 'LoginCredentialDTO', description: 'User account form data.', type: LoginCredentialDTO })
+    @ApiImplicitBody({ name: 'LoginCredentialDTO', description: 'Candidate account form data.', type: LoginCredentialDTO })
     async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
         form.candidate = true;
         const credential: LoginResponseDTO = await this.authService.login(form);
@@ -86,8 +86,8 @@ export default class AuthCandidateController {
 
     @Delete('logout')
     @UseGuards(CookieAuthGuard)
-    @ApiOperation({ title: 'User Logout', description: 'Destroy any session related to the current user.' })
-    @ApiNoContentResponse({ description: 'User successfuly logged-out.' })
+    @ApiOperation({ title: 'Candidate Logout', description: 'Destroy any session related to the current candidate.' })
+    @ApiNoContentResponse({ description: 'Candidate successfuly logged-out.' })
     @ApiUnauthorizedResponse({ description: 'Unauthorized logout', type: ApiExceptionResponse })
     @ApiNotFoundResponse({ description: 'Session invalid', type: ApiExceptionResponse })
     async logout(@Req() request: Request, @Res() response: Response): Promise<void> {
@@ -100,12 +100,12 @@ export default class AuthCandidateController {
 
     @Put('password/reset/:key/:token')
     @UseInterceptors(ResponseRebuildInterceptor)
-    @ApiOperation({ title: 'Account Password Update', description: 'Update user account password (can also be used to reset new backoffice user account password).' })
+    @ApiOperation({ title: 'Account Password Update', description: 'Update candidate account password (can also be used to reset new backoffice candidate account password).' })
     @ApiImplicitParam({ name: 'key', description: 'Activation key.', required: true })
     @ApiImplicitParam({ name: 'token', description: 'Activation token.', required: true })
     @ApiImplicitBody({ name: 'PasswordResetDTO', description: 'Password reset form data.', type: PasswordResetDTO })
     @ApiOkResponse({ description: 'Account password changed.', type: LoginResponse })
-    @ApiBadRequestResponse({ description: 'User password reset form validation failed.', type: ApiExceptionResponse })
+    @ApiBadRequestResponse({ description: 'Candidate password reset form validation failed.', type: ApiExceptionResponse })
     async passwordResetUpdate(@Body() form: PasswordResetDTO, @Param('key') key: string, @Param('token') token: string): Promise<LoginResponse> {
         const data: LoginResponseDTO = await this.authService.passwordReset(form, key, token);
 
@@ -114,10 +114,10 @@ export default class AuthCandidateController {
 
     @Post('password/reset')
     @UseInterceptors(ResponseRebuildInterceptor)
-    @ApiOperation({ title: 'User Password Reset', description: 'Request to reset user password.' })
+    @ApiOperation({ title: 'Candidate Password Reset', description: 'Request to reset candidate password.' })
     @ApiImplicitBody({ name: 'PasswordResetRequestDTO', description: 'Password reset request form data.', type: PasswordResetRequestDTO })
     @ApiCreatedResponse({ description: 'Successful request to reset password.', type: PasswordResetResponse })
-    @ApiBadRequestResponse({ description: 'User account email validation failed.', type: ApiExceptionResponse })
+    @ApiBadRequestResponse({ description: 'Candidate account email validation failed.', type: ApiExceptionResponse })
     async passwordResetRequest(@Body() form: PasswordResetRequestDTO): Promise<PasswordResetResponse> {
         form.candidate = true;
         const data: boolean = await this.authService.prePasswordReset(form);
@@ -127,10 +127,10 @@ export default class AuthCandidateController {
 
     @Get('services')
     @UseInterceptors(ResponseRebuildInterceptor)
-    @ApiOperation({ title: 'Available Auth Services', description: 'Get a list of available auth services.' })
+    @ApiOperation({ title: 'Available Auth Services', description: 'Get a list of available candidate auth services.' })
     @ApiOkResponse({ description: 'List of auth services.', type: AuthServicesResponse })
     async services(): Promise<AuthServicesResponse> {
-        const data: Service[] = await this.authService.getAuthServices();
+        const data: Service[] = await this.authService.getFrontofficeAuthService();
 
         return { data };
     }

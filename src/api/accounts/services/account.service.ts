@@ -120,7 +120,6 @@ export default class AccountService {
     query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE });
     query.limit(1);
 
-    Logger.log(query.getSql());
     return query.getOne();
   }
 
@@ -254,6 +253,7 @@ export default class AccountService {
     account.password = await this.hashUtil.create(process.env.DEFAULT_PASSWORD);
     account.profile = profile;
     account.status = AccountStatus.SUSPENDED;
+    account.accountType = accountDto.accountType;
 
     if (accountDto.roles) {
       const roles: Role[] = await this.roleServices.findAllRelated(accountDto.roles);

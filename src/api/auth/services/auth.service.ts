@@ -7,7 +7,7 @@ import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
 import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
 import { AccountPrivilege } from '../../accounts/models/account.dto';
-import { AccountStatus, ServiceType } from '../../../config/constants';
+import { AccountStatus } from '../../../config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
@@ -29,8 +29,12 @@ export default class AuthService {
     private readonly config: AppConfig,
   ) { }
 
-  async getAuthServices(): Promise<Service[]> {
-    return await this.service.findAllByServiceType(ServiceType.PUBLIC);
+  async getFrontofficeAuthService(): Promise<Service[]> {
+    return await this.service.findAllPublicFrontofficeServices();
+  }
+
+  async getBackofficeAuthService(): Promise<Service[]> {
+    return await this.service.findAllPublicBackofficeServices();
   }
 
   async getAccountPrivileges(accountId: string): Promise<AccountPrivilege> {
