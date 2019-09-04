@@ -47,14 +47,14 @@ export default class AccountService {
     if (queryParams.term) {
       let { term } = queryParams;
       term = `%${term}%`;
-      query
-        .orWhere('a.username LIKE :term', { term })
-        .orWhere('a.status LIKE :term', { term })
-        .orWhere('p.fullname LIKE :term', { term })
-        .orWhere('p.nickname LIKE :term', { term })
-        .orWhere('p.phone LIKE :term', { term });
+
+      query.orWhere('a.username LIKE :term', { term });
+      query.orWhere('a.status LIKE :term', { term });
+      query.orWhere('p.fullname LIKE :term', { term });
+      query.orWhere('p.nickname LIKE :term', { term });
+      query.orWhere('p.phone LIKE :term', { term });
     }
-    query.where('a.status = :status', { status: AccountStatus.ACTIVE });
+    query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE });
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
     query.offset(offset);
     query.limit(queryParams.rowsPerPage);
