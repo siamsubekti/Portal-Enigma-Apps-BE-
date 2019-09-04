@@ -254,6 +254,7 @@ export default class AccountService {
     account.password = await this.hashUtil.create(process.env.DEFAULT_PASSWORD);
     account.profile = profile;
     account.status = AccountStatus.SUSPENDED;
+    account.accountType = accountDto.accountType;
 
     if (accountDto.roles) {
       const roles: Role[] = await this.roleServices.findAllRelated(accountDto.roles);
