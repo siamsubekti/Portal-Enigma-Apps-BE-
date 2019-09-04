@@ -4,38 +4,38 @@ import { ProfileGender, ProfileReligion, ProfileMaritalStatus } from '../../../c
 
 @Entity('profiles')
 export default class Profile {
-  @PrimaryColumn({type: 'varchar', length: 64})
+  @PrimaryColumn({ type: 'varchar', length: 64 })
   @Generated('uuid')
   id: string;
 
-  @Column({type: 'varchar', length: 255, nullable: false})
+  @Column({ type: 'varchar', length: 255, nullable: false })
   fullname: string;
 
-  @Column({type: 'varchar', length: 125, unique: true, nullable: false})
+  @Column({ type: 'varchar', length: 125, unique: false, nullable: false })
   nickname: string;
 
-  @Column({type: 'varchar', length: 255, unique: true, nullable: false})
+  @Column({ type: 'varchar', length: 255, unique: true, nullable: false })
   email: string;
 
-  @Column({type: 'varchar', length: 18, nullable: false})
+  @Column({ type: 'varchar', length: 18, nullable: false })
   phone: string;
 
-  @Column({type: 'date', nullable: true})
+  @Column({ type: 'date', nullable: true })
   birthdate: Date;
 
-  @Column({type: 'varchar', length: 10, nullable: true})
+  @Column({ type: 'varchar', length: 10, nullable: true })
   gender: ProfileGender;
 
-  @Column({type: 'varchar', length: 50, nullable: true})
+  @Column({ type: 'varchar', length: 50, nullable: true })
   religion: ProfileReligion;
 
-  @Column({type: 'varchar', length: 20, nullable: true, name: 'marital_status'})
+  @Column({ type: 'varchar', length: 20, nullable: true, name: 'marital_status' })
   maritalStatus: ProfileMaritalStatus;
 
-  @Column({name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP'})
+  @Column({ name: 'created_at', type: 'timestamp', nullable: false, default: (): string => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({name: 'updated_at', type: 'timestamp', nullable: true})
+  @Column({ name: 'updated_at', type: 'timestamp', nullable: true })
   updatedAt: Date;
 
   @OneToOne(() => Account, (account: Account) => account.profile)

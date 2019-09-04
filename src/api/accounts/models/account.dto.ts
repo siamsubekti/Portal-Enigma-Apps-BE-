@@ -114,6 +114,12 @@ export class AccountProfileDTO {
   @IsEnum(ProfileMaritalStatus)
   maritalStatus: ProfileMaritalStatus;
 
+  @ApiModelProperty({ description: 'Account Type', type: 'string', enum: AccountType, required: true })
+  @IsDefined()
+  @IsNotEmpty()
+  @IsEnum(AccountType)
+  accountType: AccountType;
+
   @ApiModelProperty({ type: [Role], required: false})
   @IsOptional()
   @IsDefined()
