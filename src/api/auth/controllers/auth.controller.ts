@@ -128,7 +128,7 @@ export default class AuthController {
   @ApiOperation({ title: 'Available Auth Services', description: 'Get a list of available auth services.' })
   @ApiOkResponse({ description: 'List of auth services.', type: AuthServicesResponse })
   async services(): Promise<AuthServicesResponse> {
-    const data: Service[] = await this.authService.getAuthServices();
+    const data: Service[] = await this.authService.getBackofficeAuthService();
 
     return { data };
   }

@@ -120,7 +120,6 @@ export default class AccountService {
     query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE });
     query.limit(1);
 
-    Logger.log(query.getSql());
     return query.getOne();
   }
 
