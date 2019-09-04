@@ -10,7 +10,7 @@ import {
   AccountRegisterResponseDTO,
   AccountRegistrationCredential,
 } from '../models/register.dto';
-import { AccountStatus } from '../../../config/constants';
+import { AccountStatus, AccountType } from '../../../config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
@@ -86,6 +86,7 @@ export default class RegisterService {
       account.password = form.password;
       account.profile = profile;
       account.status = AccountStatus.ACTIVE;
+      account.accountType = AccountType.CANDIDATE;
       account.roles = Promise.resolve((await this.roleService.all({term: 'CANDIDATE'})).result as Role[]);
       account = await this.accountService.save(account);
 
