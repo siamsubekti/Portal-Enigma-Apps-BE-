@@ -410,6 +410,20 @@ export default class MigrationService {
         icon: 'settings-2',
         order: 3,
       },
+      {
+        code: 'CANDIDATE_PROFILE',
+        name: 'My Profile',
+        path: '/my-profile',
+        icon: 'person-outline',
+        order: 4,
+      },
+      {
+        code: 'CANDIDATE_RESUME',
+        name: 'My Resume',
+        path: '/my-resume',
+        icon: 'file-text-outline',
+        order: 5,
+      },
     ];
 
     Logger.log(`Creating ${data.length} parents menu...`);
@@ -455,8 +469,15 @@ export default class MigrationService {
         code: 'CANDIDATE_REGISTERED',
         name: 'Candidate Registered',
         path: '/candidates/registered',
-        order: 4,
+        order: 0,
         parentMenu: parents['CANDIDATE'],
+      },
+      {
+        code: 'CANDIDATE_UPLOAD_CV',
+        name: 'Upload Resume',
+        path: '/my-resume/upload',
+        order: 0,
+        parentMenu: parents['CANDIDATE_RESUME'],
       },
     ];
 
@@ -474,8 +495,8 @@ export default class MigrationService {
       {
         code: 'ADMIN',
         name: 'Administrator',
-        services: this.services,
-        menus: this.menus,
+        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) < 0),
+        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) < 0),
       },
       {
         code: 'STAFF',
@@ -487,7 +508,7 @@ export default class MigrationService {
         code: 'CANDIDATE',
         name: 'Candidate',
         services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) > -1),
-        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) > -1),
       },
       {
         code: 'TRAINEE',
