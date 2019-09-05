@@ -120,6 +120,13 @@ export default class MigrationService {
         serviceType: ServiceType.PUBLIC,
       },
       {
+        code: 'CAND_PROFILE_UPDATE',
+        name: 'Candidate Profile Update',
+        endpointUrl: '/candidates',
+        method: HttpMethod.PUT,
+        serviceType: ServiceType.FRONTOFFICE,
+      },
+      {
         code: 'RES_DOCUMENT_UPLOAD',
         name: 'Candidate Document Upload',
         endpointUrl: '/documents/upload',
@@ -479,7 +486,7 @@ export default class MigrationService {
       {
         code: 'CANDIDATE',
         name: 'Candidate',
-        services: this.services.filter((service: Service) => ['RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) > -1),
+        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) > -1),
         menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
       },
       {

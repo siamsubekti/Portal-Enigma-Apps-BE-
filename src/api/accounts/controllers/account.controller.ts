@@ -15,8 +15,8 @@ import {
 import { Controller, UseGuards, Get, Put, Query, Param, Body, Delete, UseInterceptors, HttpException, HttpStatus, Request, Post, HttpCode } from '@nestjs/common';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
-import { ApiPagedResponse, ApiExceptionResponse, ApiResponse } from '../../../libraries/responses/response.type';
-import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege, AccountPagedResponse, AccountResponseDTO } from '../models/account.dto';
+import { ApiPagedResponse, ApiExceptionResponse } from '../../../libraries/responses/response.type';
+import { AccountResponse, AccountProfileDTO, AccountPrivilegeResponse, AccountPrivilege, AccountPagedResponse, AccountResponseDTO, AccountSearchResponse } from '../models/account.dto';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import Account from '../models/account.entity';
@@ -71,14 +71,14 @@ export default class AccountController {
   @ApiImplicitQuery({ name: 'term', description: 'Search keyword', type: 'string', required: false })
   @ApiImplicitQuery({ name: 'order', description: 'Order columns (username, fullname, or nickname)', type: ['username', 'fullname', 'nickname'], required: false })
   @ApiImplicitQuery({ name: 'sort', description: 'Sorting order (asc or desc)', type: ['asc', 'desc'], required: false })
-  @ApiOkResponse({ description: 'Search result of user accounts.', type: ApiPagedResponse })
+  @ApiOkResponse({ description: 'Search result of user accounts.', type: AccountSearchResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async search(
     @Query('term') term?: string,
     @Query('order') order: 'username' | 'fullname' | 'nickname' = 'fullname',
     @Query('sort') sort: 'asc' | 'desc' = 'asc',
-  ): Promise<AccountPagedResponse> {
+  ): Promise<AccountSearchResponse> {
     const { result = [] } = await this.accountService.all({ term, order, sort, page: 1, rowsPerPage: 1000 });
     const data: AccountResponseDTO[] = [];
 
@@ -93,7 +93,7 @@ export default class AccountController {
 
   @Get('privileges')
   @ApiOperation({ title: 'Get current account privileges.', description: 'Get current account roles, available menus, and available services.' })
-  @ApiOkResponse({ description: 'Account privileges.', type: ApiResponse })
+  @ApiOkResponse({ description: 'Account privileges.', type: AccountPrivilegeResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async privileges(@Request() request: any): Promise<AccountPrivilegeResponse> {
@@ -107,7 +107,7 @@ export default class AccountController {
   @Get(':id')
   @ApiOperation({ title: 'Get an account.', description: 'Get single account data based on ID.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
-  @ApiOkResponse({ description: 'Account data.', type: ApiResponse })
+  @ApiOkResponse({ description: 'Account data.', type: AccountResponse })
   @ApiNotFoundResponse({ description: 'Account data not found.', type: ApiExceptionResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
@@ -132,7 +132,7 @@ export default class AccountController {
   @ApiOperation({ title: 'Update an account.', description: 'Renew account and profile data based on ID.' })
   @ApiImplicitParam({ name: 'id', description: 'Account ID', type: 'string', required: true })
   @ApiImplicitBody({ name: 'AccountProfileDTO', description: 'Account Profile form data', type: AccountProfileDTO, required: true })
-  @ApiOkResponse({ description: 'Updated account and profile data.', type: ApiResponse })
+  @ApiOkResponse({ description: 'Updated account and profile data.', type: AccountResponse })
   @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
   @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })

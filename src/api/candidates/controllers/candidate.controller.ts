@@ -8,6 +8,9 @@ import {
   UseInterceptors,
   Param,
   NotFoundException,
+  Put,
+  Body,
+  Request,
 } from '@nestjs/common';
 import {
   ApiUseTags,
@@ -17,12 +20,13 @@ import {
   ApiUnauthorizedResponse,
   ApiInternalServerErrorResponse,
   ApiImplicitParam,
+  ApiImplicitBody,
 } from '@nestjs/swagger';
 import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 import { PagingData } from '../../../libraries/responses/response.class';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { CandidateDocumentResponse, CandidateQueryDTO } from '../models/candidate.dto';
-import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO } from '../../accounts/models/account.dto';
+import { AccountPagedResponse, AccountSearchResponse, AccountResponseDTO, AccountProfileDTO, AccountResponse } from '../../accounts/models/account.dto';
 import AppConfig from '../../../config/app.config';
 import CookieAuthGuard from '../../auth/guards/cookie.guard';
 import DocumentService from '../../resumes/document/services/document.service';
@@ -108,6 +112,18 @@ export default class CandidateController {
       });
 
     return { data };
+  }
+
+  @Put()
+  @ApiOperation({ title: 'Candidate profile update.', description: 'Update the logged-in candidate profile data.' })
+  @ApiImplicitBody({ name: 'AccountProfileDTO', description: 'Account profile data.', type: AccountProfileDTO })
+  @ApiOkResponse({ description: 'Updated candidate data.', type: AccountResponse })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized API Call.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
+  async update(@Body() form: AccountProfileDTO, @Request() request: any): Promise<AccountResponse> {
+    const account: Account = await this.candidateServices.update(request.user, form);
+
+    return { data: { ...account, roles: undefined } };
   }
 
   @Get('documents/:accountId')
