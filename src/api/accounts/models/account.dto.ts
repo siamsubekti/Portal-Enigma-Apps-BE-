@@ -174,15 +174,15 @@ export class AccountSearchResponse {
   @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
   status?: ResponseStatus;
 
-  @ApiModelProperty({ description: 'Account data', type: [ Account ], required: true })
-  data: Account[];
+  @ApiModelProperty({ description: 'Account data', type: [ AccountResponseDTO ], required: true })
+  data: AccountResponseDTO[];
 }
 
 export class AccountResponse {
   @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
   status?: ResponseStatus;
 
-  @ApiModelProperty({ description: 'Account data', type: Account, required: true })
+  @ApiModelProperty({ description: 'Account data', type: AccountResponseDTO, required: true })
   data: AccountResponseDTO;
 }
 
@@ -190,7 +190,7 @@ export class AccountPagedResponse {
   @ApiModelProperty({ description: 'Response status', type: ResponseStatus, required: false})
   status?: ResponseStatus;
 
-  @ApiModelProperty({ description: 'List of accounts', type: [ Account ], required: true })
+  @ApiModelProperty({ description: 'List of accounts', type: [ AccountResponseDTO ], required: true })
   data: AccountResponseDTO[];
 
   @ApiModelProperty({ description: 'Paging data', type: PagingData, required: false })

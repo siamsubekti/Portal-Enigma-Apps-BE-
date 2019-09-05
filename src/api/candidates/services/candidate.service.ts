@@ -3,7 +3,7 @@ import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
 import { AccountType } from 'src/config/constants';
-import { AccountQueryResult } from '../../../api/accounts/models/account.dto';
+import { AccountQueryResult, AccountProfileDTO } from '../../../api/accounts/models/account.dto';
 import { CandidateQueryDTO } from '../models/candidate.dto';
 import ValidatorUtil from 'src/libraries/utilities/validator.util';
 import Account from '../../../api/accounts/models/account.entity';
@@ -84,6 +84,24 @@ export default class CandidateService {
     }
 
     return registeredCandidate;
+  }
+
+  async update(candidate: Account, form: AccountProfileDTO): Promise<Account> {
+    const { profile } = candidate;
+
+    profile.fullname = form.fullname;
+    profile.nickname = form.nickname;
+    profile.email = form.email;
+    profile.phone = form.phone;
+    profile.birthdate = moment(form.birthdate, 'DD-MM-YYYY').toDate();
+    profile.gender = form.gender;
+    profile.religion = form.religion;
+    profile.maritalStatus = form.maritalStatus;
+
+    candidate.username = form.email;
+    candidate.profile = profile;
+
+    return await this.candidate.save(candidate);
   }
 
 }
