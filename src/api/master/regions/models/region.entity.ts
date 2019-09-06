@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryColumn, Generated, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
-import { RegionType } from 'src/config/constants';
+import { RegionType } from '../../../../config/constants';
 
 @Entity('mst_regions')
 export default class Region {

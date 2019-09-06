@@ -3,7 +3,7 @@ import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsDefined, IsNotEmpty, MaxLength, IsOptional, IsEnum } from 'class-validator';
 import Template from './template.entity';
-import { TemplateType } from 'src/config/constants';
+import { TemplateType } from '../../../../config/constants';
 
 export class TemplateDTO {
 

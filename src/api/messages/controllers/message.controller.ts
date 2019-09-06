@@ -18,7 +18,7 @@ import { ContactFormDTO, MessageResponse, MessageQueryParams, MessagePagedRespon
 import AppConfig from '../../../config/app.config';
 import MessageService from '../services/message.service';
 import Message from '../models/message.entity';
-import CookieAuthGuard from 'src/api/auth/guards/cookie.guard';
+import CookieAuthGuard from '../../auth/guards/cookie.guard';
 
 @Controller('messages')
 @ApiUseTags('Messages')

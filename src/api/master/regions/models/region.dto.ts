@@ -3,7 +3,7 @@ import { IApiResponse, IApiPagedResponse } from '../../../../libraries/responses
 import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 import { IsDefined, IsEnum, IsNotEmpty, MaxLength, IsOptional } from 'class-validator';
 import Region from './region.entity';
-import { RegionType } from 'src/config/constants';
+import { RegionType } from '../../../../config/constants';
 
 export class RegionDTO {
 

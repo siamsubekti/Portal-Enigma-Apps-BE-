@@ -1,6 +1,6 @@
 import { ApiModelProperty } from '@nestjs/swagger';
 import { IsDefined, IsNotEmpty, MaxLength, IsNumber } from 'class-validator';
-import { ResponseStatus, PagingData } from 'src/libraries/responses/response.class';
+import { ResponseStatus, PagingData } from '../../../../libraries/responses/response.class';
 
 export class DocumentDTO {
 

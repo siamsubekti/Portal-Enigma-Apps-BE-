@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
-import { TemplateType } from 'src/config/constants';
+import { TemplateType } from '../../../../config/constants';
 
 @Entity('mst_templates')
 export default class Template {
