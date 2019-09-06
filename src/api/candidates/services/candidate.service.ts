@@ -1,4 +1,4 @@
-import * as moment from 'moment';
+import * as moment from 'moment-timezone';
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
@@ -93,7 +93,7 @@ export default class CandidateService {
     profile.nickname = form.nickname;
     profile.email = form.email;
     profile.phone = form.phone;
-    profile.birthdate = moment(form.birthdate, 'DD-MM-YYYY').toDate();
+    profile.birthdate = form.birthdate;
     profile.gender = form.gender;
     profile.religion = form.religion;
     profile.maritalStatus = form.maritalStatus;

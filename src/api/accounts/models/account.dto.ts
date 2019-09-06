@@ -94,7 +94,7 @@ export class AccountProfileDTO {
   @ApiModelProperty({ description: 'Account birthdate.', type: 'string', required: true, example: '31-12-1991' })
   @IsDefined()
   @IsNotEmpty()
-  birthdate: string;
+  birthdate: Date;
 
   @ApiModelProperty({ description: 'Account gender.', type: 'string', enum: ProfileGender, required: true })
   @IsDefined()
