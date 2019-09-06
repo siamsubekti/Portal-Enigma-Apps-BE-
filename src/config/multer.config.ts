@@ -33,7 +33,7 @@ export const multerOptions: any = {
             const uploadPath: string = join(multerConfig.dest, 'documents', 'candidates', md5(id));
             // Create folder if doesn't exist
             if (!existsSync(uploadPath)) mkdirSync(join(config.get('BASE_PATH'), uploadPath), { recursive: true });
-            Logger.log(`creating directory for file ${file.filename}`, 'multerConfig@options', true);
+            Logger.log(`creating directory for file ${file.filename} inside ${uploadPath}`, 'multerConfig@options', true);
 
             cb(null, uploadPath);
         },

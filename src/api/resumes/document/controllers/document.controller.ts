@@ -58,7 +58,7 @@ export default class DocumentController {
   @ApiInternalServerErrorResponse({ description: 'API experienced error.', type: ApiExceptionResponse })
   async download( @Param('accountId') accountId: string, @Param('filename') filename: string, @Res() res: Response): Promise<void> {
     const document: Document = await this.docService.findByAccountIdAndName(accountId, filename);
-    const documentPath: string =  document ? join(process.env.BASE_PATH, document.filepath) : null;
+    const documentPath: string =  document ? join(process.env.BASE_PATH, process.env.UPLOAD_LOCATION, document.filepath) : null;
 
     if (!documentPath && !existsSync(documentPath)) {
       Logger.error(`File ${documentPath} cannot be found.`);
