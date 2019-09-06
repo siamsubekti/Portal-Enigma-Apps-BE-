@@ -4,10 +4,10 @@ import { IORedis } from 'redis';
 import { Validator } from 'class-validator';
 import { RedisService } from 'nestjs-redis';
 import { Injectable, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { AccountStatus } from '../../../config/constants';
+import { AccountPrivilege } from '../../accounts/models/account.dto';
 import { LoginCredentialDTO, LoginResponseDTO, JwtPayload } from '../models/auth.dto';
 import { PasswordResetRequestDTO, PasswordResetCredential, PasswordResetDTO, PasswordResetPayload } from '../models/password-reset.dto';
-import { AccountPrivilege } from '../../accounts/models/account.dto';
-import { AccountStatus } from '../../../config/constants';
 import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
@@ -175,7 +175,7 @@ export default class AuthService {
   }
 
   async prePasswordCreate(account: Account): Promise<PasswordResetCredential> {
-    const expiresIn: number = Number(this.config.get('PASSWORD_RESET_EXPIRES')); // 30 minutes in seconds
+    const expiresIn: number = +this.config.get('PASSWORD_RESET_EXPIRES'); // 30 minutes in seconds
     const client: IORedis.Redis = await this.redisService.getClient();
     const key: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}-password-reset`);
     const token: string = this.hashUtil.createRandomString(72);
@@ -205,13 +205,13 @@ export default class AuthService {
   }
 
   private async createSession(account: Account): Promise<string> {
-    const expiresIn: number = Number(this.config.get('SESSION_EXPIRES')) / 1000; // 1 day in seconds
+    const expiresIn: number = +this.config.get('SESSION_EXPIRES'); // 1 day in seconds
     const client: IORedis.Redis = await this.redisService.getClient();
     const sessionId: string = this.hashUtil.createMd5Hash(`${account.id}-${account.username}-${moment().valueOf()}-session`);
     const payload: JwtPayload = { aid: account.id };
     const token: string = jwtSign(payload, this.config.get('HASH_SECRET'), { expiresIn });
 
-    // Logger.log({account, sessionId, token}, 'AuthService@createSession', true);
+    Logger.log({account, sessionId, token}, 'AuthService@createSession', true);
     await client.set(sessionId, token);
     await client.expire(sessionId, expiresIn);
     return sessionId;

@@ -28,6 +28,7 @@ import {
   ApiOkResponse,
   ApiImplicitParam,
   ApiUnprocessableEntityResponse,
+  ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
@@ -57,13 +58,14 @@ export default class AuthController {
   @ApiBadRequestResponse({ description: 'Form data validation failed.', type: ApiExceptionResponse })
   @ApiUnprocessableEntityResponse({ description: 'New account in suspended status.', type: ApiExceptionResponse })
   @ApiImplicitBody({ name: 'LoginCredentialDTO', description: 'User account form data.', type: LoginCredentialDTO })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error.', type: ApiExceptionResponse })
   async login(@Body() form: LoginCredentialDTO, @Res() response: Response): Promise<void> {
     const credential: LoginResponseDTO = await this.authService.login(form);
 
     if (credential && credential.accountStatus === AccountStatus.ACTIVE) {
       const body: LoginResponse = this.responseUtil.rebuildResponse(credential);
       response.cookie('EPSESSION', credential.sessionId, {
-        maxAge: Number(this.config.get('SESSION_EXPIRES')),
+        maxAge: +this.config.get('SESSION_EXPIRES') * 1000,
         httpOnly: true,
         secure: true,
       });
@@ -89,6 +91,7 @@ export default class AuthController {
   @ApiNoContentResponse({ description: 'User successfuly logged-out.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized logout', type: ApiExceptionResponse })
   @ApiNotFoundResponse({ description: 'Session invalid', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error.', type: ApiExceptionResponse })
   async logout(@Req() request: Request, @Res() response: Response): Promise<void> {
     const { EPSESSION: sessionId } = request.cookies;
     const loggedOut: boolean = await this.authService.logout(sessionId);
@@ -105,6 +108,7 @@ export default class AuthController {
   @ApiImplicitBody({ name: 'PasswordResetDTO', description: 'Password reset form data.', type: PasswordResetDTO })
   @ApiOkResponse({ description: 'Account password changed.', type: LoginResponse })
   @ApiBadRequestResponse({ description: 'User password reset form validation failed.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error.', type: ApiExceptionResponse })
   async passwordResetUpdate(@Body() form: PasswordResetDTO, @Param('key') key: string, @Param('token') token: string): Promise<LoginResponse> {
     const data: LoginResponseDTO = await this.authService.passwordReset(form, key, token);
 
@@ -117,6 +121,7 @@ export default class AuthController {
   @ApiImplicitBody({ name: 'PasswordResetRequestDTO', description: 'Password reset request form data.', type: PasswordResetRequestDTO })
   @ApiCreatedResponse({ description: 'Successful request to reset password.', type: PasswordResetResponse })
   @ApiBadRequestResponse({ description: 'User account email validation failed.', type: ApiExceptionResponse })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error.', type: ApiExceptionResponse })
   async passwordResetRequest(@Body() form: PasswordResetRequestDTO): Promise<PasswordResetResponse> {
     const data: boolean = await this.authService.prePasswordReset(form);
 
@@ -127,6 +132,7 @@ export default class AuthController {
   @UseInterceptors(ResponseRebuildInterceptor)
   @ApiOperation({ title: 'Available Auth Services', description: 'Get a list of available auth services.' })
   @ApiOkResponse({ description: 'List of auth services.', type: AuthServicesResponse })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error.', type: ApiExceptionResponse })
   async services(): Promise<AuthServicesResponse> {
     const data: Service[] = await this.authService.getBackofficeAuthService();
 
