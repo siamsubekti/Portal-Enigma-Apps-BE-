@@ -3,6 +3,11 @@ import { IsDefined, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
 import { IApiResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
 
+export class CaptchaDTO {
+  id: string;
+  text: string;
+}
+
 export class AccountRegisterDTO {
   @IsDefined()
   @IsNotEmpty()
@@ -38,6 +43,11 @@ export class AccountRegisterDTO {
   @IsNotEmpty()
   @ApiModelProperty({type: 'string', description: 'Birthdate.', required: true, example: '03-12-1995'})
   birthDate: string;
+
+  @IsDefined()
+  @IsNotEmpty()
+  @ApiModelProperty({type: 'string', description: 'Captcha.', required: true })
+  captcha: CaptchaDTO;
 }
 
 export class AccountRegisterResponseDTO {

@@ -33,7 +33,7 @@ export default class RegisterService {
     private readonly templateUtil: TemplateUtil,
     private readonly redisService: RedisService,
     private readonly config: AppConfig,
-  ) {}
+  ) { }
 
   async preActivation(key: string, token: string): Promise<AccountRegisterDTO> {
     const client: IORedis.Redis = await this.redisService.getClient();
@@ -87,7 +87,7 @@ export default class RegisterService {
       account.profile = profile;
       account.status = AccountStatus.ACTIVE;
       account.accountType = AccountType.CANDIDATE;
-      account.roles = Promise.resolve((await this.roleService.all({term: 'CANDIDATE'})).result as Role[]);
+      account.roles = Promise.resolve((await this.roleService.all({ term: 'CANDIDATE' })).result as Role[]);
       account = await this.accountService.save(account);
 
       const client: IORedis.Redis = await this.redisService.getClient();
@@ -100,6 +100,14 @@ export default class RegisterService {
 
   private async validateForm(form: AccountRegisterDTO): Promise<void> {
     const validator: Validator = new Validator();
+    const client: IORedis.Redis = this.redisService.getClient();
+    const captcha: { data: string, text: string } = client.exists(form.captcha.id) ? JSON.parse(await client.get(form.captcha.id)) : null;
+
+    if (!captcha || (captcha && !validator.equals(form.captcha.text, captcha.text)))
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: `Form validation failed: invalid captcha value.`,
+      }, HttpStatus.BAD_REQUEST);
 
     if (await this.accountService.countByUsername(form.username) > 0)
       throw new HttpException({
@@ -145,7 +153,7 @@ export default class RegisterService {
       });
 
       if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
-      return ( response ? true : false);
+      return (response ? true : false);
     } catch (exception) {
       Logger.error(exception, exception, 'RegisterService@sendActivationEmail');
 
