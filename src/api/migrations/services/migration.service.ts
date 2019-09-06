@@ -507,7 +507,7 @@ export default class MigrationService {
       {
         code: 'CANDIDATE',
         name: 'Candidate',
-        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) > -1),
+        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD', 'CAND_DOCUMENT_LINK'].indexOf(service.code) > -1),
         menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) > -1),
       },
       {
