@@ -15,24 +15,26 @@ import AppConfig from '../../../config/app.config';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import MailerUtil from '../../../libraries/mailer/mailer.util';
 import TemplateUtil from '../../../libraries/utilities/template.util';
-import Profile from '../../accounts/models/profile.entity';
+import Role from '../../master/roles/models/role.entity';
+import RoleService from '../../master/roles/services/role.service';
 import Account from '../../accounts/models/account.entity';
 import AccountService from '../../accounts/services/account.service';
+import Profile from '../../accounts/models/profile.entity';
 import ProfileService from '../../accounts/services/profile.service';
-import RoleService from '../../master/roles/services/role.service';
-import Role from '../../master/roles/models/role.entity';
+import CaptchaService from './captcha.service';
 
 @Injectable()
 export default class RegisterService {
   constructor(
-    private readonly accountService: AccountService,
-    private readonly profileService: ProfileService,
-    private readonly roleService: RoleService,
+    private readonly config: AppConfig,
     private readonly hashUtil: HashUtil,
     private readonly mailUtil: MailerUtil,
     private readonly templateUtil: TemplateUtil,
     private readonly redisService: RedisService,
-    private readonly config: AppConfig,
+    private readonly roleService: RoleService,
+    private readonly accountService: AccountService,
+    private readonly profileService: ProfileService,
+    private readonly captchaService: CaptchaService,
   ) { }
 
   async preActivation(key: string, token: string): Promise<AccountRegisterDTO> {
@@ -65,6 +67,7 @@ export default class RegisterService {
     const credential: AccountRegistrationCredential = await this.storeRegistrationData(form);
     this.sendActivationEmail(credential);
 
+    this.captchaService.destroy(form.captcha.token);
     return {
       accountId: credential.key,
       status: 'NEW',
@@ -78,7 +81,7 @@ export default class RegisterService {
       profile.nickname = this.getNickname(form.fullname);
       profile.email = form.username;
       profile.phone = form.phone;
-      profile.birthdate = moment(form.birthDate, 'DD-MM-YYYY').toDate();
+      profile.birthdate = form.birthdate;
       profile = await this.profileService.save(profile);
 
       let account: Account = new Account();
@@ -100,14 +103,7 @@ export default class RegisterService {
 
   private async validateForm(form: AccountRegisterDTO): Promise<void> {
     const validator: Validator = new Validator();
-    const client: IORedis.Redis = this.redisService.getClient();
-    const captcha: { data: string, text: string } = client.exists(form.captcha.id) ? JSON.parse(await client.get(form.captcha.id)) : null;
-
-    if (!captcha || (captcha && !validator.equals(form.captcha.text, captcha.text)))
-      throw new HttpException({
-        status: HttpStatus.BAD_REQUEST,
-        error: `Form validation failed: invalid captcha value.`,
-      }, HttpStatus.BAD_REQUEST);
+    const { captcha: { token, answer } } = form;
 
     if (await this.accountService.countByUsername(form.username) > 0)
       throw new HttpException({
@@ -119,6 +115,12 @@ export default class RegisterService {
       throw new HttpException({
         status: HttpStatus.BAD_REQUEST,
         error: `Form validation failed: please type the same exact value as password field in the confirmPassword field.`,
+      }, HttpStatus.BAD_REQUEST);
+
+    if (!(await this.captchaService.verify(token, answer)))
+      throw new HttpException({
+        status: HttpStatus.BAD_REQUEST,
+        error: `Form validation failed: invalid captcha answer.`,
       }, HttpStatus.BAD_REQUEST);
   }
 

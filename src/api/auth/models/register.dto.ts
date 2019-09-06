@@ -1,11 +1,36 @@
 import { ApiModelProperty } from '@nestjs/swagger';
-import { IsDefined, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsDefined, IsNotEmpty, MaxLength, MinLength, Length } from 'class-validator';
 import { IApiResponse } from '../../../libraries/responses/response.interface';
 import { ResponseStatus } from '../../../libraries/responses/response.class';
 
 export class CaptchaDTO {
-  id: string;
-  text: string;
+  @ApiModelProperty({type: 'string', description: 'Captcha token.', required: true})
+  @IsDefined()
+  @IsNotEmpty()
+  @Length(32)
+  token: string;
+
+  @ApiModelProperty({type: 'string', description: 'Captcha answer.', required: true})
+  @IsDefined()
+  @IsNotEmpty()
+  @Length(5)
+  answer: string;
+}
+
+export class CaptchaResponseDTO {
+  @ApiModelProperty({type: 'string', description: 'Captcha token.', required: true})
+  token: string;
+
+  @ApiModelProperty({type: 'string', description: 'Captcha token.', required: true})
+  image: string;
+}
+
+export class CaptchaResponse {
+  @ApiModelProperty({type: ResponseStatus, description: 'Response status', required: true})
+  status: ResponseStatus;
+
+  @ApiModelProperty({type: CaptchaResponseDTO, description: 'Response data', required: true})
+  data: CaptchaResponseDTO;
 }
 
 export class AccountRegisterDTO {
@@ -42,11 +67,11 @@ export class AccountRegisterDTO {
   @IsDefined()
   @IsNotEmpty()
   @ApiModelProperty({type: 'string', description: 'Birthdate.', required: true, example: '03-12-1995'})
-  birthDate: string;
+  birthdate: Date;
 
   @IsDefined()
   @IsNotEmpty()
-  @ApiModelProperty({type: 'string', description: 'Captcha.', required: true })
+  @ApiModelProperty({type: CaptchaDTO, description: 'Captcha answer.', required: true })
   captcha: CaptchaDTO;
 }
 

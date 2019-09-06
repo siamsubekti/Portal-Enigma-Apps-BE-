@@ -1,3 +1,5 @@
+import { IORedis } from 'redis';
+import { RedisService } from 'nestjs-redis';
 import { Injectable, Logger } from '@nestjs/common';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import ServicesService from '../../master/services/services/services.service';
@@ -32,6 +34,7 @@ export default class MigrationService {
   private roles: { [key: string]: Role } = {};
 
   constructor(
+    private readonly redisService: RedisService,
     private readonly service: ServicesService,
     private readonly menu: MenuService,
     private readonly role: RoleService,
@@ -41,10 +44,25 @@ export default class MigrationService {
   ) {}
 
   async start(): Promise<void> {
-    await this.createDefaultServices();
-    await this.createDefaultMenus();
-    await this.createRoles();
-    await this.createAccounts();
+    if (!this.migrated()) {
+      await this.createDefaultServices();
+      await this.createDefaultMenus();
+      await this.createRoles();
+      await this.createAccounts();
+      await this.setMigrated();
+    } else
+      Logger.error(`Migration already done in ${process.env.NODE_ENV} environment.`, undefined, 'MigrationService@start', true);
+  }
+
+  private migrated(): boolean {
+    const client: IORedis.Redis = this.redisService.getClient();
+    return (client.exists('migrated') && client.get('migrated') === 'true');
+  }
+
+  private async setMigrated(): Promise<void> {
+    const client: IORedis.Redis = this.redisService.getClient();
+
+    client.set('migrated', (process.env.NODE_ENV === 'production'));
   }
 
   private async createDefaultServices(): Promise<void> {
@@ -103,6 +121,13 @@ export default class MigrationService {
         name: 'Candidate Password Reset Update Service',
         endpointUrl: '/auth/candidate/password/reset',
         method: HttpMethod.PUT,
+        serviceType: ServiceType.PUBLIC,
+      },
+      {
+        code: 'CAND_CAPTCHA_REQUEST',
+        name: 'New Candidate Registration Captcha Image Request',
+        endpointUrl: '/auth/request',
+        method: HttpMethod.GET,
         serviceType: ServiceType.PUBLIC,
       },
       {
@@ -491,46 +516,51 @@ export default class MigrationService {
   }
 
   private async createRoles(): Promise<void> {
-    const data: RoleDTO[] = [
-      {
-        code: 'ADMIN',
-        name: 'Administrator',
-        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) < 0),
-        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) < 0),
-      },
-      {
-        code: 'STAFF',
-        name: 'Staff',
-        services: [],
-        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
-      },
-      {
-        code: 'CANDIDATE',
-        name: 'Candidate',
-        services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD', 'CAND_DOCUMENT_LINK'].indexOf(service.code) > -1),
-        menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) > -1),
-      },
-      {
-        code: 'TRAINEE',
-        name: 'Trainee',
-        services: [],
-        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
-      },
-      {
-        code: 'TRAINER',
-        name: 'Trainer',
-        services: [],
-        menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
-      },
-    ];
+    try {
+      const data: RoleDTO[] = [
+        {
+          code: 'ADMIN',
+          name: 'Administrator',
+          services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD'].indexOf(service.code) < 0),
+          menus: this.menus.filter((menu: Menu) => ['CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) < 0),
+        },
+        {
+          code: 'STAFF',
+          name: 'Staff',
+          services: [],
+          menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+        },
+        {
+          code: 'CANDIDATE',
+          name: 'Candidate',
+          services: this.services.filter((service: Service) => ['CAND_PROFILE_UPDATE', 'RES_DOCUMENT_UPLOAD', 'RES_DOCUMENT_DOWNLOAD', 'CAND_DOCUMENT_LINK'].indexOf(service.code) > -1),
+          menus: this.menus.filter((menu: Menu) => ['HOME', 'CANDIDATE_PROFILE', 'CANDIDATE_RESUME', 'CANDIDATE_UPLOAD_CV'].indexOf(menu.code) > -1),
+        },
+        {
+          code: 'TRAINEE',
+          name: 'Trainee',
+          services: [],
+          menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+        },
+        {
+          code: 'TRAINER',
+          name: 'Trainer',
+          services: [],
+          menus: this.menus.filter((menu: Menu) => menu.code === 'HOME'),
+        },
+      ];
 
-    Logger.log(`Creating ${data.length} roles...`);
-    const roles: Role[] = await this.role.createBulk(data);
+      Logger.log(`Creating ${data.length} roles...`);
+      const roles: Role[] = await this.role.createBulk(data);
 
-    roles.forEach((role: Role) => {
-      Logger.log(`Role ${role.code} created.`);
-      this.roles[ role.code ] = role;
-    });
+      roles.forEach((role: Role) => {
+        Logger.log(`Role ${role.code} created.`);
+        this.roles[ role.code ] = role;
+      });
+    } catch (exception) {
+      console.error(exception);
+      throw exception;
+    }
   }
 
   private async createAccounts(): Promise<void> {
@@ -588,160 +618,162 @@ export default class MigrationService {
 
     Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate One',
-      nickname: 'canone',
-      email: 'candidate1@candidates.com',
-      phone: '-',
-      gender: ProfileGender.FEMALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2000, 1, 1, 0, 0, 0, 0),
-    });
+    if (process.env.NODE_ENV === 'local') {
+      profile = this.profile.repository().create({
+        fullname: 'Candidate One',
+        nickname: 'canone',
+        email: 'candidate1@candidates.com',
+        phone: '-',
+        gender: ProfileGender.FEMALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2000, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate1@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate1@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate Two',
-      nickname: 'cantwo',
-      email: 'candidate2@candidates.com',
-      phone: '-',
-      gender: ProfileGender.MALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2001, 1, 1, 0, 0, 0, 0),
-    });
+      profile = this.profile.repository().create({
+        fullname: 'Candidate Two',
+        nickname: 'cantwo',
+        email: 'candidate2@candidates.com',
+        phone: '-',
+        gender: ProfileGender.MALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2001, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate2@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate2@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate Three',
-      nickname: 'canthree',
-      email: 'candidate3@candidates.com',
-      phone: '-',
-      gender: ProfileGender.MALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2002, 1, 1, 0, 0, 0, 0),
-    });
+      profile = this.profile.repository().create({
+        fullname: 'Candidate Three',
+        nickname: 'canthree',
+        email: 'candidate3@candidates.com',
+        phone: '-',
+        gender: ProfileGender.MALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2002, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate3@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate3@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate Four',
-      nickname: 'canfour',
-      email: 'candidate4@candidates.com',
-      phone: '-',
-      gender: ProfileGender.MALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2003, 1, 1, 0, 0, 0, 0),
-    });
+      profile = this.profile.repository().create({
+        fullname: 'Candidate Four',
+        nickname: 'canfour',
+        email: 'candidate4@candidates.com',
+        phone: '-',
+        gender: ProfileGender.MALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2003, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate4@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate4@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate Five',
-      nickname: 'canfive',
-      email: 'candidate5@candidates.com',
-      phone: '-',
-      gender: ProfileGender.MALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2004, 1, 1, 0, 0, 0, 0),
-    });
+      profile = this.profile.repository().create({
+        fullname: 'Candidate Five',
+        nickname: 'canfive',
+        email: 'candidate5@candidates.com',
+        phone: '-',
+        gender: ProfileGender.MALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2004, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate5@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate5@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
 
-    profile = this.profile.repository().create({
-      fullname: 'Candidate Six',
-      nickname: 'cansix',
-      email: 'candidate6@candidates.com',
-      phone: '-',
-      gender: ProfileGender.MALE,
-      religion: ProfileReligion.ISLAM,
-      maritalStatus: ProfileMaritalStatus.SINGLE,
-      birthdate: new Date(2005, 1, 1, 0, 0, 0, 0),
-    });
+      profile = this.profile.repository().create({
+        fullname: 'Candidate Six',
+        nickname: 'cansix',
+        email: 'candidate6@candidates.com',
+        phone: '-',
+        gender: ProfileGender.MALE,
+        religion: ProfileReligion.ISLAM,
+        maritalStatus: ProfileMaritalStatus.SINGLE,
+        birthdate: new Date(2005, 1, 1, 0, 0, 0, 0),
+      });
 
-    account = this.account.repository().create({
-      username: 'candidate6@candidates.com',
-      password: await this.hash.create('P@ssw0rd'),
-      status: AccountStatus.ACTIVE,
-      accountType: AccountType.CANDIDATE,
-      profile,
-    });
+      account = this.account.repository().create({
+        username: 'candidate6@candidates.com',
+        password: await this.hash.create('P@ssw0rd'),
+        status: AccountStatus.ACTIVE,
+        accountType: AccountType.CANDIDATE,
+        profile,
+      });
 
-    account = await this.account.save(account);
-    account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
+      account = await this.account.save(account);
+      account.roles = Promise.resolve([ this.roles['CANDIDATE'] ]);
 
-    await this.account.save(account);
+      await this.account.save(account);
 
-    Logger.log(`Account ${account.username} created.`);
+      Logger.log(`Account ${account.username} created.`);
+    }
   }
 }
