@@ -3,7 +3,7 @@ import { ApiUseTags, ApiOperation, ApiOkResponse, ApiInternalServerErrorResponse
 import { ResponseRebuildInterceptor } from '../../../libraries/responses/response.interceptor';
 import CaptchaService from '../services/captcha.service';
 import { CaptchaResponse, CaptchaResponseDTO } from '../models/register.dto';
-import { ApiExceptionResponse } from 'src/libraries/responses/response.type';
+import { ApiExceptionResponse } from '../../../libraries/responses/response.type';
 
 @ApiUseTags('Authentication')
 @Controller('auth')
