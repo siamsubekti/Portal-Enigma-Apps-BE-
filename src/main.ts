@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
 
   generateSwagger(app);
 
-  app.enableCors({ origin: process.env.API_DOMAIN, credentials: true });
+  // app.enableCors({ origin: process.env.API_DOMAIN, credentials: true });
   app.use(compression());
   app.use(helmet());
   app.use(cookieParser());
