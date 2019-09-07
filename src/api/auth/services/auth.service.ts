@@ -41,7 +41,7 @@ export default class AuthService {
     try {
       return this.accountService.buildAccountPrivileges(accountId);
     } catch (error) {
-      Logger.error('');
+      Logger.error(error, undefined, 'AuthService@getAccountPrivileges', true);
       return undefined;
     }
   }
@@ -80,7 +80,7 @@ export default class AuthService {
 
       return loginResponse;
     } catch (error) {
-      Logger.error(error);
+      Logger.error(error, undefined, 'AuthService@login', true);
       return null;
     }
   }
@@ -96,7 +96,7 @@ export default class AuthService {
         return !(await client.exists(sessionId));
       }
     } catch (error) {
-      Logger.error(error, undefined, 'AuthService');
+      Logger.error(error, undefined, 'AuthService@logout', true);
       return false;
     }
   }
@@ -199,7 +199,7 @@ export default class AuthService {
       return account;
 
     } catch (error) {
-      Logger.error(error, undefined, 'AuthService');
+      Logger.error(error, undefined, 'AuthService@validateSession', true);
       return null;
     }
   }
@@ -211,7 +211,7 @@ export default class AuthService {
     const payload: JwtPayload = { aid: account.id };
     const token: string = jwtSign(payload, this.config.get('HASH_SECRET'), { expiresIn });
 
-    Logger.log({account, sessionId, token}, 'AuthService@createSession', true);
+    // Logger.log({account, sessionId, token}, 'AuthService@createSession', true);
     await client.set(sessionId, token);
     await client.expire(sessionId, expiresIn);
     return sessionId;
@@ -238,7 +238,7 @@ export default class AuthService {
       const response: any = await this.mailUtil.send(config);
       return (response ? true : false);
     } catch (exception) {
-      Logger.error(exception, undefined, 'AuthService @sendPasswordResetEmail', true);
+      Logger.error(exception, undefined, 'AuthService@sendPasswordResetEmail', true);
 
       return false;
     }

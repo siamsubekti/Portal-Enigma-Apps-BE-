@@ -217,7 +217,7 @@ export default class AccountService {
 
       await this.account.delete(account);
     } catch (error) {
-      Logger.log(error);
+      Logger.error(error, undefined, 'AccountService@resetPassword', true);
 
       throw error;
     }
@@ -282,10 +282,10 @@ export default class AccountService {
         html,
       });
 
-      if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
+      if (response) Logger.log(`User account activation email sent to ${to}.`, 'AccountService@sendAccountCreatedEmail', true);
       return (response ? true : false);
     } catch (exception) {
-      Logger.error(exception, exception, 'AccountService@sendAccountCreatedEmail', true);
+      Logger.error(exception, undefined, 'AccountService@sendAccountCreatedEmail', true);
 
       return false;
     }

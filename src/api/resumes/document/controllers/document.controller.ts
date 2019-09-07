@@ -61,7 +61,7 @@ export default class DocumentController {
     const documentPath: string =  document ? join(process.env.BASE_PATH, process.env.UPLOAD_LOCATION, document.filepath) : null;
 
     if (!documentPath && !existsSync(documentPath)) {
-      Logger.error(`File ${documentPath} cannot be found.`);
+      Logger.error(`File ${documentPath} cannot be found.`, undefined, 'DocumentController@download', true);
       throw new NotFoundException(`File ${filename} (${accountId}) not found.`);
     }
 
