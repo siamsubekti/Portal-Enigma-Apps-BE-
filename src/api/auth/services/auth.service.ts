@@ -63,6 +63,7 @@ export default class AuthService {
           sessionId: account.status === AccountStatus.ACTIVE ? await this.createSession(account) : null,
           redirectTo: account.status === AccountStatus.ACTIVE ? await this.service.findByCode('MST_ACCOUNT_PRIVILEGES') : null,
         };
+      else Logger.warn('Invalid account credential.');
 
       // Logger.log(account, 'AuthService@login', true);
 
@@ -70,17 +71,17 @@ export default class AuthService {
         const { key, token } = await this.prePasswordCreate(account);
 
         loginResponse.sessionId = `${key}/${token}`;
-      }
+      } else Logger.log(`Account status ${account.status} (not suspended).`);
 
       // Logger.log({ account }, 'AuthService@login', true);
       if (account.status === AccountStatus.ACTIVE) {
         account.lastlogin = moment().toDate();
         await this.accountService.save(account);
-      }
+      } else Logger.log(`Account status ${account.status} (not active).`);
 
       return loginResponse;
     } catch (error) {
-      Logger.error(error);
+      Logger.error(error, undefined, 'AuthService@login', true);
       return null;
     }
   }
