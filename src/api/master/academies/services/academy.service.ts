@@ -62,7 +62,7 @@ export default class AcademyService {
             const academy: Academy = await this.academyRepository.save(academyDTO);
             return academy;
         } catch (error) {
-            Logger.error(error);
+            Logger.error(error, undefined, 'AcademyService@insert', true);
             throw new InternalServerErrorException('Internal Server Error');
         }
     }

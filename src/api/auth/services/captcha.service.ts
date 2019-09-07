@@ -2,7 +2,7 @@ import * as captcha from 'svg-captcha';
 import { Validator } from 'class-validator';
 import { IORedis } from 'redis';
 import { RedisService } from 'nestjs-redis';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CaptchaResponseDTO } from '../models/register.dto';
 import HashUtil from '../../../libraries/utilities/hash.util';
 import AppConfig from '../../../config/app.config';
@@ -26,7 +26,7 @@ export default class CaptchaService {
     const dbToken: string = await client.get(token);
     const valid: boolean = ( await client.exists(token) && dbToken && validator.equals(answer, dbToken) );
 
-    Logger.log(`token: ${token}, answer: ${answer}, db: ${dbToken}, valid: ${valid}`);
+    // Logger.log(`token: ${token}, answer: ${answer}, db: ${dbToken}, valid: ${valid}`);
 
     return valid;
   }
@@ -36,7 +36,7 @@ export default class CaptchaService {
     const { data: image, text: answer } = await captcha.create(options);
     const token: string = await this.storeCaptchaData(answer);
 
-    Logger.log(`token: ${token}, answer: ${answer}`);
+    // Logger.log(`token: ${token}, answer: ${answer}`);
     return { token, image };
   }
 

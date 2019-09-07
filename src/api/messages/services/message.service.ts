@@ -115,18 +115,17 @@ export default class MessageService {
           { sender, subject, content, name, baseUrl: this.config.get('FRONTEND_PORTAL_URL')},
         );
 
-        const response: any = await this.mailUtil.send({
+        await this.mailUtil.send({
           from: this.config.get('MAIL_SENDER'),
           to: `${name}<${to}>`,
           subject,
           html,
         });
 
-        Logger.log(response);
+        // Logger.log(response);
       }
     } catch (exception) {
-      Logger.error('NOTIFICATION EMAIL FAILURE.', undefined, 'MessageService@sendNotificationEmail', true);
-      console.error(exception);
+      Logger.error(exception, undefined, 'MessageService@sendNotificationEmail', true);
     }
   }
 }

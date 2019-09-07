@@ -48,7 +48,7 @@ export default class MajorService {
             const major: Major = await this.majorRepository.save(majorDTO);
             return major;
         } catch (error) {
-            Logger.error(error);
+            Logger.error(error, undefined, 'MajorService@insertMajor', true);
             throw new InternalServerErrorException('Internal Server Error');
         }
     }

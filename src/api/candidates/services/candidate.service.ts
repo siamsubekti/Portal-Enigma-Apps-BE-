@@ -1,5 +1,5 @@
 import * as moment from 'moment-timezone';
-import { Injectable, BadRequestException, Logger } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
 import { AccountType } from '../../../config/constants';
@@ -47,13 +47,11 @@ export default class CandidateService {
         .orWhere('p.email LIKE :term', { term });
     }
 
-    if (startDate && startDate.isValid() && !endDate) {
+    if (startDate && startDate.isValid() && !endDate)
       query.andWhere('DATE(a.created_at) = :startDate', { startDate: startDate.format('YYYY-MM-DD') });
-      Logger.log(`start date only ${startDate.toDate()}`);
-    } else if (startDate && endDate && this.validatorUtil.validateDateBetween(startDate, endDate)) {
+    else if (startDate && endDate && this.validatorUtil.validateDateBetween(startDate, endDate))
       query.andWhere('DATE(a.created_at) BETWEEN :startDate AND :endDate', { startDate: startDate.format('YYYY-MM-DD'), endDate: endDate.format('YYYY-MM-DD') });
-      Logger.log(`start date (${startDate.toDate()}) between end date (${endDate.toDate()})`);
-    } else if (startDate && endDate && !this.validatorUtil.validateDateBetween(startDate, endDate))
+    else if (startDate && endDate && !this.validatorUtil.validateDateBetween(startDate, endDate))
       throw new BadRequestException('Validation failed for start and end date range, end date cannot be earlier than start date, both date range must be a valid date.');
 
     query.andWhere('a.account_type = :type', { type: AccountType.CANDIDATE });

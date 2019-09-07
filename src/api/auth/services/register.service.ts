@@ -52,7 +52,7 @@ export default class RegisterService {
 
       return payload.account;
     } catch (exception) {
-      Logger.error(exception, undefined, 'RegisterService', true);
+      Logger.error(exception, undefined, 'RegisterService@preActivation', true);
 
       throw new HttpException({
         status: HttpStatus.BAD_REQUEST,
@@ -154,10 +154,10 @@ export default class RegisterService {
         html,
       });
 
-      if (response) Logger.log(`Candidate account activation email sent to ${to}.`);
+      if (response) Logger.log(`Candidate account activation email sent to ${to}.`, 'RegisterService@sendActivationEmail', true);
       return (response ? true : false);
     } catch (exception) {
-      Logger.error(exception, exception, 'RegisterService@sendActivationEmail');
+      Logger.error(exception, undefined, 'RegisterService@sendActivationEmail', true);
 
       return false;
     }
