@@ -89,7 +89,7 @@ export default class AuthService {
   async logout(sessionId: string): Promise<boolean> {
     try {
       const client: IORedis.Redis = await this.redisService.getClient();
-      const deleted: boolean = ( await client.unlink(sessionId) > 0 );
+      const deleted: boolean = ( await client.del(sessionId) > 0 );
 
       if ( deleted ) Logger.log(`Session ID ${sessionId} deleted.`, 'AuthService@logout', true);
       else Logger.warn(`Invalid session ID ${sessionId}.`, 'AuthService@logout', true);
