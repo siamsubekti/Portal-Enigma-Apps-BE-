@@ -79,7 +79,6 @@ export default class AccountService {
     const profile: Profile = account.profile;
     profile.fullname = data.fullname;
     profile.nickname = data.nickname || data.fullname.substring(0, data.fullname.indexOf(' '));
-    profile.email = data.email;
     profile.phone = data.phone;
     profile.birthdate = moment(data.birthdate, 'DD-MM-YYYY').toDate();
     profile.gender = data.gender;
