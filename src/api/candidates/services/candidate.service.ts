@@ -2,7 +2,7 @@ import * as moment from 'moment-timezone';
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder, Like } from 'typeorm';
-import { AccountType } from '../../../config/constants';
+import { AccountType, AccountStatus } from '../../../config/constants';
 import { AccountQueryResult, AccountProfileDTO } from '../../../api/accounts/models/account.dto';
 import { CandidateQueryDTO } from '../models/candidate.dto';
 import ValidatorUtil from '../../../libraries/utilities/validator.util';
@@ -54,6 +54,7 @@ export default class CandidateService {
     else if (startDate && endDate && !this.validatorUtil.validateDateBetween(startDate, endDate))
       throw new BadRequestException('Validation failed for start and end date range, end date cannot be earlier than start date, both date range must be a valid date.');
 
+    query.andWhere('a.status = :status', { status: AccountStatus.ACTIVE});
     query.andWhere('a.account_type = :type', { type: AccountType.CANDIDATE });
     query.orderBy(queryParams.order ? orderCols[queryParams.order] : orderCols.fullname, sort);
     query.offset(offset);
