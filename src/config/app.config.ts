@@ -11,35 +11,35 @@ import { existsSync, readFileSync } from 'fs';
 
 @Injectable()
 export default class AppConfig {
-  private readonly configurations: dotenv.DotenvParseOutput;
   private readonly packageJson: { [key: string]: string };
 
   constructor() {
-    this.configurations = this.configure();
+    // this.configurations = this.configure();
+    this.configure();
     this.packageJson = require(join(root.get(), 'package.json'));
   }
 
-  private configure(): dotenv.DotenvParseOutput {
-    const { parsed: config, error} = dotenv.config();
-    const saltbae: string = bcrypt.genSaltSync(Number(config['HASH_SALTROUNDS']));
+  private configure(): void {
+    if (!process.env.HASH_KEY) {
+      const { parsed: config, error} = dotenv.config();
+      const saltbae: string = bcrypt.genSaltSync(Number(config['HASH_SALTROUNDS']));
 
-    if (error) throw new Error(`Unable to load environment variables from the root of app directory.`);
+      if (error) throw new Error(`Unable to load environment variables from the root of app directory.`);
 
-    process.env.HASH_SECRET = config['HASH_SECRET'] = bcrypt.hashSync(md5(`${config['HASH_KEY']}x${moment().valueOf()}`), saltbae);
-    process.env.BASE_PATH = config['BASE_PATH'] = root.get();
-    process.env.SRC_PATH = config['SRC_PATH'] = join(root.get(), 'src');
-    process.env.SSL_KEY = config['SSL_KEY'] = join(root.get(), config['SSL_KEY']);
-    process.env.SSL_CERT = config['SSL_CERT'] = join(root.get(), config['SSL_CERT']);
+      process.env.HASH_SECRET = config['HASH_SECRET'] = bcrypt.hashSync(md5(`${config['HASH_KEY']}x${moment().valueOf()}`), saltbae);
+      process.env.BASE_PATH = config['BASE_PATH'] = root.get();
+      process.env.SRC_PATH = config['SRC_PATH'] = join(root.get(), 'src');
+      process.env.SSL_KEY = config['SSL_KEY'] = join(root.get(), config['SSL_KEY']);
+      process.env.SSL_CERT = config['SSL_CERT'] = join(root.get(), config['SSL_CERT']);
 
-    Logger.log(`${Object.keys(config).length} ${process.env.NODE_ENV} configuration items loaded.`, 'AppConfig', true);
-    // Logger.debug(`SECRET: ${config['HASH_SECRET']}`, 'AppConfig', true);
-    // Logger.debug(JSON.stringify(config), 'AppConfig', true);
-
-    return config;
+      Logger.log(`${Object.keys(config).length} ${process.env.NODE_ENV} configuration items loaded.`, 'AppConfig@configure', true);
+      // Logger.debug(`SECRET: ${config['HASH_SECRET']}`, 'AppConfig', true);
+      // Logger.debug(JSON.stringify(config), 'AppConfig', true);
+    }
   }
 
   get(key: string): string {
-    return process.env[ key ] || this.configurations[ key ] || null;
+    return process.env[ key ] || null;
   }
 
   getPackageInfo(key: string): string {
